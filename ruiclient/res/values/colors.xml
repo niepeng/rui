@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <color name="dialog_title">#5f9dd3</color>
+    <color name="dialog_title_bottom_divider">#5f9dd3</color>
+    <color name="dialog_with_listview_divider">#19000000</color>
+
+</resources>

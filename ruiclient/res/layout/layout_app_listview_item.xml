@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    style="@style/listview_item" >
+
+    <ImageView
+        android:id="@+id/icon"
+        style="@style/listview_item_icon" />
+
+    <TextView
+        android:id="@+id/title"
+        style="@style/listview_item_title" />
+
+</LinearLayout>

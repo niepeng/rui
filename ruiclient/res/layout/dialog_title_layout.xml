@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:doit="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/title_wrap"
+    style="@style/dialog_title_wrap" >
+
+    <TextView
+        android:id="@+id/title"
+        style="@style/dialog_title" />
+
+    <View style="@style/dialog_title_bottom_line" />
+
+</RelativeLayout>

@@ -7,5 +7,10 @@
     <string name="title_section3">下载排行</string>
     <string name="title_section4">猜你喜欢</string>
     <string name="action_settings">Settings</string>
+    
+    <string name="upgrade_version">升级</string>
+    <string name="about_us">关于我们</string>
+    <string name="feedback">反馈</string>
+    <string name="help_center">帮助中心</string>
 
 </resources>
