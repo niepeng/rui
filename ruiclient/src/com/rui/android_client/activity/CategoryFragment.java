@@ -130,6 +130,7 @@ public class CategoryFragment extends Fragment {
 		protected void onPostExecute(HttpResponse result) {
 			// TODO Auto-generated method stub
 			super.onPostExecute(result);
+			mListAdapter.notifyDataSetChanged();
 			DProgressDialog.closeDialog(getActivity());
 			mGetAppTypesTask = null;
 		}
