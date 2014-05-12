@@ -5,6 +5,8 @@ import java.net.URL;
 
 import org.apache.http.HttpResponse;
 
+import com.rui.android_client.R;
+
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.os.AsyncTask;
@@ -14,6 +16,7 @@ import android.view.ViewGroup;
 import android.widget.AbsListView;
 import android.widget.AbsListView.OnScrollListener;
 import android.widget.BaseAdapter;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 
 public class AppListView {
@@ -66,6 +69,15 @@ public class AppListView {
 		public View getView(int position, View convertView, ViewGroup parent) {
 			// TODO Auto-generated method stub
 			return null;
+		}
+		
+		private class ViewHolder extends LinearLayout {
+
+			public ViewHolder(Context context) {
+				super(context);
+				View.inflate(context, R.layout.layout_app_listview_item, this);
+			}
+			
 		}
 
 	}
