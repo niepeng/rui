@@ -4,12 +4,15 @@ import java.util.Date;
 import java.util.Locale;
 import java.util.TimeZone;
 
+import net.tsz.afinal.FinalBitmap;
+
 import android.app.Application;
 import android.content.Context;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.PackageManager.NameNotFoundException;
 import android.graphics.Point;
+import android.graphics.Bitmap.CompressFormat;
 import android.os.Build;
 import android.util.DisplayMetrics;
 import android.view.Display;
@@ -22,6 +25,8 @@ public class RuiApp extends Application {
 	
 	public static Context context;
 	public static int SDK_INT;
+	
+	public static FinalBitmap fb;
 	
 	private boolean needInit = true;
 	
@@ -45,6 +50,9 @@ public class RuiApp extends Application {
 		SDK_INT = android.os.Build.VERSION.SDK_INT;
 		getScreenSize();
 		needInit = false;
+		
+		fb = FinalBitmap.create(this);// 初始化FinalBitmap模块
+		fb.configCompressFormat(CompressFormat.PNG);
 	}
 	
 	public static void getScreenSize() {

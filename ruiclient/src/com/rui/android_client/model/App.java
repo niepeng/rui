@@ -4,6 +4,8 @@ import java.util.Calendar;
 
 public class App {
 
+	private long id;
+	
 	// 链接地址
 	private String downUrl;
 
@@ -70,6 +72,14 @@ public class App {
 
 	// 评论数量
 	private int commentNum;
+	
+	public long getId() {
+		return id;
+	}
+	
+	public void setId(long id) {
+		this.id = id;
+	}
 
 	public String getDownUrl() {
 		return downUrl;

@@ -2,14 +2,17 @@ package com.rui.android_client.activity;
 
 import android.app.Activity;
 import android.os.Bundle;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.BaseAdapter;
-import android.widget.ListView;
+import android.widget.ImageView;
+import android.widget.TextView;
 
 import com.rui.android_client.R;
 
 public class AppDetailActivity extends Activity {
+	
+	private long appId;
+	
+	private ImageView iconView;
+	private TextView titleView;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -28,7 +31,7 @@ public class AppDetailActivity extends Activity {
 	}
 	
 	private void initData() {
-		
+		appId = getIntent().getLongExtra("ID", 0);
 	}
 	
 	private void initViewContent() {
