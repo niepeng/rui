@@ -9,10 +9,18 @@ import android.view.ViewGroup;
 import android.widget.Button;
 
 import com.rui.android_client.R;
+import com.rui.android_client.utils.ThreadAid;
+import com.rui.android_client.utils.ThreadListener;
+import com.rui.http.Config;
+import com.rui.http.RemoteManager;
+import com.rui.http.Request;
+import com.rui.http.Response;
 
 public class MoreFragment extends Fragment {
 
-	private Button upgradeBtn, aboutUsBtn, feedbackBtn, helpCenterBtn;
+	private Button upgradeBtn, aboutUsBtn, feedbackBtn;
+	
+	private RuiApp mApp;
 
 	public static MoreFragment newInstance() {
 		MoreFragment fragment = new MoreFragment();
@@ -24,16 +32,17 @@ public class MoreFragment extends Fragment {
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
+		
+		mApp = (RuiApp)getActivity().getApplication();
+		
 		View rootView = inflater.inflate(R.layout.fragment_more, null);
 		upgradeBtn = (Button) rootView.findViewById(R.id.upgrade_version_btn);
 		aboutUsBtn = (Button) rootView.findViewById(R.id.about_us_btn);
 		feedbackBtn = (Button) rootView.findViewById(R.id.feedback_btn);
-		helpCenterBtn = (Button) rootView.findViewById(R.id.help_center_btn);
 
 		upgradeBtn.setOnClickListener(onUpgradeVersionClick);
 		aboutUsBtn.setOnClickListener(onAboutUsClick);
 		feedbackBtn.setOnClickListener(onFeedbackClick);
-		helpCenterBtn.setOnClickListener(onHelpCenterClick);
 		
 		return rootView;
 	}
@@ -42,8 +51,9 @@ public class MoreFragment extends Fragment {
 
 		@Override
 		public void onClick(View v) {
-			// TODO Auto-generated method stub
-
+			RemoteManager remoteManager = RemoteManager.getPostOnceRemoteManager();
+			Request request = remoteManager.createPostRequest(Config.getConfig().getProperty(Config.Names.CHECK_UPDATE_URL));
+			mApp.asyInvoke(new ThreadAid(new CheckVersionCallbackListener(), request));
 		}
 	};
 
@@ -64,14 +74,19 @@ public class MoreFragment extends Fragment {
 
 		}
 	};
-
-	private View.OnClickListener onHelpCenterClick = new OnClickListener() {
+	
+	private class CheckVersionCallbackListener implements ThreadListener {
 
 		@Override
-		public void onClick(View v) {
+		public void onPostExecute(Response response) {
 			// TODO Auto-generated method stub
-
+			if (response != null && response.isSuccess()) {
+				
+			} else {
+				
+			}
 		}
-	};
+		
+	}
 
 }

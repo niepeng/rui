@@ -19,9 +19,4 @@
         style="@style/more_fragment_btn"
         android:text="@string/feedback" />
 
-    <Button
-        android:id="@+id/help_center_btn"
-        style="@style/more_fragment_btn"
-        android:text="@string/help_center" />
-
 </LinearLayout>

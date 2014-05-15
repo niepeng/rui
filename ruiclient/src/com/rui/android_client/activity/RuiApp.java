@@ -3,16 +3,17 @@ package com.rui.android_client.activity;
 import java.util.Date;
 import java.util.Locale;
 import java.util.TimeZone;
+import java.util.concurrent.Callable;
+import java.util.concurrent.Future;
 
 import net.tsz.afinal.FinalBitmap;
-
 import android.app.Application;
 import android.content.Context;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.PackageManager.NameNotFoundException;
-import android.graphics.Point;
 import android.graphics.Bitmap.CompressFormat;
+import android.graphics.Point;
 import android.os.Build;
 import android.util.DisplayMetrics;
 import android.view.Display;
@@ -20,6 +21,7 @@ import android.view.WindowManager;
 
 import com.rui.android_client.utils.DateUtils;
 import com.rui.android_client.utils.StringUtils;
+import com.rui.http.AsynchronizedInvoke;
 
 public class RuiApp extends Application {
 	
@@ -37,6 +39,8 @@ public class RuiApp extends Application {
 	private static int mVersionCode;
 	private static String mVersionName;
 	
+	private AsynchronizedInvoke asynchronizedInvoke;
+	
 	@Override
 	public void onCreate() {
 		super.onCreate();
@@ -53,6 +57,9 @@ public class RuiApp extends Application {
 		
 		fb = FinalBitmap.create(this);// 初始化FinalBitmap模块
 		fb.configCompressFormat(CompressFormat.PNG);
+		
+		asynchronizedInvoke = new AsynchronizedInvoke();
+		asynchronizedInvoke.init();
 	}
 	
 	public static void getScreenSize() {
@@ -151,6 +158,14 @@ public class RuiApp extends Application {
 			}
 		}
 		return mVersionName;
+	}
+	
+	public <V> Future<V> asyInvoke(Callable<V> callable) { 
+		return asynchronizedInvoke.invoke(callable);
+	}
+
+	public void asyCall(Runnable runnable) {
+		asynchronizedInvoke.call(runnable);
 	}
 
 }

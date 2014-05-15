@@ -17,9 +17,10 @@ public class GameFragment extends Fragment {
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
-		ListView rootView = (ListView) inflater.inflate(
-				R.layout.layout_app_listview, null);
-		mListView = new AppListView(getActivity(), rootView);
+		View rootView = inflater.inflate(R.layout.layout_app_listview, null);
+
+		mListView = new AppListView(getActivity(),
+				(ListView) rootView.findViewById(R.id.list_view));
 		// TODO
 		mListView.loadApps("");
 		return rootView;
