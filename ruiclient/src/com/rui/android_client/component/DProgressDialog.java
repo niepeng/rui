@@ -12,7 +12,7 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.rui.android_client.R;
-import com.rui.android_client.utils.StringUtils;
+import com.rui.android_client.utils.StringUtil;
 
 public class DProgressDialog extends DialogFragment {
 
@@ -107,7 +107,7 @@ public class DProgressDialog extends DialogFragment {
 		setCancelable(mCancelable);
 
 		Dialog dialog;
-		if (StringUtils.isEmpty(mTitle) && StringUtils.isEmpty(mMessage)) {
+		if (StringUtil.isBlank(mTitle) && StringUtil.isBlank(mMessage)) {
 			dialog = new Dialog(getActivity(),
 					R.style.Theme_Rui_Light_TransparentProgressDialog);
 		} else {
@@ -120,13 +120,13 @@ public class DProgressDialog extends DialogFragment {
 		View titleWrap = bar.findViewById(R.id.title_wrap);
 		TextView messageView = (TextView) bar
 				.findViewById(R.id.progress_message);
-		if (StringUtils.isNotEmpty(mTitle)) {
+		if (StringUtil.isNotBlank(mTitle)) {
 			titleWrap.setVisibility(View.VISIBLE);
 			((TextView) bar.findViewById(R.id.title)).setText(mTitle);
 		} else {
 			titleWrap.setVisibility(View.GONE);
 		}
-		if (StringUtils.isNotEmpty(mMessage)) {
+		if (StringUtil.isNotBlank(mMessage)) {
 			messageView.setVisibility(View.VISIBLE);
 			messageView.setText(mMessage);
 		} else {

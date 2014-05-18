@@ -28,7 +28,6 @@ import android.view.WindowManager;
 import com.rui.android_client.utils.DateUtils;
 import com.rui.android_client.utils.PreferenceUtil;
 import com.rui.android_client.utils.StringUtil;
-import com.rui.android_client.utils.StringUtils;
 import com.rui.http.AsynchronizedInvoke;
 import com.rui.http.Config;
 import com.rui.http.RemoteManager;
@@ -119,7 +118,7 @@ public class RuiApp extends Application {
 	}
 	
 	public static String getUserAgentInfo() {
-		if (StringUtils.isEmpty(mUserAgentInfo)) {
+		if (StringUtil.isBlank(mUserAgentInfo)) {
 			StringBuffer appInfo = new StringBuffer();
 			appInfo.append("Doit.im for Android").append(getVersionName());
 			StringBuffer deviceInfo = new StringBuffer();

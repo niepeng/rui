@@ -11,7 +11,7 @@ import android.widget.ListView;
 
 import com.rui.android_client.R;
 import com.rui.android_client.component.AppListView;
-import com.rui.android_client.utils.StringUtils;
+import com.rui.android_client.utils.StringUtil;
 
 public class SearchFragment extends Fragment {
 	
@@ -45,7 +45,7 @@ public class SearchFragment extends Fragment {
 		
 		@Override
 		public void onClick(View v) {
-			if (StringUtils.isNotEmpty(mSearchKeyView.getText().toString())) {
+			if (StringUtil.isBlank(mSearchKeyView.getText().toString())) {
 				// TODO
 				String url = "";
 				mListView.loadApps(url);

@@ -26,5 +26,7 @@
 	<string name="update_client_sd_no_space_msg">对不起，无法下载到你的SD卡，请确保SD卡有用的空间。</string>
 	
 	<string name="app_label_conect_network_fail">连接网络失败。</string>
+	
+	<string name="feedback_success">反馈成功！</string>
 
 </resources>
