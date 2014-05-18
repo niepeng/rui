@@ -28,5 +28,6 @@
 	<string name="app_label_conect_network_fail">连接网络失败。</string>
 	
 	<string name="feedback_success">反馈成功！</string>
+	<string name="feedback_failed">反馈失败，请稍后再试！</string>
 
 </resources>

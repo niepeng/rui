@@ -1,5 +1,7 @@
 package com.rui.android_client.activity;
 
+import java.util.HashMap;
+
 import com.rui.android_client.R;
 import com.rui.android_client.component.AppListView;
 
@@ -21,7 +23,9 @@ public class DownloadTopFragment extends Fragment {
 				R.layout.layout_app_listview, null);
 		mListView = new AppListView(getActivity(), rootView);
 		// TODO
-		mListView.loadApps("");
+		String url = "";
+		HashMap<String, Object> params = new HashMap<String, Object>();
+		mListView.loadApps(url, params);
 		return rootView;
 	}
 

@@ -2,7 +2,7 @@ package com.rui.android_client.model;
 
 import java.util.Calendar;
 
-public class App {
+public class AppInfo {
 
 	private long id;
 	

@@ -1,5 +1,7 @@
 package com.rui.android_client.activity;
 
+import java.util.HashMap;
+
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
@@ -22,7 +24,9 @@ public class GameFragment extends Fragment {
 		mListView = new AppListView(getActivity(),
 				(ListView) rootView.findViewById(R.id.list_view));
 		// TODO
-		mListView.loadApps("");
+		String url = "";
+		HashMap<String, Object> params = new HashMap<String, Object>();
+		mListView.loadApps(url, params);
 		return rootView;
 	}
 

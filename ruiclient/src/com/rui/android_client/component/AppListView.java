@@ -1,11 +1,15 @@
 package com.rui.android_client.component;
 
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 import org.apache.http.HttpResponse;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.os.AsyncTask;
@@ -25,12 +29,20 @@ import android.widget.TextView;
 import com.rui.android_client.R;
 import com.rui.android_client.activity.AppDetailActivity;
 import com.rui.android_client.activity.RuiApp;
-import com.rui.android_client.model.App;
+import com.rui.android_client.model.AppInfo;
+import com.rui.android_client.utils.JsonUtil;
+import com.rui.android_client.utils.ThreadAid;
+import com.rui.android_client.utils.ThreadListener;
+import com.rui.http.RemoteManager;
+import com.rui.http.Request;
+import com.rui.http.Response;
 
 public class AppListView {
 
-	private Context mContext;
+	private Activity mActivity;
+	private RuiApp mApp;
 	private String mDownloadUrl;
+	private HashMap<String, Object> mParams;
 	private int mPager;
 
 	private ListView mListView;
@@ -40,17 +52,19 @@ public class AppListView {
 	private int mVisibleLastIndex = 0; // 最后的可视项索引
 	private int mVisibleItemCount; // 当前窗口可见项总数
 
-	private ArrayList<App> mApps = new ArrayList<App>();
-
-	private LoadMoreAppTask mLoadMoreAppTask;
+	private ArrayList<AppInfo> mAppInfos = new ArrayList<AppInfo>();
 
 	private boolean isLoading = false;
 
-	public AppListView(Context context, ListView listView) {
-		mContext = context;
+	private int mPage = 1;
+
+	public AppListView(Activity activity, ListView listView) {
+		mActivity = activity;
+		mApp = (RuiApp) mActivity.getApplication();
 		mListView = listView;
-		footerView = View.inflate(context, R.layout.listview_foot, null);
+		footerView = View.inflate(activity, R.layout.listview_foot, null);
 		mListView.addFooterView(footerView);
+		footerView.setVisibility(View.GONE);
 
 		mAdapter = new ListAdapter();
 		mListView.setAdapter(mAdapter);
@@ -59,32 +73,25 @@ public class AppListView {
 		mListView.setOnItemClickListener(mOnItemClickListener);
 	}
 
-	public void loadApps(String url) {
+	public void loadApps(String url, HashMap<String, Object> params) {
 		mDownloadUrl = url;
-		// loadMore();
-		// TODO test
-		for (int i = 0; i < 10; i++) {
-			App app = new App();
-			app.setIconUrl("http://youimg1.c-ctrip.com/target/tg/689/159/837/7434168f76ff4ef3b78686a4cb7a63ae.jpg");
-			app.setMainTitle(" app : " + i);
-			mApps.add(app);
-		}
-		mAdapter.notifyDataSetChanged();
+		mParams = params;
+		loadMore();
 	}
 
 	private class ListAdapter extends BaseAdapter {
 
 		@Override
 		public int getCount() {
-			if (mApps == null) {
+			if (mAppInfos == null) {
 				return 0;
 			}
-			return mApps.size();
+			return mAppInfos.size();
 		}
 
 		@Override
-		public App getItem(int position) {
-			return mApps.get(position);
+		public AppInfo getItem(int position) {
+			return mAppInfos.get(position);
 		}
 
 		@Override
@@ -96,11 +103,11 @@ public class AppListView {
 		public View getView(int position, View convertView, ViewGroup parent) {
 			ViewHolder holder;
 			if (convertView == null) {
-				holder = new ViewHolder(mContext);
+				holder = new ViewHolder(mActivity);
 			} else {
 				holder = (ViewHolder) convertView;
 			}
-			App app = getItem(position);
+			AppInfo app = getItem(position);
 			holder.setViewContent(app);
 			return holder;
 		}
@@ -117,8 +124,8 @@ public class AppListView {
 				titleView = (TextView) findViewById(R.id.title);
 			}
 
-			public void setViewContent(App app) {
-				// TODO 异步加载图片
+			public void setViewContent(AppInfo app) {
+				// 异步加载图片
 				RuiApp.fb.display(iconView, app.getIconUrl());
 				titleView.setText(app.getMainTitle());
 			}
@@ -154,50 +161,68 @@ public class AppListView {
 			return;
 		}
 		isLoading = true;
-		if (mLoadMoreAppTask == null || mLoadMoreAppTask.isCancelled()) {
-			mLoadMoreAppTask = new LoadMoreAppTask();
-			try {
-				// TODO 表忘记分页
-				URL url = new URL(mDownloadUrl);
-				mLoadMoreAppTask.execute(url);
-			} catch (MalformedURLException e) {
-				e.printStackTrace();
+		footerView.setVisibility(View.VISIBLE);
+
+		RemoteManager remoteManager = RemoteManager.getPostOnceRemoteManager();
+		Request request = remoteManager.createPostRequest(mDownloadUrl);
+		if (mParams != null) {
+			for(String keyword : mParams.keySet()) {
+				request.addParameter(keyword, mParams.get(keyword));
 			}
 		}
+		request.addParameter("page", mPage);
+		mApp.asyInvoke(new ThreadAid(new GetAppListCallbackListener(), request));
 	}
 
-	private class LoadMoreAppTask extends AsyncTask<URL, Void, HttpResponse> {
+	private class GetAppListCallbackListener implements ThreadListener {
 
 		@Override
-		protected void onPreExecute() {
-			footerView.setVisibility(View.VISIBLE);
-			// TODO listview add loading more foot view
-			super.onPreExecute();
-		}
-
-		@Override
-		protected HttpResponse doInBackground(URL... params) {
-			// TODO 网络请求
-			return null;
-		}
-
-		@Override
-		protected void onPostExecute(HttpResponse result) {
-			super.onPostExecute(result);
-			if (result != null && result.getStatusLine().getStatusCode() == 200) {
-				// TODO 解析数据
-				mAdapter.notifyDataSetChanged(); // 数据集变化后,通知adapter
-				mListView.setSelection(mVisibleLastIndex - mVisibleItemCount
-						+ 1); // 设置选中项
+		public void onPostExecute(final Response response) {
+			final boolean isSuccess = response != null && response.isSuccess();
+			if (isSuccess) {
+				// 解析数据
+				JSONObject json = JsonUtil.getJsonObject(response.getModel());
+				JSONArray jsonArray = JsonUtil.getJsonArray(json, "data");
+				if (jsonArray != null) {
+					for (int i = 0, size = jsonArray.length(); i < size; i++) {
+						try {
+							JSONObject jsonObject = jsonArray.getJSONObject(i);
+							mAppInfos.add(getAppInfo(jsonObject));
+						} catch (JSONException e) {
+							e.printStackTrace();
+						}
+					}
+				}
+				mPage++;
 			} else {
 				// TODO load failed
 			}
-			// TODO remove footView
-			footerView.setVisibility(View.GONE);
-			mLoadMoreAppTask = null;
+			mActivity.runOnUiThread(new Runnable() {
+
+				@Override
+				public void run() {
+					if (isSuccess) {
+						mAdapter.notifyDataSetChanged(); // 数据集变化后,通知adapter
+						mListView.setSelection(mVisibleLastIndex
+								- mVisibleItemCount + 1); // 设置选中项
+					}
+					footerView.setVisibility(View.GONE);
+				}
+			});
 			isLoading = false;
 		}
 
+	}
+
+	public static AppInfo getAppInfo(JSONObject jsonObject) {
+		AppInfo app = new AppInfo();
+		app.setId(JsonUtil.getLong(jsonObject, "id", 0));
+		app.setMainTitle(JsonUtil.getString(jsonObject, "mainTitle", null));
+//		app.setIconUrl(JsonUtil.getString(jsonObject, "iconUrl", null));
+		// TODO test
+		app.setIconUrl("http://192.168.1.101:8080/static/uploadinfos/1399785753855.png");
+		app.setDownUrl(JsonUtil.getString(jsonObject, "downUrl", null));
+		return app;
 	}
 
 	private OnItemClickListener mOnItemClickListener = new OnItemClickListener() {
@@ -205,10 +230,10 @@ public class AppListView {
 		@Override
 		public void onItemClick(AdapterView<?> parent, View view, int position,
 				long id) {
-			App app = mAdapter.getItem(position);
-			Intent intent = new Intent(mContext, AppDetailActivity.class);
+			AppInfo app = mAdapter.getItem(position);
+			Intent intent = new Intent(mActivity, AppDetailActivity.class);
 			intent.putExtra("ID", app.getId());
-			mContext.startActivity(intent);
+			mActivity.startActivity(intent);
 		}
 	};
 

@@ -73,7 +73,7 @@ public class FeedbackActivity extends BaseActivity {
 			RemoteManager remoteManager = RemoteManager
 					.getPostOnceRemoteManager();
 			Request request = remoteManager.createPostRequest(Config
-					.getConfig().getProperty(Config.Names.CHECK_UPDATE_URL));
+					.getConfig().getProperty(Config.Names.FEEDBACK_URL));
 			request.addParameter("deviceId", mApp.getDeviceId());
 			request.addParameter("userId", PreferenceUtil.getUserId());
 			request.addParameter("content", text);
@@ -85,21 +85,22 @@ public class FeedbackActivity extends BaseActivity {
 	private class SubmitFeedbackCallbackListener implements ThreadListener {
 
 		@Override
-		public void onPostExecute(Response response) {
-			if (response != null && response.isSuccess()) {
-				runOnUiThread(new Runnable() {
-					public void run() {
+		public void onPostExecute(final Response response) {
+			runOnUiThread(new Runnable() {
+				public void run() {
+					if (response != null && response.isSuccess()) {
 						Toast.makeText(FeedbackActivity.this,
 								R.string.feedback_success, Toast.LENGTH_SHORT)
 								.show();
 						finish();
+					} else {
+						Toast.makeText(FeedbackActivity.this,
+								R.string.feedback_failed, Toast.LENGTH_SHORT)
+								.show();
 					}
-				});
-			} else {
-
-			}
+				}
+			});
 		}
-
 	}
 
 }

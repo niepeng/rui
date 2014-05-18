@@ -1,5 +1,7 @@
 package com.rui.android_client.activity;
 
+import java.util.HashMap;
+
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
@@ -12,6 +14,7 @@ import android.widget.ListView;
 import com.rui.android_client.R;
 import com.rui.android_client.component.AppListView;
 import com.rui.android_client.utils.StringUtil;
+import com.rui.http.Config;
 
 public class SearchFragment extends Fragment {
 	
@@ -45,10 +48,12 @@ public class SearchFragment extends Fragment {
 		
 		@Override
 		public void onClick(View v) {
-			if (StringUtil.isBlank(mSearchKeyView.getText().toString())) {
-				// TODO
-				String url = "";
-				mListView.loadApps(url);
+			String searchInput = mSearchKeyView.getText().toString();
+			if (StringUtil.isNotBlank(searchInput)) {
+				String url = Config.getConfig().getProperty(Config.Names.SEARCH_URL);
+				HashMap<String, Object> params = new HashMap<String, Object>();
+				params.put("keyword", searchInput);
+				mListView.loadApps(url, params);
 			}
 		}
 	};

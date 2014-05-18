@@ -27,10 +27,6 @@ public class Config {
 		
 		String SIGN_KEY = "shenzhu.sign.key";
 		
-		String CHECK_UPDATE_URL = "check.update";
-		
-		String USER_LOGIN_URL = "login.url";
-		
 		String USER_REGISTER_URL = "uxiang.register.url";
 		
 		String CITY_LIST_URL = "uxiang.city.list.url";
@@ -42,9 +38,6 @@ public class Config {
 		String ITEM_LIST_URL = "uxiang.item.list.url";
 		
 		String BARCODE_ITEM_URL = "uxiang.barcode.url";
-		
-		String ITEM_SEARCH_URL = "uxiang.item.search.url";
-		
 		
 		String CAT_LIST_URL = "uxiang.cat.list.url";
 		
@@ -68,8 +61,6 @@ public class Config {
 
 		String UXIANG_WAPPAY_URL = "uxiang.wappay.url";
 		
-		String FEEDBACK_URL = "uxiang.feedback.url";
-
 		String USERLINK_URL = "uxiang.userlink.url";
 		
 		String ADD_TEST_CITY = "uxiang.addtest.city";
@@ -89,6 +80,12 @@ public class Config {
 		String DEL_ADDRESS_URL = "uxiang.deladdress.url"; 
  
 		String SET_DEFAULT_ADDRESS_URL = "uxiang.setdefaultaddress.url";
+		
+		
+		String CHECK_UPDATE_URL = "check.update";
+		String USER_LOGIN_URL = "login.url";
+		String FEEDBACK_URL = "feedback.url";
+		String SEARCH_URL = "search.url";
 	}
 
 	private static final String ENV_PATH = "configs/env.properties";
