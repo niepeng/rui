@@ -30,7 +30,9 @@ import com.rui.android_client.R;
 import com.rui.android_client.activity.AppDetailActivity;
 import com.rui.android_client.activity.RuiApp;
 import com.rui.android_client.model.AppInfo;
+import com.rui.android_client.parse.AppInfoParser;
 import com.rui.android_client.utils.JsonUtil;
+import com.rui.android_client.utils.StringUtil;
 import com.rui.android_client.utils.ThreadAid;
 import com.rui.android_client.utils.ThreadListener;
 import com.rui.http.RemoteManager;
@@ -157,7 +159,10 @@ public class AppListView {
 	};
 
 	private void loadMore() {
-		if (isLoading) {
+		if (StringUtil.isBlank(mDownloadUrl)) {
+			new Thread(" app listview url is blank!");
+		}
+ 		if (isLoading) {
 			return;
 		}
 		isLoading = true;
@@ -187,7 +192,7 @@ public class AppListView {
 					for (int i = 0, size = jsonArray.length(); i < size; i++) {
 						try {
 							JSONObject jsonObject = jsonArray.getJSONObject(i);
-							mAppInfos.add(getAppInfo(jsonObject));
+							mAppInfos.add(AppInfoParser.getInstance().parse(jsonObject));
 						} catch (JSONException e) {
 							e.printStackTrace();
 						}
@@ -212,17 +217,6 @@ public class AppListView {
 			isLoading = false;
 		}
 
-	}
-
-	public static AppInfo getAppInfo(JSONObject jsonObject) {
-		AppInfo app = new AppInfo();
-		app.setId(JsonUtil.getLong(jsonObject, "id", 0));
-		app.setMainTitle(JsonUtil.getString(jsonObject, "mainTitle", null));
-//		app.setIconUrl(JsonUtil.getString(jsonObject, "iconUrl", null));
-		// TODO test
-		app.setIconUrl("http://192.168.1.101:8080/static/uploadinfos/1399785753855.png");
-		app.setDownUrl(JsonUtil.getString(jsonObject, "downUrl", null));
-		return app;
 	}
 
 	private OnItemClickListener mOnItemClickListener = new OnItemClickListener() {

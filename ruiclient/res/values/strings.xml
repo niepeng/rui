@@ -29,5 +29,7 @@
 	
 	<string name="feedback_success">反馈成功！</string>
 	<string name="feedback_failed">反馈失败，请稍后再试！</string>
+	
+	<string name="detail">详情</string>
 
 </resources>
