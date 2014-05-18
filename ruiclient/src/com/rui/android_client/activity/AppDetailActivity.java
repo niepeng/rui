@@ -11,7 +11,7 @@ import android.widget.TextView;
 import com.rui.android_client.R;
 import com.rui.android_client.component.DProgressDialog;
 
-public class AppDetailActivity extends Activity {
+public class AppDetailActivity extends BaseActivity {
 	
 	private long appId;
 	

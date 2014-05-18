@@ -22,7 +22,7 @@ public class IndexFragment extends Fragment {
 			"猜你喜欢" };
 	@SuppressWarnings("rawtypes")
 	private static Class[] tabFragments = new Class[] { GameFragment.class,
-			FineRecommendedActivity.class, DownloadTopActivity.class,
+			FineRecommendedFragment.class, DownloadTopFragment.class,
 			YouLikeFragment.class };
 
 	TabHost mTabHost;

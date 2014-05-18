@@ -10,7 +10,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListView;
 
-public class DownloadTopActivity extends Fragment {
+public class FineRecommendedFragment extends Fragment {
 	
 	private AppListView mListView;
 

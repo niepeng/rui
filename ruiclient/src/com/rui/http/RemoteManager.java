@@ -19,8 +19,8 @@ public abstract Request createQueryRequest(String target);
 	
 	private static RemoteManager defaultRemoteManager = new HttpRemoteManager();
 	
-	public static void init(RuiApp shenApplication) {
-		RemoteManager.mApp = shenApplication;
+	public static void init(RuiApp application) {
+		RemoteManager.mApp = application;
 	}
 	
 	/**

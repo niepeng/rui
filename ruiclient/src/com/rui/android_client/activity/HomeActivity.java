@@ -6,6 +6,7 @@ import android.support.v4.app.FragmentTabHost;
 import android.widget.TabHost.OnTabChangeListener;
 
 import com.rui.android_client.R;
+import com.rui.android_client.tasks.AuthorUserTask;
 
 public class HomeActivity extends FragmentActivity implements
 		OnTabChangeListener {
@@ -23,6 +24,10 @@ public class HomeActivity extends FragmentActivity implements
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		
+		// 首次登录获取userId
+		RuiApp ruiApp = (RuiApp) getApplication();
+		ruiApp.asyInvoke(new AuthorUserTask(ruiApp));
 
 		setContentView(R.layout.activity_home);
 

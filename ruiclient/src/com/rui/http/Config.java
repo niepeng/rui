@@ -27,9 +27,9 @@ public class Config {
 		
 		String SIGN_KEY = "shenzhu.sign.key";
 		
-		String CHECK_UPDATE_URL = "version.htm";
+		String CHECK_UPDATE_URL = "check.update";
 		
-		String USER_LOGIN_URL = "uxiang.login.url";
+		String USER_LOGIN_URL = "login.url";
 		
 		String USER_REGISTER_URL = "uxiang.register.url";
 		
@@ -137,9 +137,9 @@ public class Config {
 			versionProperties.load(versionIs);
 			versionIs.close();
 			
-			InputStream inJxsInfo = assetManager.open("jxsinfo");
-			companyCode = inputStream2String(inJxsInfo);
-			inJxsInfo.close();
+//			InputStream inJxsInfo = assetManager.open("jxsinfo");
+//			companyCode = inputStream2String(inJxsInfo);
+//			inJxsInfo.close();
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}

@@ -1,27 +1,37 @@
 package com.rui.android_client.activity;
 
 import java.util.Date;
+import java.util.HashSet;
 import java.util.Locale;
+import java.util.Set;
 import java.util.TimeZone;
 import java.util.concurrent.Callable;
 import java.util.concurrent.Future;
 
 import net.tsz.afinal.FinalBitmap;
+import android.app.Activity;
 import android.app.Application;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.PackageManager.NameNotFoundException;
 import android.graphics.Bitmap.CompressFormat;
 import android.graphics.Point;
 import android.os.Build;
+import android.os.Bundle;
+import android.telephony.TelephonyManager;
 import android.util.DisplayMetrics;
 import android.view.Display;
 import android.view.WindowManager;
 
 import com.rui.android_client.utils.DateUtils;
+import com.rui.android_client.utils.PreferenceUtil;
+import com.rui.android_client.utils.StringUtil;
 import com.rui.android_client.utils.StringUtils;
 import com.rui.http.AsynchronizedInvoke;
+import com.rui.http.Config;
+import com.rui.http.RemoteManager;
 
 public class RuiApp extends Application {
 	
@@ -29,6 +39,8 @@ public class RuiApp extends Application {
 	public static int SDK_INT;
 	
 	public static FinalBitmap fb;
+	
+	public static SharedPreferences mPref;
 	
 	private boolean needInit = true;
 	
@@ -41,9 +53,12 @@ public class RuiApp extends Application {
 	
 	private AsynchronizedInvoke asynchronizedInvoke;
 	
+	private TelephonyManager telephonyManager;
+	
 	@Override
 	public void onCreate() {
 		super.onCreate();
+		registerActivityLifecycleCallbacks(new MyLifecycleHandler());
 		if (needInit) {
 			init();
 		}
@@ -53,13 +68,23 @@ public class RuiApp extends Application {
 		context = getApplicationContext();
 		SDK_INT = android.os.Build.VERSION.SDK_INT;
 		getScreenSize();
-		needInit = false;
+		
+		Config config = Config.getConfig();
+		config.init(this);
 		
 		fb = FinalBitmap.create(this);// 初始化FinalBitmap模块
 		fb.configCompressFormat(CompressFormat.PNG);
 		
+		RemoteManager.init(this);
+		
 		asynchronizedInvoke = new AsynchronizedInvoke();
 		asynchronizedInvoke.init();
+		
+		telephonyManager = (TelephonyManager) this.getSystemService(Context.TELEPHONY_SERVICE);
+		
+		mPref = getSharedPreferences(PreferenceUtil.SP_NAME, MODE_PRIVATE);
+		
+		needInit = false;
 	}
 	
 	public static void getScreenSize() {
@@ -166,6 +191,76 @@ public class RuiApp extends Application {
 
 	public void asyCall(Runnable runnable) {
 		asynchronizedInvoke.call(runnable);
+	}
+	
+	private Set<Activity> mActivities = new HashSet<Activity>();
+	private static int resumed;
+	private static int stopped;
+
+	public class MyLifecycleHandler implements ActivityLifecycleCallbacks {
+
+		public void onActivityCreated(Activity activity, Bundle savedInstanceState) {
+			mActivities.add(activity);
+		}
+
+		public void onActivityDestroyed(Activity activity) {
+			if (mActivities.contains(activity)) {
+				mActivities.remove(activity);
+			}
+		}
+
+		public void onActivityResumed(Activity activity) {
+			++resumed;
+		}
+
+		public void onActivityPaused(Activity activity) {
+		}
+
+		public void onActivitySaveInstanceState(Activity activity, Bundle outState) {
+		}
+
+		public void onActivityStarted(Activity activity) {
+		}
+
+		public void onActivityStopped(Activity activity) {
+			++stopped;
+		}
+
+	}
+
+	public static boolean isApplicationInForeground() {
+		return resumed > stopped;
+	}
+	
+	public void finishAllActivities() {
+		synchronized(mActivities) {
+			for (Activity a : mActivities) {
+				a.finish();
+			}
+			mActivities.clear();
+		}
+	}
+	
+	public String getDeviceId() {
+		String deviceId = PreferenceUtil.getDeviceId();
+		if (!StringUtil.isBlank(deviceId)) {
+			return deviceId;
+		}
+
+		deviceId = telephonyManager.getDeviceId();
+		if (!StringUtil.isBlank(deviceId)) {
+			addDevice(deviceId);
+			return deviceId;
+		}
+
+		// 如果上面获取不到值，那么直接获取当前时间作为唯一编号
+		deviceId = (int) (Math.random() * 100) + "-" + System.currentTimeMillis();
+		addDevice(deviceId);
+		return deviceId;
+	}
+	
+	private void addDevice(String deviceId) {
+		PreferenceUtil.addDeviceId(deviceId);
 	}
 
 }
