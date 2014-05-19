@@ -11,6 +11,8 @@ import android.widget.ListView;
 
 import com.rui.android_client.R;
 import com.rui.android_client.component.AppListView;
+import com.rui.android_client.component.IndexListView;
+import com.rui.http.Config;
 
 public class GameFragment extends Fragment {
 
@@ -21,10 +23,10 @@ public class GameFragment extends Fragment {
 			Bundle savedInstanceState) {
 		View rootView = inflater.inflate(R.layout.layout_app_listview, null);
 
-		mListView = new AppListView(getActivity(),
+		mListView = new IndexListView(getActivity(),
 				(ListView) rootView.findViewById(R.id.list_view));
 		// TODO
-		String url = "";
+		String url = Config.getConfig().getProperty(Config.Names.GAME_LIST);
 		HashMap<String, Object> params = new HashMap<String, Object>();
 		mListView.loadApps(url, params);
 		return rootView;

@@ -41,24 +41,23 @@ import com.rui.http.Response;
 
 public class AppListView {
 
-	private Activity mActivity;
-	private RuiApp mApp;
-	private String mDownloadUrl;
-	private HashMap<String, Object> mParams;
-	private int mPager;
+	protected Activity mActivity;
+	protected RuiApp mApp;
+	protected String mDownloadUrl;
+	protected HashMap<String, Object> mParams;
 
-	private ListView mListView;
-	private ListAdapter mAdapter;
-	private View footerView;
+	protected ListView mListView;
+	protected ListAdapter mAdapter;
+	protected View footerView;
 
-	private int mVisibleLastIndex = 0; // 最后的可视项索引
-	private int mVisibleItemCount; // 当前窗口可见项总数
+	protected int mVisibleLastIndex = 0; // 最后的可视项索引
+	protected int mVisibleItemCount; // 当前窗口可见项总数
 
-	private ArrayList<AppInfo> mAppInfos = new ArrayList<AppInfo>();
+	protected ArrayList<AppInfo> mAppInfos = new ArrayList<AppInfo>();
 
-	private boolean isLoading = false;
+	protected boolean isLoading = false;
 
-	private int mPage = 1;
+	protected int mPage = 1;
 
 	public AppListView(Activity activity, ListView listView) {
 		mActivity = activity;
@@ -186,18 +185,7 @@ public class AppListView {
 			final boolean isSuccess = response != null && response.isSuccess();
 			if (isSuccess) {
 				// 解析数据
-				JSONObject json = JsonUtil.getJsonObject(response.getModel());
-				JSONArray jsonArray = JsonUtil.getJsonArray(json, "data");
-				if (jsonArray != null) {
-					for (int i = 0, size = jsonArray.length(); i < size; i++) {
-						try {
-							JSONObject jsonObject = jsonArray.getJSONObject(i);
-							mAppInfos.add(AppInfoParser.getInstance().parse(jsonObject));
-						} catch (JSONException e) {
-							e.printStackTrace();
-						}
-					}
-				}
+				parseCallbackBody(response);
 				mPage++;
 			} else {
 				// TODO load failed
@@ -217,6 +205,21 @@ public class AppListView {
 			isLoading = false;
 		}
 
+	}
+	
+	protected void parseCallbackBody(final Response response) {
+		JSONObject json = JsonUtil.getJsonObject(response.getModel());
+		JSONArray jsonArray = JsonUtil.getJsonArray(json, "data");
+		if (jsonArray != null) {
+			for (int i = 0, size = jsonArray.length(); i < size; i++) {
+				try {
+					JSONObject jsonObject = jsonArray.getJSONObject(i);
+					mAppInfos.add(AppInfoParser.getInstance().parse(jsonObject));
+				} catch (JSONException e) {
+					e.printStackTrace();
+				}
+			}
+		}
 	}
 
 	private OnItemClickListener mOnItemClickListener = new OnItemClickListener() {

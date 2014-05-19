@@ -85,6 +85,7 @@ public class Config {
 		String FEEDBACK_URL = "feedback.url";
 		String SEARCH_URL = "search.url";
 		String APP_DETAIL_URL = "app.detail.url";
+		String GAME_LIST = "applist.game.url";
 	}
 
 	private static final String ENV_PATH = "configs/env.properties";

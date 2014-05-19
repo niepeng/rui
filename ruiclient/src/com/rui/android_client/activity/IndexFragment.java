@@ -13,6 +13,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TabHost;
 import android.widget.TabWidget;
+import android.widget.TextView;
 
 import com.rui.android_client.R;
 
@@ -37,6 +38,7 @@ public class IndexFragment extends Fragment {
 		mTabHost = (TabHost) rootView.findViewById(android.R.id.tabhost);
 
 		mTabHost.setup();
+		mTabHost.getTabWidget().setDividerDrawable(null);
 
 		mViewPager = (ViewPager) rootView.findViewById(R.id.pager);
 
@@ -44,11 +46,18 @@ public class IndexFragment extends Fragment {
 
 		for (int i = 0; i < tabName.length; i++) {
 			mTabsAdapter.addTab(
-					mTabHost.newTabSpec(tabName[i]).setIndicator(tabName[i]),
+					mTabHost.newTabSpec(tabName[i]).setIndicator(getTabView(tabName[i])),
 					tabFragments[i], null);
 		}
 
 		return rootView;
+	}
+	
+	private View getTabView(String tabName) {
+		View view = View.inflate(getActivity(), R.layout.layout_topbar_tab, null);
+		TextView text = (TextView) view.findViewById(R.id.topbar_tab_name);
+		text.setText(tabName);
+		return view;
 	}
 
 	/**

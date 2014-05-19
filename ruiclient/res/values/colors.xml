@@ -4,5 +4,13 @@
     <color name="dialog_title">#5f9dd3</color>
     <color name="dialog_title_bottom_divider">#5f9dd3</color>
     <color name="dialog_with_listview_divider">#19000000</color>
+    
+    <color name="topbar_bg">#FFFFFF</color>
+    <color name="topbar_text_ori">#000000</color>
+    <color name="topbar_text_sel">#41BFAA</color>
+    <color name="bottombar_tab_bg_ori">#EFEFEF</color>
+    <color name="bottombar_tab_bg_sel">#41BFAA</color>
+    <color name="bottombar_text_ori">#6C6B6B</color>
+    <color name="bottombar_text_sel">#FFFFFF</color>
 
 </resources>
