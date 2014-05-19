@@ -1,0 +1,66 @@
+
+
+
+
+ $widget.setTemplate("adminHeader").addToContext("tab",'1')
+
+    <div class="pmt-container ng-scope" ng-view="">
+        <div class="myapp-list pmt-white-box ng-scope">
+
+			<div class="home-todo-list pmt-white-box" ng-show="appList.length">
+                <div class="white-box-title">
+                    <p>
+                    </p>
+				</div> 
+				
+			</div>
+			
+			
+            <div app-list="" data="appList" class="ng-isolate-scope">
+           	    <ul class="pmt-app-list ng-animate-fadedown" ng-show="appList.length">
+
+					#foreach($cat in $catList)
+						<li class="pmt-app-list-item pmt-white-box ng-scope GENERAL_PUBLISHED" ng-repeat="appItem in appList" ng-class="appItem.status.type">
+                            
+							<div class="white-box-content">
+                                <div class="app-info">
+                                    <div class="app-icon">
+										<img  src="$cat.iconUrl" width="50px" height="50px">
+                                    </div>
+                                    <div class="app-desc">
+                                        <p class="app-title ng-binding">$!cat.name</p>
+                                        <p class="app-meta">
+                                            <span class="app-version ng-scope ng-binding"><a href="edit.htm?id=$!cat.id">修改</a> &nbsp;&nbsp;</span>
+                                            <span class="app-date ng-binding"><a href="add.htm?pid=$!cat.id">添加子类目</a> </span>
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+							
+							<div class="white-box-content" style="padding-left:150px;">
+								#foreach($secondCat in $cat.childrenList)
+									<div class="app-info" style="padding-bottom:4px;">
+                                        <div class="app-icon">
+    										<img  src="$secondCat.iconUrl" width="50px" height="50px">
+                                        </div>
+                                        <div class="app-desc">
+                                            <p class="app-title ng-binding">$secondCat.name</p>
+                                            <p class="app-meta">
+                                                <span class="app-version ng-scope ng-binding"><a href="edit.htm?id=$!secondCat.id">修改</a> &nbsp;&nbsp;</span>
+                                                <span class="app-date ng-binding"><a href="delete.htm?id=$!secondCat.id" onclick="javascript: return confirm('确定要删除该类目？');">删除</a></span>
+                                            </p>
+                                        </div>
+                                    </div>
+								#end
+							  </div>
+							  
+                        </li>
+                       #end
+                   
+                </ul>
+            </div>
+        </div>
+    </div>
+	
+    $widget.setTemplate("userFoot")
+	

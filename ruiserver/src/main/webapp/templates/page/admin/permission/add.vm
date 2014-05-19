@@ -1,0 +1,17 @@
+
+$widget.setTemplate("adminHeader").addToContext("tab",'3')
+
+
+<div class="pmt-main-section pmt-container ng-scope" ng-view="">
+ #set($form = $formFactory.getForm('permission.add'))
+		
+    <form action="doAddPermission.htm"   method="post">
+        <div style="padding:20px;">
+    		#errorMessage($!resultmessage.message) <br/>
+            $form.keyName.label：<input type="text" name="$form.keyName.name" value="$!form.keyName.value" size="100px"> * #errorMessage($!form.keyName.message) <br/> <br/> <br/>
+            $form.value.label：<input type="text" name="$form.value.name" value="$!form.value.value" size="100px"> * #errorMessage($!form.value.message) <br/> <br/> <br/>
+            <input type="submit" value="提交"/>
+        </div>
+    </form>
+</div>
+		

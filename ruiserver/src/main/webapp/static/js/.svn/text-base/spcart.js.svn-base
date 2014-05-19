@@ -1,0 +1,1095 @@
+// 加载购物车
+$(document).ready(function() {
+	$('.scalar-sugar .plus').live('click', function() {
+		var id = $(this).parents('tr').attr('data-id');
+		var number = $(this).parent().find('input[type=text]').val();
+		UX.cart.add(id, number, true);
+		loadItems();
+		//getChange();
+	});
+	$('.scalar-sugar .minus').live('click', function() {
+		var id = $(this).parents('tr').attr('data-id');
+		var number = $(this).parent().find('input[type=text]').val();
+		UX.cart.add(id, number, true);
+		loadItems();
+		//getChange();
+	});
+	$('.scalar-sugar .text').live('keyup', function() {
+		var id = $(this).parents('tr').attr('data-id');
+		var number = $(this).val();
+		UX.cart.add(id, number, true);
+		loadItems();
+		//getChange();
+	});
+	$('.cart-del').live('click', function() {
+		$('.dialog-inner').remove();
+		var _this = $(this);
+		
+		new DelAlert({
+    	   x:-230,
+    	   y:20,
+    	   relater:$(this),
+    	   title:'删除商品',
+    	   content:'确定从购物车中删除此商品？'
+        });
+		
+		
+		$('.btn-ok').bind('click',function(){
+			 var tr= _this.parents('tr');
+             var id =tr.attr('data-id');
+             $(this).parents('.dialog-inner').remove();
+			 UX.cart.remove(id);
+			 loadItems();
+		});
+
+		/*var isDel = confirm('是否确定删除');
+		if (isDel) {
+			var id = $(this).parents('tr').attr('data-id');
+			UX.cart.remove(id, function() {
+				loadItems();
+			})
+		}*/
+	})
+    
+
+	$('.cart-muldel').live('click', function() {
+		var chbx = $('.chbx:checked');
+		if (chbx.length == 0) {
+			UX.alert('您还未选择任何商品');
+			return;
+		}
+
+		new DelAlert({
+    	   x:0,
+    	   y:20,
+    	   relater:$(this),
+    	   title:'删除商品',
+    	   content:'是否确定删除所选？'
+        });
+		/*var isDel = confirm('是否确定删除所选');
+		if (!isDel) {
+			return
+		}*/
+		$('.btn-ok').bind('click',function(){
+			$(this).parents('.dialog-inner').remove();
+			chbx.each(function(index) {
+			   var id = $(this).parents('tr').attr('data-id');
+			   UX.cart.remove(id);
+			   if (index == chbx.length - 1) {
+				   loadItems();
+			   }
+			   $(this).parents('tr').remove();
+		    });
+		});
+		
+	})
+	$('#C_SelectAll').live('click', function() {
+		$('input[type=checkbox]').attr('checked', this.checked);
+	});
+	$('#C_SettleSubmit').live('click', function() {
+		var form = $('#SettleForm')[0];
+        itemsJson();
+		if (form.itemsJson.value != '' ) {
+			form.submit();
+			return false;
+		}
+
+	});
+	function itemsJson(){
+            var tr=$('#C_Cart tr[data-id]');
+			var totalNumber=0,
+			    totalPrice=0,
+			    totalWeight=0;
+            var content='';
+            var itemsJson=[];
+            for(var x=0;x<tr.length;x++){
+                var itemid=tr.eq(x).attr('data-id');
+				var num=tr.eq(x).find('.scalar-sugar .text').val();
+				var gname=tr.eq(x).find('.g-name[data-weight]');
+                itemsJson.push({
+                                	'itemid':itemid,
+                                    'num':num,
+                                    'promotion':[]
+                                });
+				if(gname.length){
+					
+				    for (var y=0;y<gname.length;y++){
+				    	var pnum=gname.eq(y).attr('data-num');
+					    var pitemid=gname.eq(y).attr('data-pitemid');
+					    var pid=gname.eq(y).attr('data-pid');
+					    var p_itemid='';
+					    var p_num='';
+				        
+
+						if(itemsJson[x].promotion.length == 0){
+							itemsJson[x].promotion.push({
+														'id':pid,
+														'pitemid':pitemid,
+														'pnum':pnum
+													}); 
+						}
+						else{
+							for(var k=0; k<itemsJson[x].promotion.length; k++){
+								var oldpid = itemsJson[x].promotion[k].id;
+								if(pid == oldpid){
+									 p_itemid = pitemid+'|'+itemsJson[x].promotion[k].pitemid;
+									 p_num = pnum+'|'+itemsJson[x].promotion[k].pnum;
+									itemsJson[x].promotion[k]={
+															'id':pid,
+															'pitemid':p_itemid,
+															'pnum':p_num
+														}; 
+								}else{
+									itemsJson[x].promotion.push({
+															'id':pid,
+															'pitemid':p_itemid,
+															'pnum':p_num
+														}); 
+								}
+							}
+						}  
+				    }
+				}
+				//补充form
+				var form = $('#SettleForm')[0];
+				form.itemsJson.value=JSON.stringify( itemsJson);
+			}
+	}
+	$('#C_SettleDisableSubmit').live('click', function() {
+		UX.alert('当前购物车中存在“暂时无货或者限购”商品，请修改后结算');
+	})
+	if ($('#C_OrderSubmit').length) {
+		if ($('input[name=payway]').length == 1) {
+			$('input[name=payway]').attr('checked', true);
+		};
+		/*if ($('input[name=postway]').length == 1) {
+			$('input[name=postway]').attr('checked', true);
+		};*/
+	}
+	var ds;
+	if ($('#D_Prov').length) {
+		ds = DistrictSelector.attach('D_Prov', 'D_City', 'D_Dist');
+		ds.selectDist(UX.city.id);
+	}
+	if ($('#C_Cart').length) {
+		function loadItems() {
+			var params = UX.cart.params();
+			var cont = $('#C_Cart').find('.cart');
+			$('#C_PostFreeItems').hide();
+			var loadEmpty = function() {
+				$('#C_PostInfo').hide();
+				var empty = $('<div class="empty cart-empty">');
+				empty.html('<p>购物车内暂时没有商品</p><p><a href="' + UX.basePath + 'index.htm?cityId=' + UX.city.id + '">去首页</a>逛逛挑选喜欢的商品</p>')
+				cont.html(empty);
+			}
+			if (params.ids.length == 0) {
+				loadEmpty();
+			} else {
+				var url = UX.basePath + 'ajax/cartItems.htm';
+                $.ajax({
+					type: 'POST',
+					url: url,
+					data: {
+						cityId: UX.city.id,
+						itemIds: params.ids,
+						nums: params.nums
+					},
+					success: function(json) {
+                        if (json.code == 0) {
+							UX.cart.clear();
+							var data = UX.cart.data = json.data.itemList;
+							if (data.length == 0) {
+								loadEmpty();
+								return;
+							}
+							var tableContent = '<tr><th width="66px" style="text-align:right;"><input id="C_SelectAll" type="checkbox"><label for="C_SelectAll">全选</label></th><th colspan="2">商品</th><th width="78px">单价</th><th width="110px">购买数量</th><th width="80px">金额小计</th><th width="78px">重量/件</th><th width="120px">库存</th><th width="78px">操作</th></tr>';
+							var freight = json.data.freight;
+							var postFree = json.data.postFree;
+							var excludePostFreePrice = json.data.excludePostFreePrice;
+							var totalNumber = 0;
+							var totalPrice = 0;
+							var totalWeight = 0;
+							var isShow = json.data.helpItemList.length;
+							$('#C_PostInfo .detail').html(json.data.postInfoStr || '');
+							var hasStock = json.data.hasAllStock;
+							for (var i = 0; i < data.length; i++) {
+								var item = data[i];
+								// 替换购物车
+								UX.cart.add(item.id, item.buyNum, true);
+								var link = UX.basePath + 'item.htm?cityId=' + UX.city.id + '&id=' + item.id;
+								var img = item.imgs.split(',')[0] + '!150px150px';
+								//var price = item.newPrice == 0 ? item.oldPrice : item.newPrice;
+								var price = item.price;
+								var delPrice = item.delPrice;
+								var stopBuyNum = item.stopBuyNum;//限购数量，大于0时，是有限购的
+								var buyTips = '暂时无货';
+								if(stopBuyNum>0 && item.buyNum>stopBuyNum){
+								    buyTips = '当前商品限购'+stopBuyNum+'个';
+								}
+								var canBuy = item.hasStock && ((stopBuyNum > 0 && item.buyNum <= stopBuyNum) || stopBuyNum == 0);
+								totalNumber += item.buyNum;
+								totalPrice += accMul(price, item.buyNum);
+								totalWeight += item.weight * item.buyNum;
+								var outActivityStr = item.outActivityStr;
+								if(outActivityStr != ''){
+								    outActivityStr = '该商品不参加' + outActivityStr+ '活动';
+								}
+								tableContent +='<tr data-id="' + item.id + '" ';
+								if((item.buyAppendPresentPromotionId && !item.buyForPresentPromotionId) || (item.fullReductionPrice && !item.buyForPresentPromotionId)){
+									tableContent+='class="hasgift" ';
+								}
+								if(!item.buyAppendPresentPromotionId && item.buyForPresentPromotionId && !item.fullReductionPrice){
+									tableContent+='class="gifts" ';
+								}
+								if((item.buyAppendPresentPromotionId && item.buyForPresentPromotionId) || (item.fullReductionPrice && item.buyForPresentPromotionId)){
+									tableContent+='class="hasgift gifts" ';
+								}
+								tableContent+='data-price="'+price+'" data-weight="'+item.weight+'"><td class="hasgift_first">'
+								if(item.buyAppendPresentPromotionId || item.fullReductionPrice){
+									tableContent+='<div class="item-header"';
+									if(item.promotionMoney){
+                                        tableContent+=' data-promotionmoney="'+item.promotionMoney+'"';
+									}
+                                    tableContent+='>';
+								    if(item.buyAppendPresentPromotionId){
+								    	tableContent+='<div class="cell f-text"><b></b><span><abbr>'+item.buyAppendPresentPromotionInfo+'</abbr><a data-id="'+item.buyAppendPresentPromotionId+'" href="javascript:void(0);" data-flag="true" data-type="hg">换购商品</a></span></div>';
+								    }
+								    if(item.fullReductionPrice){
+                                        tableContent+='<span class="fullreduct red fr" data-fullreduct="'+item.fullReductionPrice+'">'+item.buyFullReductionStr+'</span>';
+								    }
+								    tableContent+='</div>';
+								}
+								
+								if(item.buyForPresentPromotionId){
+								    tableContent+='<div class="item_extra"><div class="p-gift clearfix f-text"><a href="javascript:void(0);" data-id="'+item.buyForPresentPromotionId+'" data-flag="true" data-type="mz">赠送商品</a></div></div>';
+								}
+								tableContent+='<input class="chbx" type="checkbox"></td><td class="item-image"><a href="' + link + '"><img src="' + img + '" width="50" height="50"></a></td><td class="item-name"><a href="' + link + '">' + item.name + '</a><p class="red">'+outActivityStr+'</p></td><td class="item-price"><p>' + UX.util.priceFormat(price) + '</p>' + (delPrice == 0 ? '' : ('<del>￥ ' + UX.util.priceFormat(delPrice) + '</del>')) + '</td><td><span class="scalar-sugar"><a href="javascript:void(0)" class="minus' + (item.buyNum == 1 ? '-disable' : '') + '"></a><input type="text" value="' + item.buyNum + '" class="text"><a href="javascript:void(0)" class="plus"></a></span></td><td><span class="red">￥ ' + UX.util.priceFormat(price * item.buyNum) + '</span></td><td>' + accDiv(item.weight, 1000) + 'kg</td><td>' + ( canBuy ? '可当日出库' : '<span class="red">'+buyTips+'</span>') + '</td><td><a class="cart-del" href="javascript:void(0)">删除</a></td></tr>';
+							}
+							tableContent += '<tr><td colspan="9"><div class="delete"><a class="cart-muldel" href="javascript:void(0)"><span class="i-icon"></span>删除选中商品</a></div><div class="total"><p><span class="key"><span class="red">' + totalNumber + '</span>件商品&nbsp;&nbsp;&nbsp;&nbsp;总计：</span><span class="value">¥' + UX.util.priceFormat(totalPrice) + '</span></p><p><span class="key">重量：</span><span class="value">' + accDiv(totalWeight, 1000) + 'kg</span></p>';
+							    if(json.data.fullReductionPrice){
+                                   tableContent+='<p><span class="key">满减小计：</span><span class="value">-￥' + UX.util.priceFormat(json.data.fullReductionPrice)+ '</span></p>';
+							    }
+							    tableContent+='</div></td></tr>';
+							var postFreeContent = '';
+							/*if (isShow) {
+								var needPrice = UX.util.priceFormat(postFree - (totalPrice - excludePostFreePrice));
+								postFreeContent = '<div class="fl detail"><div class="hd"></div><div class="bd"><p class="bold">运费<span class="red">' + UX.util.priceFormat(freight, 1) + '</span>元</p><a href="#C_PostFreeItems">凑单免运费</a></div><div class="ft">再需购买' + needPrice + '元免首重运费</div></div>';
+							};*/
+							tableContent += '<tr class="result"><td colspan="9"><a href="' + UX.basePath + 'index.htm?cityId=' + UX.city.id + '" class="btn-gray">继续购物</a><div class="settle"><div class="total-price bold">总计（不含运费）：<span class="red price">' + UX.util.priceFormat(Subtr(totalPrice,json.data.fullReductionPrice) )+ '元</span></div>' + postFreeContent + '<a id="' + (hasStock ? 'C_SettleSubmit' : 'C_SettleDisableSubmit') + '" href="javascript:void(0)" class="i-icon' + (hasStock ? '' : ' disable') + '"></a></div></td></tr>';
+							cont.html('<table class="cart-list">' + tableContent + '</table>');
+
+							/*if (isShow) {
+								var postFreeItems = json.data.helpItemList;
+								var postFreeList = '';
+								for (var i = 0; i < postFreeItems.length; i++) {
+									var item = postFreeItems[i];
+									var link = UX.basePath + 'item.htm?cityId=' + UX.city.id + '&id=' + item.id;
+									var img = item.imgs.split(',')[0] + '!150px150px';
+									var price = item.price;
+									var delPrice = item.delPrice;
+									var name = item.name;
+									postFreeList += '<li><a class="image" href="' + link + '"><img width="77" src="' + img + '"></a><div class="content"><a class="name" href="' + link + '">' + name + '</a><p class="price-sugar same"><span>¥' + UX.util.priceFormat(price) + '</span>' + (delPrice != 0 ? ('<del>' + UX.util.priceFormat(delPrice) + '</del>') : '') + '</p><a class="btn-cart A_Cart_Add" data-id="' + item.id + '" href="javascript:void(0)"></a></div></li>';
+								}
+								$('#C_PostFreeItems .bd').html('<ul>' + postFreeList + '</ul>');
+								$('#C_PostFreeItems').show();
+							}*/
+						}
+					}
+				});
+			}
+		}
+		loadItems();
+        
+		function getChange(){
+            var tr=$('#C_Cart tr[data-id]');
+			var totalNumber=0,
+			    totalPrice=0,
+			    totalWeight=0,
+			    totalReduct=0;
+            var content='';
+            tr.each(function(){
+                var itemid=$(this).attr('data-id');
+				var num=$(this).find('.scalar-sugar .text').val();
+				var gname=$(this).find('.g-name[data-weight]');
+                var subtotal=$(this).find('.item-price').next().next().find('span');
+                var fullreduct=$(this).find('.fullreduct');
+                var itemheader=$(this).find('.item-header');
+                
+				if(gname.length){
+					
+				    gname.each(function(){
+				    	var pnum=$(this).attr('data-num');
+					    var pitemid=$(this).attr('data-pitemid');
+					    var pid=$(this).attr('data-pid');
+					    var promotionmoney=$(this).attr('data-promotionmoney');
+				          if(promotionmoney){
+				             totalPrice=accAdd(totalPrice, promotionmoney);
+				          }
+				          totalWeight=accAdd(totalWeight, $(this).attr('data-weight')*pnum);
+				   });
+				}
+				if(fullreduct.length){
+					totalReduct=accAdd(totalReduct,fullreduct.attr('data-fullreduct'));
+				}
+				totalNumber=accAdd(totalNumber,num);
+				totalPrice=accAdd(totalPrice, $(this).attr('data-price')*num);
+				totalWeight=accAdd(totalWeight, $(this).attr('data-weight')*num);
+				subtotal.text('￥'+UX.util.priceFormat($(this).attr('data-price')*num));
+			});
+			
+
+			content+='<p><span class="key"><span class="red">'+totalNumber+'</span>件商品&nbsp;&nbsp;&nbsp;&nbsp;总计：</span><span class="value">¥'+UX.util.priceFormat(totalPrice)+'</span></p><p><span class="key">重量：</span><span class="value">'+accDiv(totalWeight, 1000)+'kg</span></p>';
+			if(totalReduct){
+				content+='<p><span class="key">满减小计：</span><span class="value">-￥' +UX.util.priceFormat(totalReduct)+ '</span></p>';
+			}
+            $('#C_Cart .total').empty().append(content);
+            $('#C_Cart .total-price .price').text(UX.util.priceFormat(Subtr(totalPrice,totalReduct))+'元');
+		}
+		getChange();
+	}
+	//满减/赠
+	$('.gift-item input').live('click',function(){
+		var item=$(this).parents('.gift-item');
+		var products=item.parent();
+		if(item.hasClass('gift-item-selected')){
+		   item.removeClass('gift-item-selected');
+           products.find('input').attr('disabled',false);
+           products.find('.m-check').hide();
+		}else{
+		   item.addClass('gift-item-selected').siblings().find('.m-check').show();
+           products.find('input').attr('disabled',true);
+           item.find('input').attr('disabled',false);
+        }
+	});
+	$('.m-check').live('click',function(){
+	   $(this).siblings('.gift-check-tip').show();
+	});
+
+	$('#C_Cart .f-text a').live('click',function(){
+	  var top=$(this).offset().top;
+	  var left=$(this).offset().left;
+	  var hei=$(this).height();
+	  var id=$(this).parents('tr').attr('data-id');
+	  var type=$(this).attr('data-type');
+	  var content='';
+	  var id=type+'-'+id;
+	  var flag=$(this).attr('data-flag');
+	  var url = UX.basePath + 'ajax/ajaxGetPromotionItems.htm';
+	  var pid=$(this).attr('data-id');
+	  var _this=$(this);
+	  if(flag=='true'){
+	  	$.ajax({
+			type: 'POST',
+			url: url,
+			data: {
+				cityId: UX.city.id,
+				promotionId:pid
+			},
+			success: function(json) {
+                if(json.code==0){
+                    var data = json.data.itemList;
+                    var content = '';
+                    if(data.length==0){
+                       UX.alert('暂时没有商品参与该活动');
+                    }else{
+                        content+='<div id="'+id+'" class="dialog gift-dialog loading"><div class="dialog-inner"><div class="dialog-toolbar clearfix"><a class="dialog-close" href="javascript:void(0);" onclick="javascript:$(\'#'+id+'\').hide()" title="关闭">关闭</a><h3 class="dialog-title">请选择换购商品，数量有限，换完即止</h3></div><div class="dialog-content"><div class="give-box"><div class="gift-products clearfix" data-max="1">';
+			            for (var i = data.length - 1; i >= 0; i--) {
+				           var item = data[i];
+					       var itemid = item.id;
+					       var link = UX.basePath + 'item.htm?cityId=' + UX.city.id + '&id=' + id;
+					       var imgs = item.imgs.split(',')[0] + '!310px310px';
+					       var name = item.name;
+					       var price = item.price;
+					       var weight = item.weight;
+					       var num=item.stopBuyNum;
+
+					       content+='<div class="gift-item" data-weight="'+weight+'" data-price="'+price+'" data-id="'+itemid+'" data-num="'+num+'" data-pid="'+pid+'"><div class="radio-checkbox"><input type="checkbox" ><span class="m-check"></span><div class="gift-check-tip" style="display: none;">限选择1种商品，您已选满<b onclick="$(this).parent().hide();">×</b></div></div><div class="p-img"><a href="'+link+'" target="_blank"><img src="'+imgs+'" alt="'+name+'" width="50"></a></div><div class="p-name"><a href="'+link+'" target="_blank" title="'+name+'">'+name+'x'+num+'</a><div><span class="price">¥'+UX.util.priceFormat(price)+'</span></div></div></div>';  
+				        }
+				        content+='</div><div class="p-btns ac"><a href="javascript:void(0);"  class="btn btn-red">确定</a><a href="javascript:void(0);" onclick="javascript:$(\'#'+id+'\').hide()" class="btn btn-gray">取消</a></div></div></div></div></div>';
+                         _this.parents('tr').find('.hasgift_first').next().append(content);  
+                         $('#'+id).css({
+	                       'top':top+hei,
+	                       'left':left
+	                     });
+	                }
+	                _this.attr('data-flag','false');
+	    	    }
+			}
+		});
+                        
+	  }else{
+	  	if($('#'+id).length){
+	  	   $('#'+id).show();
+	    }else{
+	  	   UX.alert('暂时没有商品参与该活动');
+	    }
+	  }
+	  
+	  
+	});
+
+	$('#C_Cart .p-btns .btn-red').live('click',function(){
+	    var item=$(this).parents('.give-box').find('.gift-item-selected');
+	    var type=$(this).parents('.gift-dialog').attr('id').substring(0,2);
+	    var promotionmoney=$(this).parents('tr').find('.item-header').attr('data-promotionmoney');
+	    if(!item.length){
+           if(type=='hg'){
+           	  $(this).parents('tr').removeClass('selectedgift');
+           	  $(this).parents('tr').find('.hasgift_first .p-gift-box').remove();
+           }else if(type='mz'){
+           	  $(this).parents('tr').find('.item_extra .p-gift .g-name').remove();
+           }
+	    }else{
+	        var pitemid=item.attr('data-id');
+	        var pid=item.attr('data-pid');
+	        var name=item.find('a').text();
+	        var price=item.attr('data-price');
+	        var weight=item.attr('data-weight');
+	        var num=item.attr('data-num');
+            var content='';
+            if(type=='hg'){
+              content+='<div class="p-gift-box"><div class="mc"><div class="p-gift clearfix"><div class="g-name" data-price="'+price+'" data-weight="'+weight+'" data-num="'+num+'" data-pitemid="'+pitemid+'" data-pid="'+pid+'" data-promotionmoney="'+promotionmoney+'">[换购商品] '+name+'</div></div></div><div class="mb"><div class="p-gift-extra" style="display: none;">展开全部（5）个<b></b></div></div></div>';
+              $(this).parents('tr').addClass('selectedgift');
+              $(this).parents('tr').find('.hasgift_first').find('.p-gift-box').remove();
+              $(this).parents('tr').find('.hasgift_first').append(content);
+            }else if(type=='mz'){
+              var mcon='';
+              mcon+='<span class="g-name" data-pitemid="'+pitemid+'" data-weight="'+weight+'" data-num="'+num+'" data-pid="'+pid+'">[赠品]'+name+'</span>';
+              $(this).parents('tr').find('.item_extra .p-gift .g-name').remove();
+              $(this).parents('tr').find('.item_extra .p-gift').append(mcon);
+            }
+        } 
+            getChange();
+            $(this).parents('.gift-dialog').hide();   
+	});
+
+
+	$('#C_PostFreeItems .bd li').live('mouseenter', function() {
+		$(this).find('.btn-cart').css('display', 'inline-block');
+	})
+	$('#C_PostFreeItems .bd li').live('mouseleave', function() {
+		$(this).find('.btn-cart').hide();
+	})
+	$('#C_PostFreeItems .bd .A_Cart_Add').live('click', function() {
+		window.scrollTo(0, 0);
+		//loadItems();
+	})
+	var addrURLs = {
+		'new': UX.basePath + 'my/address/add-address-for-settlement.htm',
+		'edit': UX.basePath + 'my/address/update-address-for-settlement.htm',
+		'get': UX.basePath + 'my/address/address-detail-for-settlement.htm'
+	}
+	var mode = 'new';
+	$('#C_AddrSubmit').live('click', function() {
+		if (!addressValidate()) {
+			return;
+		}
+		var form = $('#C_AddrEditor form');
+		var url = addrURLs[mode];
+		form.attr('method', 'GET');
+		form.attr('action', url);
+		form.ajaxSubmit({
+			success: function(json) {
+				if (json.code == -1) {
+					alert(json.msg);
+					//hideAddressPopup();
+					return;
+				}
+				var addr = json.addressInfo;
+				var id = addr.id;
+				var provStr = ds.getStrByCode(addr.proviceId);
+				var cityStr = ds.getStrByCode(addr.cityId);
+				var areaStr = ds.getStrByCode(addr.areaId);
+				var telephone = '';
+				if (addr.telephone2 != '') {
+					telephone = addr.telephone1 + addr.telephone2 + (addr.telephone3 == '' ? '' : '-' + addr.telephone3);
+				}
+				if ($('#Addr_' + id).length) {
+					$('#Addr_' + id).parents('li').remove();
+				}
+				var content = '<li class="selected" data-id="' + id + '"><input id="Addr_' + id + '" class="" autocomplete="off" type="radio" checked name="address"><label for="Addr_' + id + '"> <strong>' + addr.userName + '</strong>' + provStr + cityStr + areaStr + addr.address + '&nbsp;&nbsp;<span>' + (addr.cellphone == '' ? '' : (addr.cellphone + ' ')) + telephone + '</span><a class="C_AddrEdit" href="javascript:void(0)">编辑</a></label></li>';
+				$('#C_AddrList ul li').removeClass('selected');
+				$('#C_AddrList ul').append(content);
+				$('#C_AddrEditor').hide();
+				$('#C_AddrList').show();
+				$('#C_FinalAddr').html(addr.userName + '&nbsp;&nbsp;' + provStr + cityStr + areaStr + '&nbsp;&nbsp;' + addr.address + telephone);
+			},
+			error: function() {
+
+			}
+		});
+	});
+    //收货地址
+	$('#C_AddrList ul li').live('mouseenter', function() {
+		$(this).addClass('hover');
+	})
+	$('#C_AddrList ul li').live('mouseleave', function() {
+		$(this).removeClass('hover');
+	})
+	$('#C_AddrList ul li').bind('click', function() {
+		$('#C_AddrList ul li').removeClass('selected');
+		$(this).addClass('selected');
+		$(this).find('input').attr('checked', 'checked');
+		var id = $(this).attr('data-id');
+		$('#C_FinalAddr').html($(this).text());
+	});
+	//增加收货地址
+	$('#C_AddrNew').live('click', function() {
+		mode = 'new';
+		$('#C_AddrEditor form')[0].reset();
+		ds.selectDist(UX.city.id);
+		$('#C_AddrEditor').show();
+		$('#C_AddrList').hide();
+	});
+	$('#C_AddrCancel').live('click', function() {
+		if ($('#C_AddrList ul li').length > 0) {
+			$('#C_AddrEditor').hide();
+			$('#C_AddrList').show();
+		}
+	});
+	$('.C_AddrEdit').live('click', function() {
+		mode = 'edit';
+		var id = $(this).parents('li').attr('data-id');
+		var url = addrURLs.get;
+		$('#C_AddrEditor input[name=id]').val(id);
+		$.ajax({
+			url: url,
+			method: 'GET',
+			data: {
+				id: id
+			},
+			success: function(json) {
+				if (json.code == -1) {
+					UX.alert(json.msg);
+					return
+				}
+				loadDataToForm(json.addressInfo);
+				$('#C_AddrEditor').show();
+				$('#C_AddrList').hide();
+			}
+		});
+	});
+	//配送方式
+	var pickupmoney=$('.k-v:eq(1) .v').text();
+    $('input[name=postway]').bind('change',function(){
+
+        $('input[name=store]').attr('checked',false);
+    	$('.k-v:eq(1) .v').text(pickupmoney);
+
+    	if($(this).attr('value')==4){
+    		$('input[name=store]').eq(0).attr('checked',true);
+			$('.k-v:eq(1) .v').text('￥0.0');
+    	}
+
+    	updatePriceInfo();
+    });
+	$('input[name=store]').bind('change',function(){
+		$(this).parents('dl.list').children('dt').find('input').attr('checked',true);
+		$('.k-v:eq(1) .v').text('￥0.0');
+		updatePriceInfo();
+	});
+	//发票
+	var invoUrl = UX.basePath + 'my/invoice/editInvoiceForSettlement.htm';
+	var invoDeleUrl = UX.basePath + 'my/invoice/deleteInvoiceForSettlement.htm';
+	var invoStatus = 0;
+	var invoInEdit = function() {
+		invoStatus = 1;
+		$('#C_EditInvoice form')[0].reset();
+		$('#C_NewInvoice').text('- 取消编辑');
+		$('#C_Invoices').hide();
+		$('#C_EditInvoice').show();
+	}
+	var invoOutEdit = function() {
+		invoStatus = 0;
+		$('#C_NewInvoice').text('+新增发票信息')
+		$('#C_Invoices').show();
+		$('#C_EditInvoice').hide();
+	}
+	$('#C_NewInvoice').bind('click', function() {
+		if (!invoStatus) {
+			invoInEdit();
+		} else {
+			invoOutEdit();
+		}
+	})
+
+	$('.invoice-list li').live('mouseenter', function() {
+		$(this).find('.act').show();
+	});
+	$('.invoice-list li').live('click', function() {
+		$('.invoice-list li').removeClass('selected');
+		$(this).addClass('selected');
+	})
+	$('.invoice-list li').live('mouseleave', function() {
+		$(this).find('.act').hide();
+	});
+
+	$('.C_Invo_Edit').live('click', function() {
+		invoInEdit();
+		var li = $(this).parents('li');
+		var id = li.attr('data-id');
+		$('#C_EditInvoice input[name=id]').val(id);
+		var titleType = li.find('.C_Invo_TitleType').attr('data-value');
+		var title = li.find('.C_Invo_Title').attr('data-value');
+		var content = li.find('.C_Invo_Content').attr('data-value');
+		var form = $('#C_EditInvoice form');
+		form.find('input[name=titleType][value=' + titleType + ']').attr('checked', true);
+		if (titleType) {
+			$('#C_InvoTitle_CName').show();
+			form.find('input[name=title]').val(title);
+		}
+		form.find('input[name=content][value=' + content + ']').attr('checked', true);
+	})
+
+	$('.C_Invo_Dele').live('click', function() {
+		var isDelete = confirm('确定删除该发票信息？');
+		if (!isDelete) {
+			return
+		}
+		var li = $(this).parents('li');
+		var id = li.attr('data-id');
+		$.ajax({
+			url: invoDeleUrl,
+			method: 'POST',
+			data: {
+				id: id
+			},
+			success: function(json) {
+				if (json.code == -1) {
+					UX.alert(json.msg);
+					return
+				}
+				li.remove();
+			}
+		});
+	});
+
+	$('input[name=titleType]').live('click', function() {
+		if ($('#C_InvoTitle_C').is(':checked')) {
+			$('#C_InvoTitle_CName').show();
+		} else {
+			$('#C_InvoTitle_CName').hide();
+		}
+	});
+	$('#C_InvoiceSubmit').live('click', function() {
+		if (!$('input[name=titleType]:checked').val()) {
+			UX.alert('请选择发票抬头');
+			return;
+		}
+		if (!$('input[name=content]:checked').val()) {
+			UX.alert('请选择发票内容');
+			return;
+		}
+		var form = $('#C_EditInvoice form');
+		form.attr('method', 'GET');
+		form.attr('action', invoUrl);
+		form.ajaxSubmit({
+			success: function(json) {
+				if (json.code == -1) {
+					alert(json.msg);
+					//hideAddressPopup();
+					return;
+				}
+				var invo = json.data;
+				var titleType = invo.titleType ? '单位' : '个人';
+				var id = invo.id;
+				if ($('#C_Invoice_' + id).length) {
+					$('#C_Invoice_' + id).remove();
+				}
+				var content = '<li id="C_Invoice_' + id + '" data-id="' + id + '" class="selected"><input type="radio" name="invoice" id="C_Invoice' + id + '" value="' + id + '" checked><label for="C_Invoice' + id + '"> <span class="C_Invo_TitleType" data-value="' + invo.titleType + '">' + titleType + '</span>' + (invo.titleType ? (' <span class="C_Invo_Title" data-value="' + invo.title + '">发票抬头：' + invo.title + '</span>') : '') + ' <span class="C_Invo_Content" data-value="' + invo.contentIndex + '">发票内容：' + invo.content + '</span></label> <span class="act" style="display:none"><a class="C_Invo_Edit" href="javascript:void(0)">编辑</a><a class="C_Invo_Dele" href="javascript:void(0)">删除</a></span></li>';
+				invoOutEdit();
+				$('#C_Invoices li.selected').removeClass('selected');
+				$('#C_Invoices').append(content);
+			},
+			error: function() {
+
+			}
+		});
+	});
+	//支付方式选择
+	if ($('.P_MoreBank').length) {
+		$('.P_MoreBank').toggle(function() {
+			var ul = $(this).siblings('ul');
+			var len = ul.find('li').length;
+			var height = Math.ceil(len / 3) * 58;
+			ul.animate({
+				height: height
+			}, 500);
+			$(this).find('span').addClass('up')
+			$(this).find('i').text('收起');
+		}, function() {
+			$(this).siblings('ul').animate({
+				height: 174
+			}, 500)
+			$(this).find('span').removeClass('up');
+			$(this).find('i').text('选择其他银行');
+		});
+	}
+	$('.A_TabT li').each(function(index) {
+		$(this).click(function() {
+			$('.A_TabT li').removeClass('selected');
+			$(this).addClass('selected');
+			$('.A_TabC .content').hide();
+			$('.A_TabC .content').eq(index).show();
+		});
+	})
+	//代金券相关
+	$('#C_Coupon').click(function() {
+		var $i=$(this).children('i');
+		
+		$('.coupons').slideToggle(300);
+		if($i.attr('class').match("minus")){
+            $i.removeClass('minus');
+		}else{
+			$i.addClass('minus');
+		}
+	});
+
+	$('input[name=coupon]').live('click', function() {
+		updatePriceInfo();
+	});
+
+	$('#C_CouponSubmit').click(function() {
+		var ctext = $('#C_CouponText').val();
+		if (ctext == '') {
+			UX.alert("错误的代金券码");
+			return
+		}
+		$.ajax({
+			url: UX.basePath + 'ajax/bindCashcoupon.htm',
+			method: 'GET',
+			data: {
+				cityId: UX.city.id,
+				cashCode: ctext
+			},
+			success: function(json) {
+				$('#C_CouponText').val('');
+				if (json.code == -1) {
+					UX.alert(json.msg);
+					return
+				}
+				var data = json.data;
+				var id = data.id;
+				var conditionMoney = UX.util.priceFormat(data.conditionMoney);
+				//除去邮费和不参加代金券的商品的价格
+				var orderPrice = parseFloat($('#C_TotalPrice').attr("data-item")) - parseFloat($('#C_TotalPrice').attr("data-excludeCashCoupon"));
+				if (conditionMoney > orderPrice) {
+					$('.coupons').after('<p style="line-height:40px;font-weight:bold">绑定成功！但是，您刚使用的代金券<span class="red">未到达使用条件</span>（需要达到' + conditionMoney + '元，不含运费和不参加代金券活动的商品金额），推荐您<a>看看这些商品凑单</a></p>');
+					return
+				}
+				var content = '<li><input data-money="' + data.money + '" id="Coupon' + id + '" name="coupon" type="radio" value="' + data.code + '"><label for="Coupon' + id + '">' + UX.util.priceFormat(data.money, 1) + '元代金券，编号：' + data.code + '<span class="gray">（购物满' + conditionMoney + '元使用）</span><label></li>';
+				$('.coupons').append(content);
+				$('#Coupon' + id).prop('checked', true);
+				updatePriceInfo();
+			},
+			error: function() {
+
+			}
+		});
+	})
+	//礼品卡
+	$('#C_GiftCard').click(function() {
+		var $i=$(this).children('i');
+		
+		$('.giftcard-add input:first').focus();
+		$('.giftcard').slideToggle(300);
+		if($i.attr('class').match("minus")){
+            $i.removeClass('minus');
+		}else{
+			$i.addClass('minus');
+		}
+		   
+	});
+	$('.giftcard-add input').bind('keyup', function() {
+        var str = $(this).val();
+        var num =parseInt($(this).attr('id').substr(-1));
+        str = str.toUpperCase();
+        $(this).val(str);
+
+        if(str.length==4 && num<=3){
+        	$('.giftcard-add input[id="GC_Num_'+(num+1)+'"]').focus();
+        }
+	})
+//	$('.giftcard-add input').bind('paste', function(e){
+//	    console.log(e.clipboardData)
+//	    var $this = $(this);
+//	    setTimeout(function () {
+//        var text =$this.val().trim();
+//        console.log(text);
+//            for(var i=0;i<4;i++){
+//                var str = text.substring(i*4,4);
+//                console.log(str);
+//            }
+//        }, 100);
+//	})
+	$('.giftcard-table input').live('change', function() {
+		updatePriceInfo();
+	})
+
+	function updatePriceInfo() {
+		var gcTotalNum = 0;
+		var gcTotalMoney = 0;
+		var couponMoney = 0;
+		/*var totalPrice = $('#C_TotalPrice').attr('data-total');*/
+
+		var totalPrice = accAdd($.trim($('.k-v:eq(0) .v').text()).substr(1), $.trim($('.k-v:eq(1) .v').text()).substr(1));
+
+		//计算礼品卡
+		$('input[name=giftcard]:checked').each(function() {
+			var gcMoney = parseInt($(this).attr('data-money')) || 0;
+			gcTotalMoney += gcMoney;
+			gcTotalNum++;
+		});
+
+		if (gcTotalMoney == 0) {
+			$('#C_CardUsed').html('');
+		} else {
+			$('#C_CardUsed').html('¥ -' + UX.util.priceFormat(gcTotalMoney));
+		}
+
+		$('#GC_TotalNum').text(gcTotalNum);
+		$('#GC_TotalPrice').text(UX.util.priceFormat(gcTotalMoney));
+
+		//计算代金券
+		couponMoney = $('input[name=coupon]:checked').attr('data-money');
+		couponMoney = Number(couponMoney) || 0;
+
+		if (couponMoney == 0) {
+			$('#C_CashUsed').html('');
+		} else {
+			$('#C_CashUsed').html('¥ -' + UX.util.priceFormat(couponMoney));
+		}
+
+		//合计
+		var reduceMoney = gcTotalMoney + couponMoney;
+		reduceMoney = UX.util.priceFormat(reduceMoney);
+		totalPrice = accAdd(totalPrice, -reduceMoney);
+		$('#C_TotalPrice').html(Math.max(0, totalPrice));
+	}
+
+	$('#GC_Submit').click(function() {
+		var num1 = $('#GC_Num_1').val();
+		var num2 = $('#GC_Num_2').val();
+		var num3 = $('#GC_Num_3').val();
+		var num4 = $('#GC_Num_4').val();
+		if (num1.length < 4 || num2.length < 4 || num3.length < 4 || num4.length < 4) {
+			UX.alert('请输入完整的卡/券密码')
+			return;
+		}
+		$.ajax({
+			url: UX.basePath + 'ajax/ajaxBindGiftCard.htm',
+			method: 'POST',
+			data : {
+			    cityId: UX.city.id,
+			    cardPwd : num1 + num2 + num3 + num4 + ''
+			},
+			success: function(json) {
+				if (json.code == 0) {
+				    //请求成功后清除卡券密码
+                    $('#GC_Num_1').val('');
+                    $('#GC_Num_2').val('');
+                    $('#GC_Num_3').val('');
+                    $('#GC_Num_4').val('');
+                    
+					var giftCard = json.data;
+					var id = giftCard.id;
+					if($('.giftcard-table').find('#GC_' + id).length > 0){
+					    return;
+					}
+					var content = '<tr id="GC_' + id + '"><td>' + giftCard.cardPwd + '</td><td>¥' + UX.util.priceFormat(giftCard.cardMoney) + '</td><td><input data-money="' + giftCard.cardMoney + '" data-id="' + id + '" type="checkbox" name="giftcard"></td></tr>';
+					$('.giftcard-table').append(content);
+					$('#GC_' + id).find('input').prop('checked', true);
+					updatePriceInfo();
+				} else {
+					UX.alert(json.msg || '使用失败，请再试一次');
+				}
+			},
+			error: function() {
+
+			}
+		})
+	})
+
+	$(".scalar-sugar .text").live("keyup",
+		function(e) {
+			var count = Number($(this).val());
+			if (!/^\d*$/.test(count)) {
+				$(this).val("1");
+			} else {
+				if (count > 999) {
+					$(this).val("999");
+				} else if (count < 1) {
+					$(this).val("1");
+				}
+			}
+		});
+	//订单提交
+	$('#C_OrderSubmit').bind('click', function() {
+		var form = $('#C_OrderForm')[0];
+		var itemsJson = [];
+		var line=$('.items .line');
+		for(var x=0;x<line.length;x++) {
+			var itemid = line.eq(x).attr('data-id');
+			var num = line.eq(x).attr('data-num');
+			
+			if(!line.eq(x).find('.g-name').length){
+                var appendPresentPromotion=line.eq(x).prev('.appendPresentPromotion').find('.g-name');
+			    var presentPromotion=line.eq(x).next('.presentPromotion').find('.g-name');
+			    line.eq(x).find('td:first').append(appendPresentPromotion.clone().hide());
+			    line.eq(x).find('td:first').append(presentPromotion.clone().hide());
+			}
+			var allPromotion=line.eq(x).find('.g-name');
+			itemsJson.push({
+                                	'itemid':itemid,
+                                    'num':num,
+                                    'promotion':[]
+                                });
+            
+			for(var y=0;y<allPromotion.length;y++){
+				var gname=allPromotion.eq(y);
+				var pid=gname.attr('data-pid');
+				var pitemid=gname.attr('data-pitemid');
+				var pnum=gname.attr('data-pnum');
+
+				if(itemsJson[x].promotion.length==0){
+					itemsJson[x].promotion.push({
+						'id':pid,
+						'pitemid':pitemid,
+						'pnum':pnum
+					});
+				}else{
+					for(var k=0;k<itemsJson[x].promotion[y].length;k++){
+						var oldpid=itemsJson[x].promotion[y].pid;
+						if(pid==oldpid){
+						   var p_itemid=pitemid+'|'+itemsJson[x].promotion[y].pitemid;
+						   var p_num=pnum+'|'+itemsJson[x].promotion[y].pnum;
+						   itemsJson[x].promotion[y]={
+						   	   'id':pid,
+						       'pitemid':p_itemid,
+						       'pnum':p_num
+						   };
+					    }else{
+                            itemsJson[x].promotion[y].push({
+						   	   'id':pid,
+						       'pitemid':pitemid,
+						       'pnum':pnum
+						   });
+					    }
+					}
+					
+				}
+			}
+		}
+		var itemsJson=form.itemsJson.value=JSON.stringify(itemsJson); 
+		//var idStr = form.itemIds.value = ids.join(',');
+		//var numStr = form.nums.value = nums.join(',');
+		var addressID = form.addressId.value = $('#C_AddrList li.selected').attr('data-id');
+		var paywayID = form.paywayId.value = $('input[name=payway]:checked').val();
+		var postwayId = form.postwayId.value = $('input[name=postway]:checked').val();
+		var remark = form.remark.value = $('#Remark').val();
+		var sendTimeInfoValue = form.sendTimeInfoValue.value = $('input[name=sendTimeInfo]').val() || '';
+		var cashCode = $('.coupons input[name=coupon]:checked').val();
+		var storeId=0;
+		form.invoiceId.value = $('input[name=invoice]:checked').val();
+
+		var giftCodeIds = [];
+
+		if(postwayId==4){
+			storeId=form.storeId.value=$('input[name=store]:checked').val();
+			var pickuptime=form.pickuptime.value=$("select[name=takeDate]").find("option:selected").attr('value');
+		}
+
+		$('input[name=giftcard]:checked').each(function() {
+			var giftCodeId = $(this).attr('data-id');
+			giftCodeIds.push(giftCodeId);
+		});
+		if (giftCodeIds.length && form.giftCodes) {
+			form.giftCodes.value = giftCodeIds.join(',');
+		};
+
+		if (cashCode) {
+			remark
+			form.cashCode.value = cashCode
+		}
+
+		try {
+			if (itemsJson == '') {
+				throw '没有任何商品';
+			}
+			if (!addressID) {
+				throw '请选择一个地址';
+			}
+			if (!paywayID) {
+				throw '请选择一个支付方式';
+			}
+			if (!postwayId) {
+				throw '请选择一个配送方式';
+			}
+		} catch (e) {
+			UX.alert(e);
+			return
+		}
+		form.submit();
+		return false;
+	});
+
+	//提交成功
+	if ($('#C_OrderSuccess').length) {
+		var isSuccess = Number($('#C_OrderSuccess')[0].value);
+		if (isSuccess == 1) {
+			UX.cart.clear();
+		}
+	}
+
+	if ($('#O_Remain').length) {
+		var remainTime = Number($('#O_Remain').attr('data-time'));
+		var timer = setInterval(function() {
+			if (remainTime >= 0) {
+				$('#O_Remain').html(UX.util.stringOfCountDown(remainTime));
+				--remainTime;
+			} else {
+				$('#O_Remain').html(UX.util.stringOfCountDown(0));
+				clearInterval(timer);
+			}
+		}, 1000);
+	}
+
+	function loadDataToForm(data) {
+
+		ds.selectDist(data.areaId);
+
+		for (var key in data) {
+			if (key == 'distCode') {
+				continue
+			}
+			// if (key == 'address') {
+			// 	$('textarea[name=' + key + ']').val(data[key]);
+			// 	continue
+			// }
+			$('input[name=' + key + ']').val(data[key]);
+		}
+	}
+})
+
+function orderTotalPrice() {
+	return parseFloat($('#C_TotalPrice').text());
+}
+
+function checkAddressAndPayway() {
+	var address = $('.address li.curr');
+	if (address.length) {
+		$('#addressId').val(address.attr('data-addressid'));
+	} else {
+		alert('请选择一个收货地址');
+		return false;
+	}
+
+	var payway = $('input[name=payment]:checked').val();
+	if (payway) {
+		$('#paywayId').val(payway);
+	} else {
+		alert('请选择一个付款方式');
+		return false;
+	}
+	return true;
+}

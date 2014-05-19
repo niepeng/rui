@@ -1,0 +1,61 @@
+<div class="a-ctn">
+    	<div class="w-container">
+            <div class="w-account-ctn a-module-register">
+				#set($form = $formFactory.getForm('admin.register'))
+                <form novalidate="" autocomplete="off" action="/admin/doRegister.htm" method="post">
+                     
+            <fieldset class="a-show-phone">
+                <legend class="h3">注册豌豆荚 <span class="w-text-info"></span></legend>
+                <div class="w-control-group a-field-username-group">
+                    <div class="a-field-phone">
+                        <label class="w-text-secondary" for="a-register-phone">用户名，建议手机号</label>
+                        <input autofocus="" class="w-input w-input-block w-input-kaiju" type="tel" name="$form.userName.name" value="$!form.userName.value"  placeholder="用户名，建议手机号" id="a-register-phone">
+                       #errorMessage($!form.userName.message) <span class="a-input-clear" style="display: none;">×</span>
+                        <div class="w-text-warning a-error" style="display: none;"></div>
+                    </div>
+                </div>
+                <div class="w-control-group a-field-password">
+                    <label class="w-text-secondary" for="a-register-password">密码<span></span></label>
+                    <input class="w-input w-input-block w-input-kaiju js-readable-password" type="password" name="$form.psw.name" value="$!form.psw.value"  placeholder="密码" data-placeholder="密码" id="a-register-password">
+                    #errorMessage($!form.psw.message)<span class="a-input-clear">×</span>
+                    <div class="w-text-warning a-error"></div>
+                </div>
+                <div class="w-control-group a-field-name">
+                    <label class="w-text-secondary" for="a-register-name">姓名<span></span></label>
+                    <input class="w-input w-input-block w-input-kaiju" type="text" name="$form.nick.name" value="$!form.nick.value"  placeholder="姓名" data-placeholder="姓名" id="a-register-name">
+                    #errorMessage($!form.nick.message)<span class="a-input-clear">×</span>
+                    <div class="w-text-warning a-error"></div>
+                </div>
+                <!--
+				<div class="w-control-group a-field-idcard">
+                    <label class="w-text-secondary" for="a-register-idcard">身份证号码<span></span></label>
+                    <input class="w-input w-input-block w-input-kaiju" type="text" name="idcard" placeholder="身份证号码" data-placeholder="身份证号码" id="a-register-idcard">
+                    <span class="a-input-clear">×</span>
+                    <div class="w-text-warning a-error"></div>
+                </div>
+				-->
+                <div class="w-control-group a-field-contact">
+                    <label class="w-text-secondary" for="a-register-contact">联系方式<span></span></label>
+                    <input class="w-input w-input-block w-input-kaiju" type="text" name="$form.phone.name" value="$!form.phone.value"  placeholder="联系方式" data-placeholder="联系方式" id="a-register-contact">
+                    #errorMessage($!form.phone.message)<span class="a-input-clear">×</span>
+                    <div class="w-text-warning a-error"></div>
+                </div>
+                <div class="w-control-group a-field-action">
+                    <button class="w-btn w-btn-primary w-btn-kaiju w-btn-block" type="submit">注册</button>
+                    <div class="w-text-warning a-error"></div>
+                </div>
+                <div class="w-control-group a-notice w-cf a-hr-bottom">
+                    <a class="a-pull-left js-switch-log" href="$adminModule.setTarget('login')">已有账号登录</a>
+                    <!--
+					<a class="a-pull-right a-use-email js-register-username-switcher" href="javascript:;">使用 email 注册</a>
+                    <a class="a-pull-right a-use-phone js-register-username-switcher" href="javascript:;">使用手机号注册</a>
+					-->
+                </div>
+                <div class="w-control-group a-field-terms w-text-info w-cf">
+                    <p>注册豌豆荚账号表示您同意<a href="http://www.wandoujia.com/terms" target="_default">最终用户协议</a></p>
+                </div>
+            </fieldset>
+        </form>
+    </div>
+        </div>
+    </div>

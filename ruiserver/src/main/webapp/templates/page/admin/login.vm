@@ -1,0 +1,55 @@
+<div class="a-ctn">
+		<div class="w-container">
+                <div class="w-account-ctn a-module-login">
+					#set($form = $formFactory.getForm('user.login'))
+                    <form novalidate="" autocomplete="off" action="/admin/doLogin.htm" method="post">
+                        <fieldset>
+                            <legend class="h3">登录豌豆荚 <span class="w-text-info"></span></legend>
+                            <div class="w-control-group a-field-username">
+                                <label class="w-text-secondary" for="a-login-username">用户名，建议手机号</label>
+                                <input autofocus="" class="w-input w-input-block w-input-kaiju js-email-autocomplete" type="email" name="$form.nick.name" value="$!form.nick.value" placeholder="用户名，建议手机号" id="a-login-username" autocomplete="off">
+									<ul class="a-autocomplete" style="width: 360px; display: none;"></ul>#errorMessage($!form.nick.message)
+                                <span class="a-input-clear" style="display: none;">×</span>
+                                <div class="w-text-warning a-error" style="display: none;"></div>
+                            </div>
+                            <div class="w-control-group a-field-password">
+                                <label class="w-text-secondary" for="a-login-password">密码</label>
+                                <input class="w-input w-input-block w-input-kaiju" type="password" name="$form.password.name" value="$!form.password.value" placeholder="密码" id="a-login-password">
+                                <span class="a-input-clear" style="display: none;">×</span>
+                                <div class="w-text-warning a-error" style="display: none;"></div>#errorMessage($!form.password.message)  #errorMessage($!resultmessage.message)
+                            </div>
+                            <div class="w-control-group a-field-captcha">
+                                <label class="w-text-secondary" for="a-login-captcha">激活码</label>
+                                <div class="a-field-captcha-info">
+                                    <input class="w-input w-input-kaiju" type="text" name="captcha" maxlength="6" placeholder="激活码" id="a-login-captcha">
+                                    <img class="js-captcha-refresh" src="" title="点击刷新激活码">
+                                </div>
+                                <div class="w-text-warning a-error"></div>
+                            </div>
+                            <div class="w-control-group a-field-action">
+                                <button class="w-btn w-btn-primary w-btn-kaiju w-btn-block" type="submit">登录</button>
+                                <div class="w-text-warning a-error"></div>
+                            </div>
+                            <div class="w-control-group a-field-switcher a-notice w-cf a-hr-bottom">
+                                <a class="a-pull-left js-switch-log" href="$adminModule.setTarget('register')">新用户注册</a>
+                                <a class="a-pull-right js-switch-log" href="#" onclick="showMsg();">忘记密码,联系管理员</a>
+                            </div>
+                            <div class="w-control-group a-hr-bottom show-ie6"><p>您正在使用的浏览器有点儿陈旧，所以不支持豌豆荚账号直接登录。您可以用微博账号或 QQ 账号登录，或者升级浏览器后再来试试。</p><p>除了 IE6 之外，世界上还是有很多浏览器值得您尝试的，比如 <a href="https://www.google.com/intl/zh-CN/chrome/browser/">Chrome</a> 。</p></div>
+                            
+                            <div class="a-field-terms w-text-info w-cf">
+                                <p>登录豌豆荚账号表示您同意<a href="http://www.wandoujia.com/terms" target="_default">最终用户协议</a></p>
+                            </div>
+                        </fieldset>
+                    </form>
+					
+                </div>
+		  </div>
+     </div>
+		
+	 
+	 <SCRIPT language="JavaScript">
+function showMsg(){
+	alert("请联系管理员，电话：139-8949-8009");
+}
+</SCRIPT>
+

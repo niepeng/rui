@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE beans PUBLIC
+    "-//SPRING//DTD BEAN//EN"
+     "http://www.springframework.org/dtd/spring-beans.dtd">
+<beans default-autowire="byName">
+    
+    <import resource="beans/biz-dao.xml" />
+
+    <import resource="beans/biz-service.xml" />
+	
+	<import resource="beans/persistence.xml" />
+	
+	<import resource="beans/jdbc-datasource.xml" />
+	
+	
+</beans>

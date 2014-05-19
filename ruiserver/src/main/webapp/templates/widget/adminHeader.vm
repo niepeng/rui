@@ -1,0 +1,32 @@
+ <div class="pmt-header">
+        <div class="pmt-container">
+            <h1 class="logo" logo="">
+            	<a class="logo-text">豌豆荚</a>
+            	<span>开发者中心</span>
+            </h1>
+            <div class="pmt-account-field ng-isolate-scope" ng-show="account" account="" accountdata="$root.account">
+            	<img ng-src="http://tp2.sinaimg.cn/2158026077/180/5627908465/1" class="pmt-account-avatar" src="http://tp2.sinaimg.cn/2158026077/180/5627908465/1">
+            	<div class="pmt-account-info">
+            		<span class="pmt-account-nickname ng-binding">GimponG</span>
+            		<span class="pmt-account-email ng-binding">gimpong@hotmail.com</span>
+            	</div>
+            	<ul class="account-dropdown-menu hide">
+            		<li><a href="/account/info" target="_self">修改注册信息</a></li>
+            		<li><a ng-click="changePwdHandler()">修改密码</a></li>
+            		<li><a ng-click="logoutHandler()">退出登录</a></li>
+            	</ul>
+            </div>
+            <!-- TODO: conf mainnav, subnav via attrs -->
+            <div class="pmt-nav" ng-show="isShowTopNav" topnav="">
+            	<ul class="main-nav">
+            		<li><a href="$adminModule.setTarget('app/list')" #if("$tab" == "0") class="nav-item current" #else class="nav-item" #end target="">app管理</a></li>
+            		<li><a href="$adminModule.setTarget('cat/list')" #if("$tab" == "1") class="nav-item current" #else class="nav-item" #end target="">类目管理</a></li>
+            		<li><a href="$adminModule.setTarget('banner/list')" #if("$tab" == "2") class="nav-item current" #else class="nav-item" #end target="">banner管理</a></li>
+            		<li><a href="$adminModule.setTarget('permission/list')" #if("$tab" == "3") class="nav-item current" #else class="nav-item" #end target="">app权限翻译</a></li>
+            	</ul>
+            	<ul class="sub-nav">
+            		<li><a href="http://developer.wandoujia.com/getting-started/" target="_blank" class="nav-item">帮助中心</a></li>
+            	</ul>
+            </div>
+        </div>
+    </div>

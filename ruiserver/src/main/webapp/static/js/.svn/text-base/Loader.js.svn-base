@@ -1,0 +1,105 @@
+/**
+ * Loader
+ * @authors 	Boya (boya@uxiang.com)
+ * @date    	2013-11-7 13:55:35
+ * @version 	1.0.0
+ * @dependences	jQuery
+ */
+
+function Loader(tabers, contenter, render, options) {
+	this.data = {};
+	this.tabers = tabers;
+	this.contenter = contenter;
+	this.page = -1;
+	this.number = 0;
+	this.render = render;
+	this.loader = null;
+	this.options = $.extend({
+		autoload: false,
+		type: 'mouseenter',
+		needRefresh: false,
+		loadDataByCustom:null
+	}, options);
+	this.init();
+}
+
+Loader.prototype.init = function() {
+	var _this = this;
+	var opts = this.options;
+	_this.number = _this.tabers.length;
+	if (opts.autoload) {
+		_this.selectAtPage(0);
+	}
+	_this.tabers.each(function(index) {
+		$(this).bind(opts.type, function() {
+			if (index == _this.page && !_this.options.needRefresh) {
+				return
+			} else {
+				_this.tabers.removeClass('selected');
+				$(this).addClass('selected');
+				_this.contenter.css('z-index', '999');
+				_this.selectAtPage(index);
+			}
+		});
+	});
+}
+Loader.prototype.selectAtPage = function(index) {
+	var _this = this;
+	_this.page = index;
+	_this.contenter.html('');
+	if (_this.loader) {
+		_this.loader.abort();
+	}
+	var data = _this.data['data' + index];
+	if (data && !_this.options.needRefresh) {
+		var string = _this.render(data);
+		_this.contenter.html(string);
+		UX.util.imgLazyLoad(_this.contenter);
+	} else {
+		var taber = _this.tabers.eq(index);
+		var uri = taber.attr('data-uri');
+		if(!uri && _this.options.loadDataByCustom){
+		    var string = _this.options.loadDataByCustom(index);
+		    _this.contenter.html(string);
+		    return;
+		}
+		_this.loader = $.ajax({
+			type: 'GET',
+			url: uri,
+			dataType: 'json',
+			success: function(json) {
+				if (json.code == 0) {
+					_this.data['data' + index] = json.data;
+					var string = _this.render(json.data);
+					_this.contenter.html(string);
+					UX.util.imgLazyLoad(_this.contenter);
+				} else {
+					_this.showErrorView();
+				}
+			},
+			error: function(e) {
+				console.log(e)
+				_this.showErrorView();
+			},
+			complete: function() {
+				_this.loader = null;
+			}
+		})
+	}
+}
+Loader.prototype.showErrorView = function() {
+	var _this = this;
+	var reloadButton = $('<a href="javascript:void(0)"></a>');
+	reloadButton.text('重新加载');
+	reloadButton.bind('click', function() {
+		_this.selectAtPage(_this.page);
+	})
+	var height = _this.contenter.height() == 0?'50px':_this.contenter.height();
+	reloadButton.css({
+		display: 'block',
+		textAlign: 'center',
+		lineHeight: height +'px',
+		backgroundColor: '#fff'
+	});
+	_this.contenter.html(reloadButton);
+}

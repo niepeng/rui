@@ -1,0 +1,233 @@
+﻿UX.wx={
+  cartInfo:function(){
+    var li=$('#cartlist>ul>li');
+    var total_num=0;
+    var selectnum=1;
+    var total_weight=0;
+    var total_price=0;
+    var params = UX.cart.params();
+    li.each(function(){
+      total_weight=accAdd(total_weight, accMul($(this).attr('data-weight'),$(this).find('.selectnum').text()));
+      total_price=accAdd(total_price,accMul($(this).attr('data-price'),$(this).find('.selectnum').text()));
+      total_num=accAdd(total_num,$(this).find('.selectnum').text());
+    });
+    total_weight=accDiv(total_weight, 1000);
+    total_price=UX.util.priceFormat(total_price);
+
+    $('.allnum').text(total_num);
+    $('.all_weight').text(total_weight);
+    $('.all_price').text('￥'+total_price);
+    $('.goConfirm .ids').val(params.ids);
+    $('.goConfirm .nums').val(params.nums);
+      
+  },
+  alert : function(msg) {
+      if (!-[1, ] && !window.XMLHttpRequest) {
+       alert(msg);
+       return
+      }
+      var uxAlert = new UX.popup({
+         fixed: true,
+         className: 'C_Pop_Alert',
+         size: {
+           width: 150
+         },
+         x: false
+      });
+      uxAlert.setContent(msg);
+      uxAlert.show();
+      setTimeout(function() {
+      uxAlert.hide();
+      }, 2000)
+  }
+};
+   //轮播
+function Slide(){
+   $('.banner_img').append($('.banner_img li:eq(0)').clone());
+   $('.banner_img').prepend($('.banner_img li').eq($('.banner_img li').length-1).clone());
+   
+   this.$banner=$('.banner');
+   this.$v_img=$('.banner').width();
+   this.cri_ul='';
+   this.criwrap=$('.banner').find('.circle');
+   this.banner_img=$('.banner').find('.banner_img');
+   this.banner_li=$('.banner').find('.banner_img li');
+   this.num=$('.banner').find('img').length;
+   this.cri_num=this.num-2;
+   this.page=1;
+   this.timer=null;
+   this.init();
+}
+Slide.prototype.init=function(){
+  var _this=this;
+
+  _this.cri_ul="<ul><li class='hight'><a href='javascript:void(0);'></a></li>";
+  for(var i=1;i<_this.cri_num;i++){
+    _this.cri_ul+="<li><a href='javascript:void(0);'></a></li>";
+  }
+  _this.cri_ul+="</ul>";
+  _this.criwrap.append(_this.cri_ul);
+  _this.criwrap.css({
+    'margin-left':-_this.criwrap.width()/2
+  });
+  _this.banner_img.css({
+        'width':_this.num*_this.$v_img,
+        'margin-left':-_this.$v_img+'px'
+      });
+  _this.banner_li.css('width',_this.$v_img);
+  
+  this.start();
+
+};
+
+Slide.prototype.start=function(){
+  var _this=this;
+  _this.$banner.touchwipe({
+    wipeLeft:function(){
+      clearInterval(_this.timer);
+      _this.timer=setInterval(_this.move,3000);
+      _this.move();
+    },
+    wipeRight:function(){
+      clearInterval(_this.timer);
+      _this.timer=setInterval(_this.move,3000);
+      _this.move('r');
+    },
+    min_move_x: 20,
+    min_move_y: 20,
+    preventDefaultEvents: true
+
+  });
+  _this.timer=setInterval(function(){
+    _this.move();
+  },3000);
+  
+
+};
+Slide.prototype.move=function(or){
+   var _this=this;
+
+    if(!$('.banner_img').is(':animated')){
+        if(or){
+          if( _this.page==1 ){
+            _this.page=_this.cri_num;
+            _this.criMove();
+            $('.banner_img').animate({'margin-left':'+='+_this.$v_img+'px'},1000,function(){
+                $('.banner_img').css('margin-left',-_this.$v_img*_this.cri_num+'px');
+            });
+          }else{
+            _this.page--;
+            _this.criMove();
+            $('.banner_img').animate({'margin-left':'+='+_this.$v_img+'px'},1000);
+          }
+        }else{
+          if( _this.page==_this.cri_num ){
+            _this.page=1;
+            _this.criMove();
+            $('.banner_img').animate({'margin-left':'-='+_this.$v_img+'px'},1000,function(){
+                $('.banner_img').css('margin-left',-_this.$v_img+'px');
+            });
+          }else{
+            _this.page++;
+            _this.criMove();
+            $('.banner_img').animate({'margin-left':'-='+_this.$v_img+'px'},1000);
+          }
+        }
+    }
+};
+Slide.prototype.criMove=function(){
+        var _this=this;
+        $('.circle li').eq(_this.page-1).addClass('hight').siblings().removeClass('hight');
+};
+
+
+//旋转
+   addEventListener('load', function(){
+    window.onorientationchange = orientationChange;
+   });
+
+   function orientationChange(){
+        window.location.reload();
+   }
+//加入购物车
+  $('.a_cart_add').live('click', function() {
+    var number = 1;
+    var timer;
+    var x;
+
+    if ($(this).parent().find('input[type=text]').length == 1) {
+      number = $(this).parent().find('input[type=text]').val();
+    }
+    var id = $(this).attr('data-id');
+    if (!id || id == "") {
+      return
+    }
+    var status = UX.cart.add(id, number);
+    if (status == 1) {
+      $('.rightBtns .number').html(UX.cart.number());
+      UX.wx.alert('加入购物车成功！');
+      return true;
+    } else if (status == 0) {
+
+    } else {
+
+    }
+  });
+
+$(function(){
+	//if(!is_weixin()){//限制非微信端访问
+	 	//  window.location.href="http://uxiang.com";
+		//     return;
+	//}
+   //回顶部
+   $('.gotop').bind('click',function(){
+      $("html, body").animate({ scrollTop: 0 }, 300);
+   });
+
+
+   //显示密码
+   $('.def').toggle(function(){
+      
+      $(this).addClass('active');
+      
+      $('#spsw').val($('#psw').val()).show();
+      $('#psw').hide();
+
+   },function(){
+      
+      $(this).removeClass('active');
+     
+      $('#psw').val($('#spsw').val()).show();
+       $('#spsw').hide();
+   });
+
+
+ 
+
+});
+
+//判断是否是微信访问
+function is_weixin(){
+    var ua = navigator.userAgent.toLowerCase(); 
+    if(ua.match(/MicroMessenger/i)=="micromessenger") {
+        return true;
+    } else {
+        return false;
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

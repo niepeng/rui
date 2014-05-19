@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="gbk"?>
+<!DOCTYPE beans PUBLIC
+    "-//SPRING//DTD BEAN//EN"
+     "http://www.springframework.org/dtd/spring-beans.dtd">
+<beans default-autowire="byName">
+	
+	  <bean id="testDAO" class="com.baibutao.apps.linkshop.uxiang.ruiserver.biz.dal.ibatis.TestDAOIbatis"></bean>
+	  <bean id="adminDAO" class="com.baibutao.apps.linkshop.uxiang.ruiserver.biz.dal.ibatis.AdminDAOIbatis"></bean>
+	  <bean id="appInfoDAO" class="com.baibutao.apps.linkshop.uxiang.ruiserver.biz.dal.ibatis.AppInfoDAOIbatis"></bean>
+	  <bean id="bannerDAO" class="com.baibutao.apps.linkshop.uxiang.ruiserver.biz.dal.ibatis.BannerDAOIbatis"></bean>
+	  <bean id="catDAO" class="com.baibutao.apps.linkshop.uxiang.ruiserver.biz.dal.ibatis.CatDAOIbatis"></bean>
+	  <bean id="keyValueDAO" class="com.baibutao.apps.linkshop.uxiang.ruiserver.biz.dal.ibatis.KeyValueDAOIbatis"></bean>
+	  <bean id="tagDAO" class="com.baibutao.apps.linkshop.uxiang.ruiserver.biz.dal.ibatis.TagDAOIbatis"></bean>
+	  <bean id="userAppOptInfoDAO" class="com.baibutao.apps.linkshop.uxiang.ruiserver.biz.dal.ibatis.UserAppOptInfoDAOIbatis"></bean>
+	  <bean id="userDAO" class="com.baibutao.apps.linkshop.uxiang.ruiserver.biz.dal.ibatis.UserDAOIbatis"></bean>
+	
+</beans>

@@ -1,0 +1,15 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>#if($title) $!title #else 处理app #end</title>
+    <link rel="stylesheet" href="$staticServer/css/app.css">
+		<style type="text/css">.w-account-hook-opened {overflow: hidden;}.w-account-hook-backdrop {background: #4C4C4C;background: url(http://img.wdjimg.com/account/overlay.png);background: rgba(0, 0, 0, .7);bottom: 0;left: 0;opacity: 0;position: fixed;right: 0;top: 0;z-index: 999;-webkit-transition: opacity .15s linear;-moz-transition: opacity .15s linear;-o-transition: opacity .15s linear;transition: opacity .15s linear;}.w-account-hook-backdrop-in {opacity: 1;}.w-account-hook-iframe {border: none;border-radius: 10px;left: 50%;height: 200px;margin: 0 0 0 -208px;position: fixed;top: 10%;width: 434px;-webkit-transform: translate3d(0, -150%, 0);-moz-transform: translate3d(0, -150%, 0);-ms-transform: translate3d(0, -150%, 0);-o-transform: translate3d(0, -150%, 0);transform: translate3d(0, -150%, 0);-webkit-transition: height .3s linear, -webkit-transform .3s ease-in-out;-moz-transition: height .3s linear, -moz-transform .3s ease-in-out;-o-transition: height .3s linear, -o-transform .3s ease-in-out;transition: height .3s linear, transform .3s ease-in-out;}.w-account-hook-iframe-in {-webkit-transform: translate3d(0, 0, 0);-moz-transform: translate3d(0, 0, 0);-ms-transform: translate3d(0, 0, 0);-o-transform: translate3d(0, 0, 0);transform: translate3d(0, 0, 0);}</style>
+  </head>
+  <body class="pmt-home ng-isolate-scope" busy="" busy-when-name="GLOBAL" >
+		$page_content
+    </body>
+</html>
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1/jquery.min.js"></script>
+<script src="$staticServer/js/golbal.js"></script>
+

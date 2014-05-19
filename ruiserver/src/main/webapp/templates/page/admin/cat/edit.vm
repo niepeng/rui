@@ -1,0 +1,35 @@
+	
+$widget.setTemplate("adminHeader").addToContext("tab",'1')
+
+#set($form = $formFactory.getForm('cat.edit'))
+	<div class="pmt-main-section pmt-container ng-scope" ng-view="">
+        <form action="doEditCat.htm"  enctype="multipart/form-data"  method="post">
+            <input type="hidden" name="id" value="$!catDO.id" />
+            <div style="padding:20px;">
+        		#errorMessage($!resultmessage.message) <br/>
+        		#set($name = $form.name.value)
+        		#if(!$name)
+        			#set($name = $!catDO.name)
+        		#end	
+                $form.name.label：<input type="text" name="$form.name.name" value="$!name">* #errorMessage($!form.name.message) <br/><br/><br/>
+                图标：<input type="file" name="iconUrl">
+        		#if($catDO.iconUrl)
+        			<img src="$!catDO.iconUrl" width="50px" height="50px"/>
+        		#end	 <br/><br/><br/>
+        		#set($sortValue = $form.sortValue.value)
+        		#if(!$sortValue)
+        			#set($sortValue = $!catDO.sortValue)
+        		#end
+                $form.sortValue.label：<input type="text" name="$form.sortValue.name" value="$!sortValue">* #errorMessage($!form.sortValue.message) <br/><br/><br/>
+        			
+                <input type="submit" value="提交"/>
+                	
+            </div>
+        </form>
+</div>
+	
+    $widget.setTemplate("userFoot")
+	
+
+	
+	

@@ -1,0 +1,44 @@
+
+$widget.setTemplate("adminHeader").addToContext("tab",'3')
+
+    <div class="pmt-container ng-scope" ng-view="">
+        <div class="myapp-list pmt-white-box ng-scope">
+
+			<div class="home-todo-list pmt-white-box" ng-show="appList.length">
+				<p>
+    				<a target="_self" href="add.htm" class="w-btn w-btn-grand w-btn-primary btn-add-app">
+                        <i class="pmt-icon-add"></i>
+                        添加新app权限翻译
+                    </a>
+				</p>
+			</div>
+			
+			
+            <div app-list="" data="appList" class="ng-isolate-scope">
+           	    <ul class="pmt-app-list ng-animate-fadedown" ng-show="appList.length">
+
+						<li class="pmt-app-list-item pmt-white-box ng-scope GENERAL_PUBLISHED" ng-repeat="appItem in appList" ng-class="appItem.status.type">
+                            
+							#foreach($keyValue in $keyValueList)
+    							<div class="white-box-content">
+                                    <div class="app-info">
+                                        <div class="app-icon">
+                                        </div>
+                                        <div class="app-desc" style="width:400px;">
+                                            <p class="app-title ng-binding">$!keyValue.keyName </p>
+                                            <p class="app-title ng-binding">$!keyValue.value</p>
+                                        </div>
+                                    </div>
+    								<div class="app-ctrl">
+    									<a  class="w-text-primary ng-scope" href="delete.htm?id=$!keyValue.id" onclick="javascript: return confirm('确定要删除该权限翻译？');">删除</a> 
+                                    </div>
+                                </div>
+							#end
+                        </li>
+                   
+                </ul>
+            </div>
+        </div>
+    </div>
+	
+    $widget.setTemplate("userFoot")

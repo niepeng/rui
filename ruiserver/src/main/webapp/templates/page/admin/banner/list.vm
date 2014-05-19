@@ -1,0 +1,55 @@
+
+
+ $widget.setTemplate("adminHeader").addToContext("tab",'2')
+
+    <div class="pmt-container ng-scope" ng-view="">
+        <div class="myapp-list pmt-white-box ng-scope">
+
+			<div class="home-todo-list pmt-white-box" ng-show="appList.length">
+				<p>
+    				<a target="_self" href="add.htm" class="w-btn w-btn-grand w-btn-primary btn-add-app">
+                        <i class="pmt-icon-add"></i>
+                        添加新banner
+                    </a>
+				</p>
+			</div>
+			
+			
+            <div app-list="" data="appList" class="ng-isolate-scope">
+           	    <ul class="pmt-app-list ng-animate-fadedown" ng-show="appList.length">
+
+					 #foreach($banner in $bannerList)
+						<li class="pmt-app-list-item pmt-white-box ng-scope GENERAL_PUBLISHED" ng-repeat="appItem in appList" ng-class="appItem.status.type">
+                            
+							<div class="white-box-content">
+                                <div class="app-info">
+                                    <div class="app-icon">
+										<img  src="$!banner.imageUrl" width="150px" height="150px">
+                                    </div>
+                                    <div class="app-desc">
+                                        <p class="app-title ng-binding">$!banner.name</p>
+                                        <p class="app-title ng-binding">排序值：$banner.sortValue</p>
+                                    </div>
+                                </div>
+								
+								<div class="app-ctrl">
+                                    <a class="w-text-primary ng-scope" href="edit.htm?id=$!banner.id">修改</a>
+									<a  class="w-text-primary ng-scope" href="delete.htm?id=$!banner.id" onclick="javascript: return confirm('确定要删除该banner？');">删除</a>
+                                </div>
+								
+								
+                            </div>
+                        </li>
+                       #end
+                   
+                </ul>
+            </div>
+        </div>
+    </div>
+	
+    $widget.setTemplate("userFoot")
+	
+
+	
+	
+	

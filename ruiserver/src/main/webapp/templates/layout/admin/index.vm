@@ -1,0 +1,13 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>#if($title) $!title #else 首页 #end</title>
+    <link rel="stylesheet" href="$staticServer/css/home.css">
+  </head>
+  <body class="pmt-home ng-isolate-scope" busy="" busy-when-name="GLOBAL" >
+		$page_content
+    </body>
+</html>
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1/jquery.min.js"></script>
+<script src="$staticServer/js/golbal.js"></script>

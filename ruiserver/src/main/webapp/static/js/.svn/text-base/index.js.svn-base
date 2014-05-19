@@ -1,0 +1,391 @@
+$(document).ready(function() { var slide=new Slide({ele: $('.att_list:eq(0)')});
+	if (!UX.user) {
+		var key = 'ux_close_bt_msg';
+		var hasClosed = Number(UX.cookie.get(key));
+		if (!hasClosed) {
+			var cityId = UX.city.id;
+			var basePath = UX.basePath;
+			var url = location.href;
+			var link = function(id) {
+				return basePath + 'userLink/login.htm?referId=' + id + '&cityId=' + cityId + '&refurl=' + url;
+			}
+			//var $content = $('<div class="C_Pop_Bottom" style="display:none"><div class="bg"></div><div class="wrap bottom-login"><ul class="login-way">');
+			var content = '<div class="C_Pop_Bottom" style="display:none"><div class="bg"></div><div class="wrap bottom-login"><ul class="login-way">';
+			if(UX.config.isOpenWeiboLogin == "true"){
+				content = content + '<li><a href="' + link(10) + '" class="sina-btn">用微博帐号登录</a></li>';
+			}
+			if(UX.config.isOpenTaobaoLogin == "true"){
+				content = content + '<li><a href="' + link(11) + '" class="tb-btn">用淘宝帐号登录</a></li>';
+			}
+			if(UX.config.isOpenQQLogin == "true"){
+				content = content + '<li><a href="' + link(12) + '" class="qq-btn">用QQ帐号登录</a></li>';
+			}
+			content = content + '</ul><div class="bottom-reg">没有帐号，<a class="btn-green" href="' + basePath + 'register.htm?cityId=' + cityId + '&referurl=' + url + '">一键注册</a></div><a id="A_BottomClose" class="x" href="javascript:void(0)"></a></div></div>';
+			var $content = $(content);
+			
+			window.setTimeout(function() {
+				$content.appendTo($('body'));
+				$content.fadeIn()
+			}, 6000);
+
+			$('#A_BottomClose').live('click', function() {
+				$('.C_Pop_Bottom').fadeOut(function() {
+					$(this).remove();
+				});
+				UX.cookie.set(key, '1', {
+					expires: 1
+				});
+			});
+		}
+	}
+ 
+	if (!UX.cookie.get('ux_default_cityid') || (!UX.city.equalsCity && !UX.cookie.get('ux_reminded'))) {
+		var pop = new UX.popup({
+			className: 'C_Pop_Areas',
+			cover: true,
+			fixed: false,
+			center: false,
+			size: {
+				width: 740,
+				height: 'auto'
+			},
+			offset: {
+				x: '50%',
+				y: '140px'
+			},
+			afterClose: function() {
+				$('#T_City').removeAttr('style');
+			},
+			zIndex: 9996
+		});
+		$('#T_City').css('background-color', '#fff');
+		jQuery.getScript("http://int.dpool.sina.com.cn/iplookup/iplookup.php?format=js", function() {
+			var cityStr = remote_ip_info.city;
+			pop.setTitle('<p style="font-size:14px">您当前所在城市为<span class="red" style="font-size:20px;font-weight:bold"> '+cityStr+'</span>，请从下列已开通城市选择进入。</span></p>');
+			var list = '';
+			for (var i = 0; i < UX.areas.length; i++) {
+				var area = UX.areas[i];
+				var isCurrent = area.name.search(cityStr);
+				list += '<li data-id="' + area.id + '" ' + (isCurrent >= 0 ? 'class="selected"' : '') + '><div class="detail"><p class="name">' + area.name + '</p><p>' + area.postArea + '</p></div><a target="_blank" class="B_Range btn-gray" href="' + UX.basePath + 'post-area.htm?city-id=' + area.id + '"><i class="icon"></i>地图显示</a></li>';
+			};
+			list = '<div class="bd"><ul class="A_PopAreas">' + list + '</ul></div>'
+			pop.setContent(list + '<div class="ft"><a class="A_Start btn-red" href="javascript:void(0)">开始购物<i></i><span></span></a></div><div class="relator"></div>');
+			pop.show();
+			$('.B_Range').live('click', function(e) {
+				e.stopPropagation();
+			})
+			$('.A_PopAreas li').live('click', function() {
+				var id = $(this).attr('data-id');
+				changeCity(id);
+				return false;
+			})
+			$('.A_Start').live('click', function() {
+				var id = $('.A_PopAreas li.selected').attr('data-id');
+				if (id) {
+					changeCity(id);
+				}
+				return false;
+			})
+			var changeCity = function(id) {
+				pop.hide();
+				
+				UX.cookie.set('ux_default_cityid', id);
+				if(!UX.city.equalsCity){
+				    UX.cookie.set('ux_reminded',1,{expires:1});
+				}
+				location.href = UX.basePath + 'index.htm?city-id=' + id;
+			}
+		});
+	}
+	// banner
+	var bannerString = $('#S_Banner').find('textarea').val();
+	var banner = $('<ul>' + bannerString + '</ul>');
+	var pieces = banner.find('li');
+
+	banner.css({
+		width: $('#S_Banner').width() * pieces.length
+	})
+	$('#S_Banner').html(banner);
+	if(pieces.length>1){
+		var btn='<a class="prev" href="javascript:void(0)" style="left:-46px;display: none;"></a><a class="next" href="javascript:void(0)"  style="right:-46px;display: none;"></a>';
+		$('#S_Banner').append(btn);
+	}
+	var slider = new Slider($('#S_Banner'));
+	$('#S_Banner').bind('mouseenter',function(){
+		$('#S_Banner .prev').animate({'left': '0'}).show();
+		$('#S_Banner .next').animate({'right':'0'}).show();
+	});
+	$('#S_Banner').bind('mouseleave',function(){
+		$('#S_Banner .prev').animate({'left': '-46px'},function(){
+			 $(this).hide();
+		});
+		$('#S_Banner .next').animate({'right':'-46px'},function(){
+			$(this).hide();
+		});
+	});
+	$('#S_Banner .next').bind('click',function(){
+		var index=$('#S_Banner .pager span[class=selected]').index()+1;
+		if(index==pieces.length){
+			index=0;
+		}
+		$('#S_Banner .pager span:eq('+index+')').trigger('click');
+	});
+	$('#S_Banner .prev').bind('click',function(){
+		var index=$('#S_Banner .pager span[class=selected]').index()-1;
+		if(index==-1){
+			index=pieces.length-1;
+		}
+		$('#S_Banner .pager span:eq('+index+')').trigger('click');
+	});
+
+	$('.items li').live('mouseenter', function() {
+		$(this).addClass('hover');
+	})
+	$('.items li').live('mouseleave', function() {
+		$(this).removeClass('hover');
+	});
+	//var attNavSlide;
+	$('.att_nav li').bind('mouseenter',function(){
+	   var _this=$(this);
+	   var index=$(this).index();
+	   var flag=$(this).attr('data-flag');
+	   var url='';
+	   var oData='';
+	   if(!flag){
+	   	  return false;
+	   }
+	   
+	   if(flag=='1'){
+	   	    if(index==1){
+	   	    	url=UX.basePath+'ajax/viewNewItem.htm.htm';
+	   	    	oData='json.data.newItemList';
+	   	    }else if(index==2){
+	   	    	url=UX.basePath+'ajax/viewDiscountSale.htm';
+	   	    	oData='json.data.discountSaleList';
+	   	    } 
+            $.ajax({
+	   	        method: 'GET',
+			    url: url,
+			    data: {
+					cityId: UX.city.id
+					
+			    },
+			    success: function(json) {
+				    if (json.code == 0) {
+
+					    var data = json.data.newItemList;
+					    var data = eval(oData);
+					    var list = '';
+			            for (var i = 0; i < data.length; i++) {
+				          var item = data[i];
+				          var link = UX.basePath + 'item.htm?cityId=' + UX.city.id + '&id=' + item.id;
+				          var name = item.name;
+				          var price = item.price;
+				          var delPrice = item.delPrice;
+				          var img = item.imgs.split(',')[0] + '!150px150px'; 
+				          list+='<li><a target="_blank" class="hd" href="'+link+'"><img width="170" src="'+img+'"></a><p class="bd"><a href="'+link+'">'+name+'</a></p><p class="price-sugar"><span>¥' + UX.util.priceFormat(price) + '</span>';
+				          if(delPrice > 0){
+				        	  list += '<del>¥' + UX.util.priceFormat(delPrice) + '</del>';
+				          }
+				          list += '</p></li>';
+				        }
+                        $('.att_list:eq('+index+') ul').append(list);
+                        _this.attr('data-flag','0');
+                        var attNavSlide=new Slide({ele: $('.att_list:eq('+index+')')});
+				    }
+			    }
+	       });
+	   }
+	   if(flag=='2'){
+	   	    if(index==2){
+	   	    	url=UX.basePath+'ajax/viewNewItem.htm.htm';
+	   	    	oData='json.data.newItemList';
+	   	    }else if(index==1){
+	   	    	url=UX.basePath+'ajax/viewDiscountSale.htm';
+	   	    	oData='json.data.discountSaleList';
+	   	    } 
+           $.ajax({
+	   	        method: 'GET',
+			    url: url,
+			    data: {
+					cityId: UX.city.id
+					
+			    },
+			    success: function(json) {
+				    if (json.code == 0) {
+
+					    var data = json.data.newItemList;
+					    var data = eval(oData);
+					    var list = '';
+			            for (var i = 0; i < data.length; i++) {
+				          var item = data[i];
+				          var link = UX.basePath + 'item.htm?cityId=' + UX.city.id + '&id=' + item.id;
+				          var name = item.name;
+				          var price = item.price;
+				          var delPrice = item.delPrice;
+				          var img = item.imgs.split(',')[0] + '!150px150px'; 
+				          list+='<li><a target="_blank" class="hd" href="'+link+'"><img width="170" src="'+img+'"></a><p class="bd"><a href="'+link+'">'+name+'</a></p><p class="price-sugar"><span>¥' + UX.util.priceFormat(price) + '</span>';
+				          if(delPrice > 0){
+				        	  list += '<del>¥' + UX.util.priceFormat(delPrice) + '</del>';
+				          }
+				          list += '</p></li>';
+				        }
+                       $('.att_list:eq('+index+') ul').append(list);
+                       _this.attr('data-flag','0');
+                       var attNavSlide=new Slide({ele: $('.att_list:eq('+index+')')});
+				    }
+			    }
+	       });
+	   }
+       _this.addClass('active').siblings().removeClass('active');
+       $('.att_list').hide();
+       $('.att_list').eq(index).show();
+	});
+
+     
+	// $('.index-section').find('.title').hover(function() {
+	// 	$(this).parents('.index-section').find('.A_Loader_C').css('z-index', '-1');
+	// 	$(this).parents('.index-section').find('.A_Loader_T').removeClass('selected');
+	// })
+	$('.index-section').each(function(index) {
+		var $this = $(this);
+		var tabs = $this.find('.A_Loader_T');
+		var conter = $this.find('.A_Loader_C');
+		var loader = new Loader(tabs, conter, function(data) {
+			var data = data.itemList;
+			var list = '';
+			for (var i = 0; i < data.length; i++) {
+				var item = data[i];
+				var link = UX.basePath + 'item.htm?cityId=' + UX.city.id + '&id=' + item.id;
+				var name = item.name;
+				var price = item.price;
+				var delPrice = item.marketPrice == 0 ? 0 : item.marketPrice;
+				var img = item.imgs.split(',')[0] + '!150px150px'; 
+				list += '<li ' + ((i + 1) % 5 == 1 ? 'class="first"' : '') + '>' + '<div class="hd loading">' + '<a target="_blank" title="' + name + '" href="' + link + '"><img width="150" height="150" data-lazy="' + img + '"></a>' + (item.delPrice != 0 ? '<i class="icon"></i>' : '') + '</div><div class="bd"><p class="title"><a target="_blank" title="' + name + '" href="' + link + '">' + name + '</a></p><p class="price-sugar"><span>￥ ' + UX.util.priceFormat(price) + '</span>' + (delPrice == 0 ? '' : '<del>￥ ' + UX.util.priceFormat(delPrice) + '</del>') + '</p></div></li>';
+			}
+			//$this.find('.A_Loader_Base').removeClass('selected');
+			return '<ul class="items">' + list + '</ul>';
+		},{
+		    loadDataByCustom:function(index){
+                var baseContent = $this.find('.base-content');
+                return baseContent.clone().html();
+            }
+		});
+		
+//		
+//		var showBaseItems = function(){
+//		    conter.css('z-index', '-1');
+//            tabs.removeClass('selected');
+//            loader.page = -1;
+//		}
+//		$this.find('.A_Loader_Base').bind('mouseenter', showBaseItems);
+		var brandLoader = new Loader($this.find('.brand .i-icon'), $(this).find('.brands'), function(data) {
+			var list = '';
+			var length = Math.min(10, data.length);
+			var cateId = $this.find('.brand .i-icon').attr('data-catid');
+			for (var i = 0; i < length; i++) {
+				var brand = data[i];
+				var link = UX.basePath + 'list.htm?cat-id=' + cateId + '&city-id=' + UX.city.id + '&brandId=' + brand.id;
+				list += '<li><a target="_blank" href="' + link + '"><img alt="' + brand.name + '" src="' + brand.logo + '" width="110px"></a></li>'
+			}
+			return '<ul>' + list + '</ul>';
+		}, {
+			type: 'click',
+			autoload: true,
+			needRefresh: true
+		})
+	});
+	//compare price now!
+	if ($('#I_Compare').length) {
+		var loadData = function() {
+			$.ajax({
+				method: 'GET',
+				url: UX.basePath + 'comparePrice/getItemsForIndex.htm',
+				data: {
+					cityId: UX.city.id
+				},
+				success: function(json) {
+					if (json.code == 0) {
+						var data = json.data.compareItemList;
+						var list = '';
+						for (var i = 0; i < data.length; i++) {
+							var item = data[i];
+							var link = UX.basePath + '/item.htm?cityId=' + UX.city.id + '&id=' + item.productId;
+							list += '<li><a target="_blank" class="name" href="' + link + '">' + item.productName + '</a><span class="yhd">￥' + UX.util.priceFormat(item.priceYihaodian, 1) + '</span><span class="ux red">￥' + UX.util.priceFormat(item.price, 1) + '</span></li>';
+						}
+						$('#I_Compare').html(list);
+						$('#I_Compare').css('margin-top', 0);
+					}
+				}
+			})
+		}
+		loadData();
+		var loadDataInterval = setInterval(loadData, 1800 * 1000);
+
+		var interval;
+		$('#I_Compare').bind('mouseenter', function() {
+			clearInterval(interval);
+			interval = null;
+		});
+		$('#I_Compare').bind('mouseleave', function() {
+			startInterval();
+		});
+
+		function startInterval() {
+			if (!interval) {
+				interval = setInterval(function() {
+					var curentTop = $('#I_Compare').css('marginTop');
+					curentTop = Math.abs(Number(curentTop.replace('px', '')));
+					if (curentTop >= $('#I_Compare').height() - 104) {
+						$('#I_Compare').css('margin-top', 0);
+						curentTop = 0;
+					}
+					$('#I_Compare').animate({
+						marginTop: -(curentTop + 104)
+					})
+				}, 5000);
+			}
+		}
+		startInterval();
+	}
+    
+
+    function indexScroll(oId){
+    	var interval;
+		$('#'+oId).bind('mouseenter', function() {
+			clearInterval(interval);
+			interval = null;
+		});
+		$('#'+oId).bind('mouseleave', function() {
+			startInterval();
+		});
+
+		var startInterval=function () {
+			if (!interval) {
+				interval = setInterval(function() {
+					var curentTop = $('#'+oId).css('margin-top');
+					curentTop = Math.abs(Number(curentTop.replace('px', '')));
+					if (curentTop >= $('#'+oId).height() - 120) {
+						$('#'+oId).css({'margin-top': 0});
+						curentTop = 0;
+						return;
+					}
+						$('#'+oId).animate({
+						  marginTop: -(curentTop + 120)
+					    })
+					
+					
+				}, 5000);
+			}
+		}
+		startInterval();
+    }
+
+    //u箱超市
+    if ($('#bulletin').length) {
+    	if($('#bulletin li').length>4){
+    		indexScroll('bulletin');
+    	}	
+	}
+
+})

@@ -1,0 +1,168 @@
+DROP DATABASE IF EXISTS `bairui`;
+CREATE DATABASE `bairui`;
+use `bairui`;
+
+delete from mysql.user where User = 'bairui';
+grant select,update,delete,insert on `bairui`.* to 'bairui'@'%' identified by 'bairui';
+flush privileges;
+
+
+
+
+DROP TABLE IF EXISTS `rui_db_admin`;
+
+CREATE TABLE `rui_db_admin` (
+`id` bigint(20) NOT NULL PRIMARY KEY AUTO_INCREMENT,
+`gmt_modified` datetime  not null ,
+`nick` varchar(128)  ,
+`gmt_create` datetime  not null ,
+`psw` varchar(512)  ,
+`user_name` varchar(128) ,
+`role_id` int  not null default 0 ,
+`info` varchar(1024) ,
+`email` varchar(128) ,
+`qq` varchar(128) ,
+`phone` varchar(128) ,
+`deleted` tinyint  not null  default 0 
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
+
+
+
+
+
+DROP TABLE IF EXISTS `rui_db_app_info`;
+
+CREATE TABLE `rui_db_app_info` (
+`id` bigint(20) NOT NULL PRIMARY KEY AUTO_INCREMENT,
+`gmt_modified` datetime  not null ,
+`package_name` varchar(512) ,
+`icon_url` varchar(512) ,
+`info` varchar(4096) ,
+`version_value` varchar(128) ,
+`file_size` int not null default 0 ,
+`sub_title` varchar(512)  ,
+`second_cat_id` bigint  not null default 0 ,
+`refer_main_app_id` bigint  not null default 0 ,
+`screenshots` varchar(4096)  ,
+`upload_date` datetime  ,
+`publish_date` datetime  ,
+`first_cat_id` bigint  not null default 0 ,
+`download_num` int  not null default 0 ,
+`fav_num` int  not null default 0 ,
+`upload_user_id` bigint  not null default 0 ,
+`gmt_create` datetime  not null ,
+`status` int  not null default 0 ,
+`version_name` varchar(512)  ,
+`down_url` varchar(4096) ,
+`update_info` varchar(2048) ,
+`comment_num` int  not null default 0 ,
+`recommend_num` int  not null default 0 ,
+`main_title` varchar(2048)  ,
+`deleted` tinyint  not null default 0 
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
+
+
+
+
+DROP TABLE IF EXISTS `rui_db_banner`;
+
+CREATE TABLE `rui_db_banner` (
+`id` bigint(20) NOT NULL PRIMARY KEY AUTO_INCREMENT,
+`gmt_modified` datetime  not null ,
+`link_url` varchar(1024)  ,
+`gmt_create` datetime  not null ,
+`image_url` varchar(1024)  ,
+`name` varchar(1024) ,
+`sort_value` int  not null default 0 ,
+`relation_app_id` bigint not null default 0 ,
+`deleted` tinyint  not null  default 0 
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
+
+
+DROP TABLE IF EXISTS `rui_db_cat`;
+
+CREATE TABLE `rui_db_cat` (
+`id` bigint(20) NOT NULL PRIMARY KEY AUTO_INCREMENT,
+`gmt_modified` datetime  not null ,
+`parent_id` bigint  not null default 0 ,
+`level` int  not null default 0 ,
+`gmt_create` datetime  not null ,
+`icon_url` varchar(1024)  ,
+`name` varchar(128) ,
+`sort_value` int  not null default 0 ,
+`deleted` tinyint  not null  default 0 
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
+
+
+
+
+DROP TABLE IF EXISTS `rui_db_key_value`;
+
+CREATE TABLE `rui_db_key_value` (
+`id` bigint(20) NOT NULL PRIMARY KEY AUTO_INCREMENT,
+`gmt_modified` datetime  not null ,
+`key_name` varchar(1024)  ,
+`gmt_create` datetime  not null ,
+`value` varchar(4096)  ,
+`type` int  not null default 0 ,
+`deleted` tinyint  not null  default 0 
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
+
+
+
+
+
+DROP TABLE IF EXISTS `rui_db_tag`;
+
+CREATE TABLE `rui_db_tag` (
+`id` bigint(20) NOT NULL PRIMARY KEY AUTO_INCREMENT,
+`gmt_modified` datetime  not null ,
+`gmt_create` datetime  not null ,
+`icon_url` varchar(1024)   ,
+`name` varchar(1024)   ,
+`sort_value` int  not null default 0 ,
+`info` varchar(2048)   ,
+`deleted` tinyint  not null  default 0 
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
+
+
+
+
+DROP TABLE IF EXISTS `rui_db_user_app_opt_info`;
+
+CREATE TABLE `rui_db_user_app_opt_info` (
+`id` bigint(20) NOT NULL PRIMARY KEY AUTO_INCREMENT,
+`gmt_modified` datetime  not null,
+`is_download` int  not null default 0 ,
+`app_id` bigint  not null default 0 ,
+`gmt_create` datetime  not null ,
+`is_fav` int  not null default 0 ,
+`user_id` bigint  not null default 0 ,
+`comment` varchar(2048)  ,
+`is_recommend` int  not null  default 0  ,
+`deleted` tinyint  not null  default 0 
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
+
+
+
+
+DROP TABLE IF EXISTS `rui_db_user`;
+
+CREATE TABLE `rui_db_user` (
+`id` bigint(20) NOT NULL PRIMARY KEY AUTO_INCREMENT,
+`gmt_modified` datetime  not null ,
+`phone` varchar(512) ,
+`height` int  not null default 0,
+`gmt_create` datetime  not null ,
+`width` int  not null default 0 ,
+`device_id` varchar(1024) ,
+`phone_module` varchar(1024) ,
+`last_visit_time` datetime  not null ,
+`deleted` tinyint  not null  default 0 
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
+
+
+
+ALTER TABLE `bairui`.`rui_db_app_info` ADD COLUMN `permission_value` TEXT NULL DEFAULT NULL  AFTER `deleted` ;
+
+

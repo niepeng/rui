@@ -1,0 +1,32 @@
+﻿var ds;
+if ($('#D_Prov').length) {
+	ds = DistrictSelector.attach('D_Prov', 'D_City', 'D_Dist');
+}
+$('#V_Tenant').bind('submit', applyValidate)
+
+function applyValidate() {
+	try {
+		if ($('#V_CompanyName').val() == '') {
+			throw '请填入公司名称'
+		}
+		if (!$('#D_Dist').val() || $('#D_Dist').val() == '') {
+			throw '请选择完整地址';
+		}
+		if ($('#V_CompanyAddress') == '') {
+			throw '请填入具体地址';
+		}
+		if ($('#V_LinkMan') == '') {
+			throw '请填入联系人';
+		}
+		if ($('#V_Phone') == '') {
+			throw '请填入手机号码';
+		}
+	} catch (e) {
+		$('#V_ErrorMsg').html(e);
+		return false;
+	}
+	$('input[name=provName]').val(ds.getStrByCode($('#D_Prov').val()));
+	$('input[name=cityName]').val(ds.getStrByCode($('#D_City').val()));
+	$('input[name=distName]').val(ds.getStrByCode($('#D_Dist').val()));
+	return true;
+}

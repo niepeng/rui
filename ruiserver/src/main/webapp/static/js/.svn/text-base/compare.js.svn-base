@@ -1,0 +1,203 @@
+$(document).ready(function() {
+	$(window).scroll(function() {
+		if (!-[1, ] && !window.XMLHttpRequest) {
+			return;
+		}
+		var scrollTop = $(window).scrollTop();
+		var side = $('.compare-price .side');
+		if (scrollTop > 220) {
+			side.css({
+				position: 'fixed',
+				top: '60px'
+			})
+		} else {
+			side.css({
+				position: 'static'
+			})
+		}
+	})
+	$('.C_OpenAll').bind('click', function() {
+		var parent = $(this).parents('.C_Items');
+		var wrapper = parent.find('.wrapper');
+		var max = Number(parent.find('.C_Number').html());
+		if (wrapper.height() > 242) {
+			wrapper.animate({
+				height: 242
+			}, 500, function() {
+				parent.find('.pager').hide();
+				parent.find('.C_OpenAll span').html('展开全部');
+				parent.find('.C_OpenAll').removeClass('up')
+			});
+		} else {
+			if (max > 12) {
+				parent.find('.pager').show()
+			}
+			wrapper.animate({
+				height: 484
+			}, 500, function() {
+				parent.find('.C_OpenAll span').html('收起全部');
+				parent.find('.C_OpenAll').addClass('up');
+			})
+		}
+	});
+	var data = {};
+	window.pages = {};
+	var isViewType = location.href.search('view') >= 0 ? true : false;
+	$('.C_Items .prev').live('click', function() {
+		var $this = $(this);
+		var parent = $this.parents('.C_Items');
+		var id = parent.attr('data-id');
+		var compareSrc = parent.attr('data-src');
+		var max = Number(parent.find('.C_Number').html());
+		var maxPage = Math.ceil(max / 12);
+		var page = pages[id] || 1;
+		page -= 1;
+		if (page < 1) {
+			return;
+		}
+		// pages[id] = page;
+		// moveTo(parent.find('ul'), page);
+		// switchPrevAndNext(parent, page, maxPage)
+		loadData(id, page, compareSrc, function(list) {
+			$this.removeClass('loader');
+			parent.find('.C_Container').html(list);
+			pages[id] = page;
+			//moveTo(listEle, page);
+			switchPrevAndNext(parent, page, maxPage)
+		})
+	})
+	$('.C_Items .next').live('click', function() {
+		var $this = $(this);
+		if ($this.hasClass('loader')) {
+			return;
+		}
+		var parent = $this.parents('.C_Items');
+		var listEle = parent.find('.C_Container');
+		var id = parent.attr('data-id');
+		var compareSrc = parent.attr('data-src');
+		var max = Number(parent.find('.C_Number').html());
+		var maxPage = Math.ceil(max / 12);
+		var page = pages[id] || 1;
+		page += 1;
+		if (maxPage < page) {
+			return;
+		}
+		// if (page <= maxPage && (parent.find('li').length >= page * 12 || parent.find('li').length == max)) {
+		// 	moveTo(listEle, page);
+		// 	pages[id] = page;
+		// 	switchPrevAndNext(parent, page, maxPage)
+		// 	return;
+		// };
+		$this.addClass('loader');
+		parent.find('.C_Container').html('');
+		loadData(id, page, compareSrc, function(list) {
+			$this.removeClass('loader');
+			parent.find('.C_Container').html(list);
+			pages[id] = page;
+			//moveTo(listEle, page);
+			switchPrevAndNext(parent, page, maxPage)
+		})
+	})
+
+	if ($('#OpenLetter').length) {
+		var hasViewOpenLetter = UX.cookie.get('ux_viewed_open_letter');
+		if (hasViewOpenLetter != 'viewed') {
+			$('#OpenLetter').show();
+			UX.cookie.set('ux_viewed_open_letter','viewed');
+		}
+		$('#OpenLetterSwitcher').bind('click', function(){
+			$('#OpenLetter').slideToggle();
+		})
+	}
+
+	function moveTo(ele, page) {
+		ele.css({
+			marginTop: -(page - 1) * (isViewType ? 467 : 484)
+		})
+	}
+
+	function switchPrevAndNext(parent, currentPage, maxPage) {
+		var id = parent.attr('data-id');
+		var next = parent.find('.next');
+		var prev = parent.find('.prev');
+		if (currentPage == 1) {
+			next.show();
+			prev.hide();
+			return
+		}
+		if (currentPage == maxPage) {
+			next.hide();
+			prev.show();
+			return
+		}
+		next.show();
+		prev.show();
+	}
+
+	function loadData(catId, page, compareSrc, callback) {
+		jQuery.ajax({
+			method: 'GET',
+			url: UX.basePath + 'comparePrice/queryComparePrice.htm',
+			data: {
+				cityId: UX.city.id,
+				catId: catId,
+				pageNo: page,
+				sort:0,
+				compareSrc : compareSrc
+			},
+			success: function(json) {
+				if (json.code == 0) {
+					var data = json.data.queryCompareItemList;
+					var list = '';
+					if (isViewType) {
+					    var tabPrice = compareSrc==1?"一号店价":"天猫价";
+						list = '<tr><th>名称</th><th>'+tabPrice+'</th><th>U箱价</th><th>便宜金额</th><th style="text-align:center">便宜比例</th></tr>';
+					}
+					for (var i = 0; i < data.length; i++) {
+						var item = data[i];
+						var id = item.productId;
+						var link = UX.basePath + '/item.htm?cityId=' + UX.city.id + '&id=' + id;
+						var img = item.imgUrl.split(',')[0];
+						if (isViewType) {
+							var price = item.price;
+							var yhdPrice = item.priceYihaodian>0?item.priceYihaodian:item.priceTmall;
+							var delta = yhdPrice - price;
+							var percent = accDiv(delta, yhdPrice).toFixed(4);
+							percent = accMul(percent,100);
+							var thirdSrcUrl = item.yihaodianUrl==''?item.tmallUrl:item.yihaodianUrl;
+							list += '<tr><td class="name"><p><a target="_blank" href="' + link + '">' + item.productName + '</a></p></td><td class="yhd"><a target="_blank" href="' + thirdSrcUrl + '">￥' + UX.util.priceFormat(yhdPrice, 1) + '</a></td><td class="ux"><a target="_blank" href="' + link + '">￥' + UX.util.priceFormat(price, 1) + '</a></td><td class="delta">￥<span>' + UX.util.priceFormat(delta, 1) + '</span></td><td class="percent">' + (percent > 10 ? ('<span>' + percent + '%</span>') : (percent + '%')) + '</td></tr>';
+						} else {
+							list += '<li ' + ((i + 1) % 3 == 0 ? 'class="last"' : '') + '><a class="image" target="_blank" href="' + link + '"><img width="100" height="100" src="' + img + '!150px150px"></a><div class="content"><p class="hd"><a target="_blank" href="' + link + '">' + item.productName + '</a></p><p class="bd"><span>￥' + UX.util.priceFormat(item.price, 1) + '</span><i>一号店:<b class="price">￥' + UX.util.priceFormat(item.priceYihaodian, 1) + '</b></i></p><p class="ft"><span class="scalar-sugar"><a class="minus-disable" href="javascript:void(0)"></a><input class="text" type="text" value="1" autocomplete="off"><a class="plus" href="javascript:void(0)"></a></span><a class="A_Cart_Add btn-cart" data-id="' + id + '" href="javascript:void(0)"></a></p></div></li>'
+						}
+					};
+					callback(list);
+				}
+
+			}
+		});
+	}
+
+	function beforeLoad(ele) {
+		ele.css({
+			position: 'relative'
+		})
+		var loader = $('<i class="loader"><img src="../static/img/loader.gif"></i>');
+		loader.css({
+			position: 'absolute',
+			background: '#fff',
+			top: 0,
+			left: 0,
+			width: ele.width(),
+			height: ele.height(),
+			zIndex: 99
+		});
+		ele.append(loader)
+	}
+
+	function afterLoad(ele) {
+		ele.css({
+			position: 'static'
+		})
+		ele.find('.loader').remove();
+	}
+});

@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE sqlMap PUBLIC "-//iBATIS.com//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<sqlMap namespace="UserDAO">
+
+	<typeAlias type="com.baibutao.apps.linkshop.uxiang.ruiserver.biz.dal.dataobject.UserDO" alias="user" />
+
+	<resultMap id="userMapping" class="user">
+				<result property="gmtModified" column="gmt_modified"/>
+				<result property="id" column="id"/>
+				<result property="phone" column="phone"/>
+				<result property="height" column="height"/>
+				<result property="gmtCreate" column="gmt_create"/>
+				<result property="width" column="width"/>
+				<result property="deviceId" column="device_id"/>
+				<result property="phoneModule" column="phone_module"/>
+				<result property="lastVisitTime" column="last_visit_time"/>
+	</resultMap>
+	
+	<sql id="user-full-columns">
+		t.gmt_modified, t.id, t.phone, t.height, t.gmt_create, t.width, t.device_id, t.phone_module, t.last_visit_time
+	</sql>
+	
+	<insert id="create" parameterClass="user">
+		<![CDATA[
+			insert into rui_db_user(gmt_modified, phone, height, gmt_create, width, device_id, phone_module, last_visit_time) 
+values (now(), #phone#, #height#, now(), #width#, #deviceId#, #phoneModule#, #lastVisitTime#)
+		]]>
+		<selectKey resultClass="long" keyProperty="id">
+			SELECT	LAST_INSERT_ID();
+	   	</selectKey>
+	</insert>
+	
+	<select id="queryById" resultMap="userMapping" parameterClass="long">
+		select
+			<include refid="user-full-columns" />
+		from
+			rui_db_user t
+		where
+			t.id = #value#  and t.deleted = 0 
+	</select>
+	
+	<select id="queryByDeviceId" resultMap="userMapping" parameterClass="string">
+		select
+			<include refid="user-full-columns" />
+		from
+			rui_db_user t
+		where
+			t.device_id = #value#  and t.deleted = 0 
+	</select>
+	
+	<update id="delete" parameterClass="long">
+			update rui_db_user t set t.deleted = 1  , t.gmt_modified = now()  where t.id = #value#
+		
+	</update>
+	
+	<update id="update" parameterClass="user">
+		<![CDATA[
+			update 
+ 				rui_db_user
+ 		set 
+ 				gmt_modified= now(),
+ 				phone= #phone#,
+ 				height= #height#,
+ 				width= #width#,
+ 				device_id= #deviceId#,
+ 				phone_module= #phoneModule#,
+ 				last_visit_time= #lastVisitTime#
+ 		where 
+ 				id=#id#
+		]]>
+	</update>
+	
+</sqlMap>

@@ -1,0 +1,180 @@
+    /*
+     *订单完成弹框
+     */
+    function BtnAlert(oParts,opts){
+
+       this.parLeft=oParts.offset().left;
+       this.parTop=oParts.offset().top;
+       this.parWidth=oParts.width();
+       this.parHei=oParts.height();
+
+       this.box=null;
+       this.context=null;
+       this.x=0;
+       this.y=this.parTop+this.parHei;
+
+       this.words=$.extend({
+           align:'right',
+           title:'提醒',
+           contain:'该订单确定完成了？',
+           btn_ok:'确定',
+           btn_cancel:'取消'
+       },opts);
+
+       this.init();
+    }
+
+    BtnAlert.prototype.init=function(){
+      var _this=this;
+
+      _this.box=$("<div class='dialog-inner'></div>");
+      _this.context=$("<div class='dialog-toolbar clearfix'><a class='dialog-close' href='javascript:void(0);' title='关闭'>关闭</a><h3 class='dialog-title'>"+_this.words.title+"</h3></div><div class='dialog-content'><div class='cart-delete'>"+_this.words.contain+"</div><div class='btns clearfix'><a href='javascript:void(0);' class='btn btn-ok'><span class='btn-text'>"+_this.words.btn_ok+"</span></a><a href='javascript:void(0);' class='btn btn-cancel'><span class='btn-text'>"+_this.words.btn_cancel+"</span></a></div></div>");
+
+      _this.context.appendTo(_this.box);
+      _this.box.appendTo('body');
+
+      this.fixed();
+
+      $('.btn-cancel,.dialog-close').live('click',function(){
+         $(this).parents('.dialog-inner').remove();
+      });
+    };
+
+   BtnAlert.prototype.fixed=function(){
+     var _this=this;
+
+     switch(_this.words.align){
+        case 'left':
+           _this.x=_this.parLeft;
+           break;
+        case 'right':
+          _this.x=_this.parLeft-(200-_this.parWidth);
+          break;
+        case 'center':
+          _this.x=_this.parLeft-(200-_this.parWidth)/2;
+          break;
+        default:
+         
+     }
+
+     _this.box.css({
+        'left':_this.x,
+        'top':_this.y
+     })
+   };
+
+   BtnAlert.prototype.btnOk=function(url){
+      $(this).parents('.dialog-inner').remove();
+      location.href=url;
+   };
+
+
+
+
+$(function(){
+   
+
+   //tr移入变色
+   $('.fixedTable tr').hover(function(){
+   	   $(this).addClass('green');
+   },function(){
+   	   $(this).removeClass('green');
+   });
+
+   
+   //全选
+   $('.fixedTable:eq(0) input[type=checkbox]').bind('click',function(){
+       var items=null;
+       if($('.fixedTable').length==1){
+           items = $('.fixedTable:eq(0)').find('input');
+       }else if($('.fixedTable').length==2){
+           items = $('.fixedTable:eq(1)').find('input');
+       }
+
+       for (i = 0; i < items.length; i++) {
+          if (items[i].type == "checkbox") {
+              items[i].checked = this.checked;
+          }
+       }
+
+       if($('.fixedTable:eq(1) input').length){
+          $('.fixedTable:eq(1) input').trigger('change');
+       }
+   });
+
+
+  //订单完成
+  $('.btn-alert').live('click',function(){
+
+      var url=$(this).attr('data-href');
+
+      $('.dialog-inner').remove();
+      var btnalert=new BtnAlert($(this));
+
+      $('.btn-ok').bind('click',function(){
+          btnalert.btnOk(url);
+      });
+  });
+
+  //订单详情页 订单完成
+  $('.detail_ok').bind('click',function(){
+
+      var url=$(this).attr('data-href');
+
+      $('.dialog-inner').remove();
+      var btnalert=new BtnAlert($(this),{
+         align:'center',
+         contain:'确定完成该订单？'
+      });
+
+      $('.btn-ok').bind('click',function(){
+          btnalert.btnOk(url);
+      });
+  });
+
+
+ //订单详情页 订单关闭
+ $('.detail_cancel').bind('click',function(){
+
+      var url=$(this).attr('data-href');
+
+      $('.dialog-inner').remove();
+      var btnalert=new BtnAlert($(this),{
+         align:'center',
+         contain:'确定关闭该订单？'
+      });
+
+      $('.btn-ok').bind('click',function(){
+          btnalert.btnOk(url);
+      });
+  });
+
+
+ //申请退货
+ $('.need-refund form input[type=button]').bind('click',function(){
+
+      var form=$(this).parent();
+      $('.dialog-inner').remove();
+
+      var btnalert=new BtnAlert(form,{
+         align:'left',
+         contain:'确定申请退货？'
+      });
+
+      $('.btn-cancel,.dialog-close').bind('click',function(){
+         form.parent().hide();
+      });
+
+      $('.btn-ok').bind('click',function(){
+        form.parent().hide();
+        form.attr('action','refunding.htm');
+        form[0].submit();
+      });
+
+ });
+
+ 
+
+});
+
+    

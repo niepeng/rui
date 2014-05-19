@@ -1,0 +1,3 @@
+{"code":0, "data":
+	{"appDetail" : $jsonUtil.fields('id,mainTitle,downUrl,fileSize,iconUrl,subTitle',$appInfoDO)}
+}	

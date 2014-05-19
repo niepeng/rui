@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8" ?>
+
+<object>
+
+	
+	<object class="wint.mvc.tools.service.DefaultPullToolsService">
+		<object name="tools">
+		    
+		    <object name="applicationUtil" class="com.baibutao.apps.linkshop.uxiang.ruiserver.biz.common.ApplicationUtil"/>
+		    <object name="dateUtil" class="com.baibutao.apps.linkshop.uxiang.ruiserver.biz.common.DateUtil"/>
+		    <object name="jsonUtil" class="com.baibutao.apps.linkshop.uxiang.ruiserver.biz.common.JsonUtil"/>
+			<!-- 
+				<object name="securityUtil" class="wint.lang.utils.SecurityUtil"/>
+				<object name="systemUtil" class="wint.lang.utils.SystemUtil"/>
+				<object name="jsonUtil" class="com.baibutao.apps.linkshop.uxiang.server.common.JsonUtil"/>
+				<object name="applicationUtil" class="com.baibutao.apps.linkshop.uxiang.server.common.ApplicationUtil"/>
+				<object name="statusUtil" class="com.baibutao.apps.linkshop.uxiang.server.common.StatusUtil"/>
+				<object name="dateUtil" class="com.baibutao.apps.linkshop.uxiang.server.common.DateUtil"/>
+				<object name="priceUtil" class="com.baibutao.apps.linkshop.uxiang.server.common.PriceUtil"/>
+				<object name="weightUtil" class="com.baibutao.apps.linkshop.uxiang.server.common.WeightUtil"/>
+				<object name="stringsUtil" class="com.baibutao.apps.linkshop.uxiang.server.common.StringsUtil"/>
+				<object name="mathUtil" class="com.baibutao.apps.linkshop.uxiang.server.biz.util.MathUtil"/>
+				<object name="randomUtil" class="com.baibutao.apps.linkshop.uxiang.server.biz.util.RandomUtil"/>			
+			 -->
+		</object>
+	</object>
+	
+</object>

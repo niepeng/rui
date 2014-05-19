@@ -1,0 +1,4 @@
+﻿#set($url = $adminModule.setTarget('login'))
+<script>
+parent.location.href='$url';
+</Script>

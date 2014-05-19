@@ -1,0 +1,16 @@
+{"code":0, "data":
+[
+	 #foreach($catDO in $catList)
+        	#if($velocityCount != 1)
+        		,
+        	#end
+        	{
+				"id":$!catDO.id ,
+        		"name": "$!catDO.name",
+				"iconUrl" : "$!catDO.iconUrl",
+				"subList": $jsonUtil.mfields('id,name,iconUrl',$catDO.childrenList)
+			}
+        #end	
+]
+
+}

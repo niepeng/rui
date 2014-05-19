@@ -1,0 +1,574 @@
+var CONSTANTS = {
+	ON_CHECK: '验证中……',
+	RULE_EMAIL: '请填写真实邮箱，它能在关键时候帮你找回密码',
+	FORGET_PASSWORD_EMAIL: '请输入注册时填写的邮箱',
+	ERROR_NO_EMAIL: '请输入邮箱',
+	ERROR_EXIST_EMAIL: '邮箱已被注册，请重新输入或使用该邮箱<a href="login.htm">登录</a>',
+	ERROR_INCORRECT_EMAIL: '邮箱格式错误，请检查确认',
+	RULE_PHONE: '用于登录和找回密码，不会被公开',
+	ERROR_NO_PHONE: '请输入手机号码',
+	ERROR_EXIST_PHONE: '手机号码已被注册，请重新输入或使用该号码<a href="login.htm">登录</a>',
+	ERROR_INCORRECT_PHONE: '手机格式错误，请检查确认',
+	RULE_USERNAME: '4-20位字符，可由中文，字母，数字及特殊字符组成',
+	ERROR_USERNAME: '用户名含有非法字符',
+	ERROR_USERNAME_LENGTH: '用户名长度在4-20个字符之间',
+	ERROR_EXIST_USERNAME: '这个名字太受欢迎，已经被人使用了',
+	ERROR_NO_USERNAME: '请输入用户名',
+	RULE_PASSWORD: '6-20位字符，可使用字母、数字或者符号的组合，不建议使用纯数字、纯字母或纯符号',
+	RULE_PASSWORD_CONFIRM: '请再次输入密码',
+	ERROR_PASSWORD_NOT_MATCH: '两次密码输入不一致',
+	ERROR_PASSWORD_ILLEGAL: '密码含有非法字符，比如空格、换行符等',
+	ERROR_PASSWORD_LENGTH: '密码长度在6-20字符之间',
+	ERROR_PASSWORD_SIMPLE: '密码过于简单，请不要使用纯数字、纯字母或纯符号的字符',
+	ERROR_NO_PASSWORD: '请输入密码',
+	ERROR_NO_SECURITY_CODE: '请输入验证码',
+	ERROR_SECURITY_CODE: '验证码错误',
+	ERROR_INCORRECT_CITY: '请选择一个地区',
+	ERROR_INCORRECT_POSTCODE: '请填写正确的邮政编码',
+	ERROR_NO_ADDRESS: '请填写收货地址',
+	ERROR_NO_NAME: '请填写收货人姓名',
+	ERROR_NO_PHONE_OR_TELEPHONE: '手机或电话号码至少写一个',
+	ERROR_INCORRECT_CELLPHONE: '不正确的手机号码',
+	ERROR_COUPON_CODE: '不正确的代金券号码',
+	ERROR_NO_LINK_NAME: '请输入网站名称',
+	ERROR_INCORRECT_URL: '不正确的网址'
+}
+if ($('#V_Address').length) {
+	$('#V_Address').bind('submit', addressValidate);
+}
+
+if ($('#V_CouponBind').length) {
+	$('#V_CouponBind').bind('submit', couponValidate);
+}
+
+if ($('#V_Login').length) {
+	$('#V_Login').bind('submit', loginValidate);
+}
+if ($('#V_LinkApply').length) {
+	$('#V_LinkApply').bind('submit', linkValidate);
+}
+
+if ($('#V_LinkApply').length) {};
+
+if ($('#V_ForgetPasswd').length) {
+	$('#V_ForgetPasswd').bind('submit', forgetPasswdValidate);
+	$('#V_Email').bind('focus', function() {
+		displayMessage($(this), CONSTANTS.FORGET_PASSWORD_EMAIL, 1)
+	}).bind('blur', function() {
+		removeMessage($(this));
+	});
+}
+if ($('#V_ResetPassWd').length) {
+	$('#V_ResetPassWd').bind('submit', resetPasswdValidate);
+}
+
+if ($('#V_Register').length) {
+	$('#V_Register').bind('submit', registerValidate);
+	var reg = {
+		email: $('#V_Email'),
+		username: $('#V_Nick'),
+		pswd: $('#V_Pswd'),
+		repswd: $('#V_RePswd'),
+		security: $('#V_Security')
+	}
+	reg.email.bind('focus', function() {
+		displayMessage($(this), CONSTANTS.RULE_EMAIL, 1)
+	}).bind('blur', function() {
+		if (checkEmail()) {
+			var $this = $(this);
+			displayMessage($this, CONSTANTS.ON_CHECK, 1);
+			$.ajax({
+				method: 'GET',
+				url: UX_Config.checkEmailURL,
+				data: {
+					email: $this.val()
+				},
+				success: function(canUsed) {
+					if (canUsed == 1) {
+						$this.addClass('un-used');
+						removeMessage($this);
+					} else {
+						$this.removeClass('un-used');
+						displayMessage($this, CONSTANTS.ERROR_EXIST_EMAIL, 1);
+					}
+				},
+				error: function() {
+
+				}
+			});
+		}
+	});
+	reg.username.bind('focus', function() {
+		displayMessage($(this), CONSTANTS.RULE_USERNAME, 1)
+	}).bind('blur', function() {
+		if (checkUsername()) {
+			var $this = $(this);
+			displayMessage($this, CONSTANTS.ON_CHECK, 1);
+			$.ajax({
+				method: 'GET',
+				url: UX_Config.checkUsernameURL,
+				data: {
+					username: $this.val()
+				},
+				success: function(canUsed) {
+					if (canUsed == 1) {
+						$this.addClass('un-used');
+						removeMessage($this);
+					} else {
+						$this.removeClass('un-used');
+						displayMessage($this, CONSTANTS.ERROR_EXIST_USERNAME, 1);
+					}
+				},
+				error: function() {
+
+				}
+			});
+		}
+	});
+	// reg.pswd.bind('focus', function() {
+	// 	displayMessage($(this), CONSTANTS.RULE_PASSWORD, 1)
+	// }).bind('blur', function() {
+	// 	if (checkPassword()) {
+	// 		removeMessage($(this));
+	// 	}
+	// }).bind('keyup', function() {
+	// 	var str = $(this).val();
+	// 	if (str.length < 6) {
+	// 		return;
+	// 	}
+	// 	var length = strength(str);
+	// 	$('.strength').width(length * 80)
+	// });
+	// reg.repswd.bind('focus', function() {
+	// 	displayMessage($(this), CONSTANTS.RULE_PASSWORD_CONFIRM, 1)
+	// }).bind('blur', function() {
+	// 	if (checkRePswd()) {
+	// 		removeMessage($(this));
+	// 	}
+	// });
+	reg.security.bind('focus', function() {
+
+	})
+}
+
+if ($('#V_MobileRegister').length) {
+
+}
+
+//tips
+$('#V_Phone').bind('focus', function() {
+	displayMessage($(this), CONSTANTS.RULE_PHONE, 1)
+}).bind('blur', function() {
+	if (checkPhone()) {
+		var $this = $(this);
+		displayMessage($this, CONSTANTS.ON_CHECK, 1);
+		$.ajax({
+			method: 'GET',
+			url: UX_Config.checPhoneURL,
+			data: {
+				phone: $this.val()
+			},
+			success: function(canUsed) {
+				if (canUsed == 1) {
+					$this.addClass('un-used');
+					removeMessage($this);
+				} else {
+					$this.removeClass('un-used');
+					displayMessage($this, CONSTANTS.ERROR_EXIST_PHONE, 1);
+				}
+			},
+			error: function() {
+
+			}
+		});
+	}
+});
+$('#V_Pswd').bind('focus', function() {
+	displayMessage($(this), CONSTANTS.RULE_PASSWORD, 1)
+}).bind('blur', function() {
+	if (checkPassword()) {
+		removeMessage($(this));
+	}
+}).bind('keyup', function() {
+	var str = $(this).val();
+	if (str.length < 6) {
+		return;
+	}
+	var length = strength(str);
+	$('.strength').width(length * 80)
+});
+$('#V_RePswd').bind('focus', function() {
+	displayMessage($(this), CONSTANTS.RULE_PASSWORD_CONFIRM, 1)
+}).bind('blur', function() {
+	if (checkRePswd()) {
+		removeMessage($(this));
+	}
+});
+
+function checkEmail() {
+	var email = $('#V_Email');
+	try {
+		if (email.val() == '') {
+			throw {
+				target: email,
+				message: CONSTANTS.ERROR_NO_EMAIL
+			}
+		}
+		if (!isEmail(email.val())) {
+			throw {
+				target: email,
+				message: CONSTANTS.ERROR_INCORRECT_EMAIL
+			}
+		}
+	} catch (e) {
+		displayMessage(e.target, e.message, 0);
+		return false;
+	}
+	return true;
+}
+
+function checkPhone(){
+	var phone = $('#V_Phone');
+	try {
+		if (phone.val() == '') {
+			throw {
+				target: phone,
+				message: CONSTANTS.ERROR_NO_PHONE
+			}
+		}
+		if (!isCellPhoneNumber(phone.val())) {
+			throw {
+				target: phone,
+				message: CONSTANTS.ERROR_INCORRECT_PHONE
+			}
+		}
+	} catch (e) {
+		displayMessage(e.target, e.message, 0);
+		return false;
+	}
+	return true;
+}
+
+function checkUsername() {
+	try {
+		var username = reg.username.val();
+		var usernameLength = strLength(username);
+		if (username == '') {
+			throw {
+				target: reg.username,
+				message: CONSTANTS.ERROR_NO_USERNAME
+			}
+		}
+		if (usernameLength < 4 || usernameLength > 20) {
+			throw {
+				target: reg.username,
+				message: CONSTANTS.ERROR_USERNAME_LENGTH
+			}
+		}
+	} catch (e) {
+		displayMessage(e.target, e.message, 0);
+		return false;
+	}
+	return true
+}
+
+function checkPassword() {
+	try {
+		var pswd = $('#V_Pswd');
+		var text = pswd.val();
+		if (text == '') {
+			throw {
+				target: pswd,
+				message: CONSTANTS.ERROR_NO_PASSWORD
+			}
+		}
+		if (text.length < 6 || text.length > 20) {
+			throw {
+				target: pswd,
+				message: CONSTANTS.ERROR_PASSWORD_LENGTH
+			}
+		}
+		if (text.match(/\s/)) {
+			throw {
+				target: pswd,
+				message: CONSTANTS.ERROR_PASSWORD_ILLEGAL
+			}
+		}
+	} catch (e) {
+		displayMessage(e.target, e.message, 0);
+		return false;
+	}
+	return true;
+}
+
+function checkRePswd() {
+	var pswd = $('#V_Pswd');
+	var repswd = $('#V_RePswd');
+	try {
+		if (pswd.val() != repswd.val()) {
+			throw {
+				target: repswd,
+				message: CONSTANTS.ERROR_PASSWORD_NOT_MATCH
+			}
+		}
+	} catch (e) {
+		displayMessage(e.target, e.message, 0);
+		return false;
+	}
+	return true;
+}
+
+function checkSecurity() {
+	try {
+		if (reg.security.val() == '') {
+			throw {
+				target: reg.security,
+				message: CONSTANTS.ERROR_NO_SECURITY_CODE
+			}
+		}
+	} catch (e) {
+		displayMessage(e.target, e.message, 0);
+		return false;
+	}
+	return true;
+}
+
+function checkURL() {
+	var url = $('#V_LinkURL');
+	try {
+		if (url.val() == '') {
+			throw {
+				target: url,
+				message: CONSTANTS.ERROR_NO_LINK_URL
+			}
+		}
+		if (!isURL(url.val())) {
+			throw {
+				target: url,
+				message: CONSTANTS.ERROR_INCORRECT_URL
+			}
+		}
+	} catch (e) {
+		displayMessage(e.target, e.message, 0);
+		return false;
+	}
+	return true;
+}
+
+function registerValidate() {
+	if (checkEmail() && checkUsername() && checkPassword() && checkRePswd() && checkSecurity()) {
+		return true;
+	}
+	return false;
+}
+
+function forgetPasswdValidate() {
+	if (checkEmail()) {
+		return true
+	}
+	return false;
+}
+
+function resetPasswdValidate() {
+	if (checkPassword() && checkRePswd()) {
+		return true
+	}
+	return false
+}
+
+function loginValidate() {
+	try {
+		var nick = $('#V_L_Nick').val();
+		var pswd = $('#V_L_Pswd').val();
+		if (nick == '') {
+			throw CONSTANTS.ERROR_NO_USERNAME;
+		}
+
+		if (pswd == '') {
+			throw CONSTANTS.ERROR_NO_PASSWORD;
+		}
+	} catch (e) {
+		$('.error').text(e);
+		return false;
+	}
+	return true;
+}
+
+function linkValidate() {
+	try {
+		if ($('#V_LinkName').val() == '') {
+			throw {
+				target: $('#V_LinkName'),
+				message: CONSTANTS.ERROR_NO_LINK_NAME
+			}
+		}
+		if (!isURL($('#V_LinkURL').val())) {
+			throw {
+				target: $('#V_LinkURL'),
+				message: CONSTANTS.ERROR_INCORRECT_URL
+			}
+		}
+	} catch (e) {
+		UX.alert(e.message);
+		return false;
+	}
+	return true;
+}
+
+function couponValidate() {
+	try {
+		if (Number($('#V_PostCode').val()) == '') {
+			throw CONSTANTS.ERROR_COUPON_CODE;
+		}
+	} catch (e) {
+		UX.alert(e);
+		return false;
+	}
+	return true;
+}
+
+function addressValidate() {
+	try {
+		if (Number($('#D_Dist').val()) <= 0) {
+			throw CONSTANTS.ERROR_INCORRECT_CITY;
+		}
+		//		if (!isPostCode($('#V_PostCode').val())) {
+		//			throw CONSTANTS.ERROR_INCORRECT_POSTCODE;
+		//		}
+		if ($('#V_AddressInfo').val() == '') {
+			throw CONSTANTS.ERROR_NO_ADDRESS;
+		}
+		if ($('#V_Username').val() == '') {
+			throw CONSTANTS.ERROR_NO_NAME;
+		}
+		if ($('#V_Cellphone').val() == '' && !($('#V_Telephone1').val() != '' && $('#V_Telephone2').val() != '')) {
+			throw CONSTANTS.ERROR_NO_PHONE_OR_TELEPHONE;
+		}
+		if ($('#V_Cellphone').val() != '' && !isCellPhoneNumber($('#V_Cellphone').val())) {
+			throw CONSTANTS.ERROR_INCORRECT_CELLPHONE;
+		}
+	} catch (e) {
+		alert(e);
+		return false;
+	}
+	return true;
+}
+
+function displayMessage(target, message, type) {
+	var parent = target.parent();
+	if (parent.next().hasClass('msg')) {
+		parent.next().remove();
+	}
+	if (type) {
+		target.removeClass('error');
+		target.addClass('hover');
+	} else {
+		target.removeClass('hover');
+		target.addClass('error');
+	}
+	var type = type ? 'tip' : 'error';
+
+	var msg = $('<div class="msg ' + type + '-msg"></div>');
+	msg.html(message);
+	msg.insertAfter(parent);
+	msg.css('font-size', '12px');
+
+	var length = msg.text().length * 12;
+	if (length > msg.width()) {
+		msg.css('line-height', '14px');
+	} else {
+		msg.css('line-height', '28px');
+	}
+}
+
+function removeMessage(target) {
+	var parent = target.parent();
+	if (parent.next().hasClass('msg')) {
+		parent.next().remove();
+	}
+	target.removeClass('hover');
+	target.removeClass('error');
+}
+
+function strLength(str) {
+	return str.replace(/[^\x00-\xff]/g, "..").length
+}
+
+function isEmail(str) {
+	return !!str.match(/^(?:[\w\!\#\$\%\&\'\*\+\-\/\=\?\^\`\{\|\}\~]+\.)*[\w\!\#\$\%\&\'\*\+\-\/\=\?\^\`\{\|\}\~]+@(?:(?:(?:[a-zA-Z0-9](?:[a-zA-Z0-9\-](?!\.)){0,61}[a-zA-Z0-9]?\.)+[a-zA-Z0-9](?:[a-zA-Z0-9\-](?!$)){0,61}[a-zA-Z0-9]?)|(?:\[(?:(?:[01]?\d{1,2}|2[0-4]\d|25[0-5])\.){3}(?:[01]?\d{1,2}|2[0-4]\d|25[0-5])\]))$/);
+}
+
+function isURL(str) {
+	return !!str.match(/^https?:\/\/[\d\-a-zA-Z]+(\.[\d\-a-zA-Z]+)*/);
+}
+
+function isCellPhoneNumber(str) {
+	return !!str.match(/^(1(([358][0-9])|(47)))\d{8}$/);
+}
+
+function isPostCode(str) {
+	return !!str.match(/^[1-9]\d{5}$/);
+}
+
+
+function strength(n) {
+	function m(p) {
+		if (p >= 65 && p <= 90) {
+			return 2
+		} else {
+			if (p >= 97 && p <= 122) {
+				return 4
+			} else {
+				if (p >= 48 && p <= 57) {
+					return 1
+				} else {
+					return 8
+				}
+			}
+		}
+	}
+
+	function l(p) {
+		var q = 0;
+		for (i = 0; i < 4; i++) {
+			if (p & 1) {
+				q++
+			}
+			p >>>= 1
+		}
+		return q
+	}
+	var k = 0,
+		j = n.length;
+	if (j < 6) {
+		return 1
+	}
+	for (i = 0; i < j; i++) {
+		k |= m(n.charCodeAt(i))
+	}
+	var o = l(k);
+	if (n.length >= 10) {
+		o++
+	}
+	if (!g(n)) {
+		o = 1
+	}
+	o = Math.min(Math.max(o, 1), 3);
+	return o
+}
+var g = (function() {
+	var j = ["000000", "111111", "11111111", "112233", "123123", "123321", "123456", "654321", "666666", "888888", "abcdef", "abcabc", "abc123", "a1b2c3", "aaa111", "123qwe", "qwerty", "qweasd", "admin", "password", "p@ssword", "passwd", "iloveyou", "5201314"];
+	var k = {};
+	for (var i = 0; i < j.length; i++) {
+		k[$.trim(j[i])] = true
+	};
+	return function(l) {
+		if (k[l]) {
+			return false
+		} else {
+			return true
+		}
+	}
+})();
+
+window.addressValidate = addressValidate;

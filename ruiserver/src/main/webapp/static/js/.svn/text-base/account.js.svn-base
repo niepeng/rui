@@ -1,0 +1,53 @@
+$(function() {
+	var urlsource = location.search;
+	var referurl = "";
+	var cityId = UX.city.id;
+	if (urlsource.indexOf("referurl=") > 0) {
+		referurl = getURLParamByName("referurl");
+	}
+	if (urlsource.indexOf("cityId=") > 0) {
+		var newCityID = getURLParamByName("cityId");
+		if (newCityID != undefined) {
+			cityId = UX.city.id = newCityID;
+		}
+	}
+	$("#A_Logo").attr("href", UX.basePath + "index.htm?cityId=" + cityId);
+	$("#A_LinkSina").attr("href", UX.basePath + "userLink/login.htm?referId=10&cityId=" + cityId + "&refurl=" + referurl);
+	$("#A_LinkTaobao").attr("href", UX.basePath + "userLink/login.htm?referId=11&cityId=" + cityId + "&refurl=" + referurl);
+	$("#A_LinkQQ").attr("href", UX.basePath + "userLink/login.htm?referId=12&cityId=" + cityId + "&refurl=" + referurl);
+
+	$('#V_SendSMSCode').click(function() {
+		if (checkPhone()) {
+			var phone = $('#V_Phone').val();
+			$.ajax({
+				method: 'POST',
+				url: UX_Config.sendCheckCodeURL,
+				data: {
+					phone: phone
+				},
+				success: function(isSuccessed) {
+					if (isSuccessed == 1) {
+						$('#V_SendSMSCode').attr('disabled', 'disabled');
+						countDownTimer();
+					}
+				},
+				error: function() {
+
+				}
+			});
+		}
+	});
+	function countDownTimer(){
+		var remind = 60;
+		var timer = setInterval(function(){
+			if (remind >= 0) {
+				$('#V_SendSMSCode').val(remind + '秒后可重新发送');
+				--remind;
+			}else{
+				clearInterval(timer);
+				$('#V_SendSMSCode').removeAttr('disabled');
+				$('#V_SendSMSCode').val('免费获取短信验证码');
+			}
+		}, 1000);
+	}
+});

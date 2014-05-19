@@ -1,0 +1,23 @@
+
+$widget.setTemplate("adminHeader").addToContext("tab",'1')
+
+
+<div class="pmt-main-section pmt-container ng-scope" ng-view="">
+	
+	#set($form = $formFactory.getForm('cat.add'))
+            		
+    <form action="doAddCat.htm"  enctype="multipart/form-data"  method="post">
+        <input type="hidden" name="parentId" value="$!parentCatDO.id" />
+		
+			父类目名称：$!parentCatDO.name <br/>
+    		#errorMessage($!resultmessage.message)<br/>
+            $form.name.label：<input type="text" name="$form.name.name" value="$!form.name.value">&nbsp; * #errorMessage($!form.name.message) <br/><br/><br/>
+            图标：<input type="file" name="iconUrl">* <br/><br/><br/>
+            $form.sortValue.label：<input type="text" name="$form.sortValue.name" value="$!form.sortValue.value">&nbsp; * #errorMessage($!form.sortValue.message) <br/><br/><br/>
+    			
+            <input type="submit" value="提交"/>
+            	
+    </form>
+	
+</div>
+	

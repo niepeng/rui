@@ -1,0 +1,7 @@
+{"code":0, "data":
+{
+	#if($bannerList)
+			"bannerList" : $jsonUtil.mfields('id,name,imageUrl',$bannerList) ,
+	#end
+	"appList" : $jsonUtil.mfields('id,mainTitle,downUrl,fileSize,iconUrl',$appList) 
+}}

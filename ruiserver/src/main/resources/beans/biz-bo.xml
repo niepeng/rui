@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="gbk"?>
+<!DOCTYPE beans PUBLIC
+    "-//SPRING//DTD BEAN//EN"
+     "http://www.springframework.org/dtd/spring-beans.dtd">
+<beans default-autowire="byName">
+	
+	  <bean id="fileService" class="com.baibutao.apps.linkshop.uxiang.ruiserver.biz.bo.impl.FileServiceImpl">
+	       <property name="filePath" value="${imageserver.file.path}"></property>
+	       <property name="imagePerfix" value="${imageserver.visit.imageprefix}"></property>
+	  </bean>
+	  
+	  
+</beans>

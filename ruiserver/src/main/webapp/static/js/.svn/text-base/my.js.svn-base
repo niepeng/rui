@@ -1,0 +1,124 @@
+var ds;
+if ($('#D_Prov').length) {
+	var code = UX.city.id;
+	if ($('#M_DefAreaID').val() != "") {
+		code = $('#M_DefAreaID').val();
+	}
+	ds = DistrictSelector.attach('D_Prov', 'D_City', 'D_Dist');
+	ds.selectDist(code);
+}
+$('.I_Recart').bind('click', function() {
+	var $this = $(this);
+	var items = $this.parents('tr').find('.order-goods a');
+	var cityId = $this.attr('data-cityid');
+	for (var i = 0; i < items.length; i++) {
+		var item = items.eq(i);
+		var id = item.attr('data-id');
+		UX.cart.addTo(id, 1, cityId);
+	}
+	location.href = UX.basePath + 'cart.htm?city-id=' + cityId;
+})
+
+//退换货
+
+$('.A_Hover li').hover(function() {
+	$(this).addClass('hover');
+}, function() {
+	$(this).removeClass('hover');
+});
+
+$('.A_Hover li').click(function() {
+	$(this).toggleClass('selected')
+})
+$('.A_ReverseNumber').change(function() {
+	$(this).parents('li').addClass('selected')
+})
+$('.A_SubmitReverse').click(function() {
+	var orderId = $(this).attr('data-orderId');
+	var selectedItemEles = $('#M_ReverOrder' + orderId + ' li.selected');
+	if (!selectedItemEles.length) {
+		UX.alert('请选择需要退/换货的商品');
+		return;
+	}
+	var form = $('#F_Reverse')[0];
+	var itemIds = [],
+		nums = [];
+	for (var i = 0; i < selectedItemEles.length; i++) {
+		var item = selectedItemEles.eq(i);
+		var itemId = item.attr('data-id');
+		var num = item.find('select').val() || 1;
+		itemIds.push(itemId);
+		nums.push(num);
+	};
+	form.orderId.value = orderId;
+	form.itemIds.value = itemIds.join(',');
+	form.nums.value = nums.join(',');
+	form.submit();
+})
+
+if (typeof UXOrderRTimes != 'undefined') {
+	for (var i = UXOrderRTimes.length - 1; i >= 0; i--) {
+		var orderRemainTime = UXOrderRTimes[i];
+		var ele = $('#MO_Order' + orderRemainTime.id).find('.MO_Remain');
+		remainTimeFormatWithSecends(ele, orderRemainTime.time);
+	}
+}
+
+function remainTimeFormatWithSecends(ele, remainTime) {
+	var ele = ele;
+	var remainTime = remainTime;
+	var timer;
+	timer = setInterval(function() {
+		if (remainTime >= 0) {
+			ele.html(UX.util.stringOfCountDown(remainTime));
+			--remainTime;
+		} else {
+			ele.html(UX.util.stringOfCountDown(0));
+			location.reload();
+		}
+	}, 1000);
+}
+
+//订单提醒
+$(function(){
+	$('.my-content .header dd a').each(function(){
+
+	  if( $(this).text().substr(-2,1) == 0 ){
+		  $(this).addClass('gray');
+	  }else{
+	  	  $(this).removeClass('gray');
+	  }
+	});
+});
+
+
+
+//订单商品显示个数
+$(function(){
+	$('.order-list td').each(function(){
+		if( $(this).find('img').length >3 ){
+			$(this).find('img:gt(2)').hide();
+		}
+	});
+});
+
+
+
+//绑定代金券
+$(function(){
+	$('.my-content .main h3').click(function(){
+		$('.my-coupin-new').slideToggle(300);
+	});
+});
+
+
+//新增收货地址取消按钮,及暂开收缩,修改事件
+$(function(){
+	if($('.baseinfo-add').text()==' 编辑收货地址'){$('.new-address').show();}
+	$('.new-address .row .botn').click(function(){
+		$(this).parents('#V_Address').find('input[class*="text"]').attr('value','');
+	});
+	$('.baseinfo-add').click(function(){
+           $('.new-address').slideToggle(300);
+	});
+});

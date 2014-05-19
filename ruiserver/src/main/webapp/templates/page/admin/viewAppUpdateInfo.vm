@@ -1,0 +1,452 @@
+ 
+ $widget.setTemplate("userHeader").addToContext("tab",'0')
+
+     <div class="pmt-main-section pmt-container ng-scope" ng-view="">
+		<div class="pmt-step-progress-bar ng-scope ng-isolate-scope step-1 step-2" step-bar="" steps="['上传安装包', '填写应用信息','提交审核', '应用上架']" stepnum="$root.stepnum" ng-show="$root.vm.isShowStepBar">
+			<div class="step-status status-1">
+				<p class="step-status-title">上传安装包</p><i class="step-status-icon"></i>
+			</div>
+			<div class="step-status status-2">
+				<p class="step-status-title">填写应用信息</p><i class="step-status-icon"></i>
+			</div>
+			
+			<div class="step-status status-3">
+				<p class="step-status-title">提交审核</p><i class="step-status-icon"></i>
+			</div>
+			
+			<div class="step-status status-4">
+				<p class="step-status-title">应用上架</p><i class="step-status-icon"></i>
+			</div>
+			
+			<div class="step-solid-line">
+				<div class="step-success-line"></div>
+			</div>
+		</div>
+
+		
+		<div class="slide-reveal up-step pmt-step ng-scope">
+			<div ng-show="$root.vm.isShowAppForm" ng-if="$root.vm.existAppForm" class="ng-scope" id='isShowAppForm'>
+                <div class="step-header">
+                    <h1 class="w-text-primary pmt-section-title ng-binding">填写应用信息</h1>
+                    <p class="step-subtitle">本页内的项目，未标记为『可选』的均为必填项</p>
+                </div>
+				
+				
+            <!-- SHOW @UPLOAD RETRY | @UPDATE | @EDIT -->
+            <div class="pmt-upload-progress ng-scope ng-hide">
+                <span class="progress-title">安装包</span>
+                <button class="w-btn w-btn-primary" style="position: relative; overflow: hidden; direction: ltr;">
+					上传新安装包
+					<input type="file" name="file" style="position: absolute; right: 0px; top: 0px; font-family: Arial; font-size: 118px; margin: 0px; padding: 0px; cursor: pointer; opacity: 0;">
+				</button>
+                <button class="w-btn ng-hide">上传</button>
+               
+                <div class="apk-info-section ng-hide">
+                    <table>
+                        <tbody><tr>
+                            <td class="title">包名</td>
+                            <td class="pn">
+                                <p class="ng-binding">$!appInfoDO.packageName</p>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="title">版本名称</td>
+                            <td class="version">
+                                <p class="ng-binding">$!appInfoDO.versionName</p>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="title">版本号</td>
+                            <td class="code">
+                                <p class="ng-binding">$!appInfoDO.versionValue</p>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="title">大小</td>
+                            <td class="size">
+                                <p class="ng-binding">$applicationUtil.showSizeM($!appInfoDO.fileSize) M</p>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="title">上传于</td>
+                            <td class="date">
+                                <p class="ng-binding">$dateUtil.format($!appInfoDO.uploadDate, 'yyyy-MM-dd')</p>
+                            </td>
+                        </tr>
+                        <tr class="sign-row">
+                            <td class="title">签名</td>
+                            <td class="sign">
+                                <p>#errorMessage($!resultmessage.message)</p>
+                            </td>
+                        </tr>
+                    </tbody></table>
+                </div>
+				
+              <!--
+			    <div class="apk-warning-section">
+                    <span class="pmt-form-help-inline w-text-warning ng-binding"></span>
+                    <div class="ng-hide">
+                        <p class="w-text-warning ng-binding">您新上传的安装包版本号是旧版本，如果您不清楚后果，建议您<a class="w-btn">取消本次上传</a></p>
+                    </div>
+    
+                    <form class="pmt-form pmt-form-horizontal ng-pristine ng-valid ng-hide" name="apkAlertSignForm" id="apkAlertSignForm">
+                        <p class="w-text-warning">您新上传的安装包签名与现有安装包的签名不一致，会造成用户升级应用时数据丢失。豌豆荚强烈反对这一做法。如果您不清楚后果，建议取消本次上传</p>
+                        <p class="w-text-warning">如果您明确后果，请阐述您的理由，以供审核：</p>
+                        <div class="pmt-form">
+                            <textarea text-area-elastic="" name="" id="" cols="60" rows="5" class="pmt-form-danger ng-pristine ng-valid" ng-model="apkAlertSignReasons" style="overflow: hidden; word-wrap: break-word; resize: horizontal; height: 102px;"></textarea>
+                        </div>
+                        <button type="submit" class="w-btn">提交</button>
+                    </form>
+    
+                    <span ng-show="$root.vm.afterAlter" class="pmt-form-help-inline w-text-warning ng-hide">您的签名更改申请已经提交成功，将需要 1-3个工作日完成，审核结果将以邮件形式通知您。</span>
+                </div>
+			  -->
+				
+               <!--
+			    <div class="pmt-popup ng-hide" ng-show="$root.vm.isShowApkManager">
+                    <div class="popup-container" ng-show="!isShowDelApkDialog">
+                        <p class="popup-title ng-binding">管理『』的安装包</p>
+                        <div class="popup-content">
+                            <div class="pkg-management">
+                                <p>豌豆荚将把已经审核通过的，版本号最高的安装包默认提供给用户。</p>
+                                <table class="pmt-standard-table">
+                                    <tbody><tr>
+                                        <th>上传日期</th>
+                                        <th>版本号</th>
+                                        <th>版本名</th>
+                                        <th>大小</th>
+                                        <th>MD5</th>
+                                        <th>状态</th>
+                                        <th>删除</th>
+                                    </tr>
+                                </tbody></table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+			   -->
+    			
+            </div>
+    
+			
+			
+			<!-- insert to values  -->
+			
+
+
+            <div ng-controller="apkInfoCtrl" class="ng-scope">
+				
+				 
+				 #set($form = $formFactory.getForm('appinfo'))
+                 <script language="JavaScript" type="text/javascript">   
+                    //定义了城市的二维数组，里面的顺序跟省份的顺序是相同的。通过selectedIndex获得省份的下标值来得到相应的城市数组   
+                    var city=[   
+                    	$applicationUtil.showSecondKeys($catList, 0)
+                    ];    
+                	
+                	var value=[   
+                    	$applicationUtil.showSecondKeys($catList, 1)
+                    ];    
+                	
+                    function getSecondCat(secondSelectedValue) { 
+                        // 获得一级下拉框的对象   
+                        var first=document.form1.firstCatId;   
+                        // 获得二级下拉框的对象   
+                        var second=document.form1.secondCatId;  
+						
+						if(first.selectedIndex == 0) {
+							return;
+						}
+						
+                        // 得到对应省份的城市数组   
+                        var provinceCity = city[first.selectedIndex - 1];   
+                        var valueInfo = value[first.selectedIndex - 1];   
+                        // 清空二级下拉框，仅留提示选项   
+                        second.length=1;
+                        //将城市数组中的值填充到城市下拉框中   
+                        for(var i=0;i<provinceCity.length;i++) {   
+                        	second[i+1]=new Option(provinceCity[i],valueInfo[i]);   
+                			if(secondSelectedValue == valueInfo[i]) {
+                				second[i+1].selected = true;
+                			} else {
+                			}
+                        }   
+                    }   
+                    </script>   
+                	
+                	
+                <form class="pmt-form pmt-form-horizontal ng-pristine ng-invalid ng-invalid-required" action="doAppUpdateInfo.htm" name="form1"  enctype="multipart/form-data"  method="post">
+					<input type="hidden" name="appId" value="$!appInfoDO.id" />
+                    <div class="step-body">
+                        <fieldset>
+                            <legend>基本信息</legend>
+                            <div class="pmt-form-row">
+                                <label for="" class="pmt-form-label">图标</label>
+                                <div class="pmt-form-controls">
+									#if($appInfoDO.iconUrl)	
+										<img class="img-rounded upload-photo" style="width:120px;height:120px;"  src="$appInfoDO.iconUrl"> 
+									#else
+										<!--   <img class="img-rounded upload-photo" style="width:120px;height:120px;"  src="http://img.wdjimg.com/pmt/add-image.png">    -->
+									#end 
+                                    <div class="up-field-extra pmt-form-help-inline">
+                                        <div class="pmt-form-help-block" message="" for="icon" help="请上传.png格式透明图标，512x512分辨率，不允许上传.jpg" xrequired="请先上传应用图标" validation="请上传应用图标">请上传.png格式透明图标，512x512分辨率，不允许上传.jpg</div>
+                                        <div class="pmt-input-filewrap">
+                                            <input type="file" name="iconUrl" >
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+							
+							#set($mainTitle = $!form.mainTitle.value)
+                    		#if(!$mainTitle)
+                    			#set($mainTitle = $appInfoDO.mainTitle)
+                    		#end
+                            <div class="pmt-form-row">
+                                <label for="app-title" class="pmt-form-label">$form.mainTitle.label</label>
+                                <div class="pmt-form-controls">
+                                    <input type="text" name="$form.mainTitle.name" value="$!mainTitle" class="ng-pristine ng-valid-maxlength ng-valid-pattern ng-invalid ng-invalid-required">
+                                    <div class="pmt-form-help-block" message="" for="title" help="用户手机上显示的应用名称" maxlength="最多只可输入 20 字" validation="请输入正确的标题名称，不允许特殊字符">用户手机上显示的应用名称  #errorMessage($!form.mainTitle.message)</div>
+                                </div>
+                            </div>
+							
+							 #set($subTitle = $!form.subTitle.value)
+                    		#if(!$subTitle)
+                    			#set($subTitle = $appInfoDO.subTitle)
+                    		#end
+                            <div class="pmt-form-row">
+                                <label for="app-tagline" class="pmt-form-label">$form.subTitle.label</label>
+                                <div class="pmt-form-controls">
+                                    <input type="text" name="$form.subTitle.name" value="$!subTitle" class="ng-pristine ng-valid-maxlength ng-valid-pattern ng-invalid ng-invalid-required">
+                                    <div class="pmt-form-help-block" message="" for="tagline" help="可输10个字，一句话描述应用的特色功能，如[和喜欢的音乐不期而遇]">可输10个字，一句话描述应用的特色功能，如[和喜欢的音乐不期而遇] #errorMessage($!form.subTitle.message)</div>
+                                </div>
+                            </div>
+							
+							
+                            <div class="pmt-form-row">
+                                <label for="" class="pmt-form-label">分类</label>
+                                <div class="pmt-form-controls">
+                                    <select class="ng-pristine ng-invalid ng-invalid-required" name="$form.firstCatId.name" onChange="getSecondCat(0)">>
+										<option value="0">请选择一级类目</option>
+                        				#foreach($cat in $catList)
+                        					<option value="$cat.id">$cat.name</option>
+                        				#end	
+								   </select>
+                                    <div class="pmt-form-help-inline">准确的分类将大大提高您的应用排名与下载量</div>
+                                </div>
+                            </div>
+                            <div class="pmt-form-row">
+                                <label for="" class="pmt-form-label">子分类</label>
+                                <div class="pmt-form-controls">
+                                    <select class="ng-pristine ng-invalid ng-invalid-required" name="$form.secondCatId.name">
+										<option value="0">请选择二级类目</option>
+									</select>
+								</div>
+                            </div>
+                        </fieldset>
+    
+                        <fieldset>
+                            <legend>详细描述</legend>
+							#set($info = $!form.info.value)
+                    		#if(!$info)
+                    			#set($info = $appInfoDO.info)
+                    		#end
+                            <div class="pmt-form-row big-textarea-row">
+                                <label for="app-description" class="pmt-form-label">$form.info.label</label>
+                                <div class="pmt-form-controls">
+                                    <div class="pmt-form-help-block" message="" for="description" help="可输入 500 字" maxlength="最多只可输入 500 字" validation="请输入正确的描述">可输入 500 字  #errorMessage($!form.info.message)</div>
+                                    <textarea  name="$form.info.name"  class="ng-pristine ng-invalid ng-invalid-required ng-valid-maxlength ng-valid-minlength" style="overflow: hidden; word-wrap: break-word; resize: horizontal; height: 64px;">$!info</textarea>
+                                </div>
+                            </div>
+							
+							
+							
+                    		#set($updateInfo = $!form.updateInfo.value)
+                    		#if(!$updateInfo)
+                    			#set($updateInfo = $appInfoDO.updateInfo)
+                    		#end
+                            <div class="pmt-form-row big-textarea-row">
+                                <label for="app-changelog" class="pmt-form-label">$form.updateInfo.label</label>
+                                <div class="pmt-form-controls">
+                                    <div class="pmt-form-help-block" message="" for="changelog" help="可输入500字，建议将各个更新内容使用数字序号进行分段" maxlength="最多只可输入 500 字" validation="请输入正确的信息">可输入500字，建议将各个更新内容使用数字序号进行分段 #errorMessage($!form.updateInfo.message)</div>
+                                    <textarea name="$form.updateInfo.name" class="ng-pristine ng-invalid ng-invalid-required ng-valid-maxlength ng-valid-minlength" style="overflow: hidden; word-wrap: break-word; resize: horizontal; height: 64px;">$!updateInfo</textarea>
+                                </div>
+                            </div>
+                        </fieldset>
+    
+                        <fieldset>
+                            <legend>素材</legend>
+                            <div class="pmt-form-row" pmt-screenshots-ctn="">
+                                <label for="" class="pmt-form-label">应用截图</label>
+                                <div class="pmt-form-controls">
+                                    <div class="screenshot-container">
+                                       应用截图：<br/>
+                                        #set($currentImg=$applicationUtil.showIndexImgs($appInfoDO.screenshots,0))	#if($currentImg)<img src="$currentImg" height="100px" /> <br/> #end 
+                                        #set($currentImg=$applicationUtil.showIndexImgs($appInfoDO.screenshots,1))	#if($currentImg)<img src="$currentImg" height="100px" /><br/> #end 
+                                        #set($currentImg=$applicationUtil.showIndexImgs($appInfoDO.screenshots,2))	#if($currentImg)<img src="$currentImg" height="100px" /><br/> #end 
+                                        #set($currentImg=$applicationUtil.showIndexImgs($appInfoDO.screenshots,3))	#if($currentImg)<img src="$currentImg" height="100px" /><br/> #end 
+                                        #set($currentImg=$applicationUtil.showIndexImgs($appInfoDO.screenshots,4))	#if($currentImg)<img src="$currentImg" height="100px" /><br/>#end 
+                                    </div>
+                                    <div class="pmt-input-filewrap">
+										<input type="file" name="screenshots1"><br/>
+										<input type="file" name="screenshots2"><br/>
+										<input type="file" name="screenshots3"><br/>
+										<input type="file" name="screenshots4"><br/>
+										<input type="file" name="screenshots5"><br/>
+										5张图片，.jpg或.png格式，不可以上传iOS应用的截图
+                                    </div>
+                                </div>
+                            </div>
+                        </fieldset>
+    
+                        <fieldset>
+                            <legend>其他</legend>
+                            
+							
+							<!--
+							
+							<div class="pmt-form-row" ng-init="app.paidType='NONE'">
+                                <label for="" class="pmt-form-label">收费内容</label>
+                                <div class="pmt-form-controls">
+                                    <div class="pmt-form-checkbox">
+                                        <label>
+                                            <input type="radio" name="paidType" value="NONE" ng-model="app.paidType" class="ng-pristine ng-valid">
+                                            没有收费内容
+                                        </label>
+                                    </div>
+                                    <div class="pmt-form-checkbox">
+                                        <label>
+                                            <input type="radio" name="paidType" value="HIDE" ng-model="app.paidType" class="ng-pristine ng-valid">
+                                            这个应用是试用版，付费后才能使用完整功能
+                                        </label>
+                                    </div>
+                                    <div class="pmt-form-checkbox">
+                                        <label>
+                                            <input type="radio" name="paidType" value="EMBEDED" ng-model="app.paidType" class="ng-pristine ng-valid">
+                                            这个应用包含付费内容，如表情，道具，电子书等虚拟物品
+                                        </label>
+                                    </div>
+                                    <div class="pmt-form-checkbox">
+                                        <label>
+                                            <input type="radio" name="paidType" value="PAID" ng-model="app.paidType" class="ng-pristine ng-valid">
+                                            这个应用是试用版，付费后才能使用完整功能，同时应用中包含付费方可购买的虚拟物品
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="pmt-form-row big-textarea-row ng-hide" ng-show="$root.vm.dangerousPermissionsArray">
+                                <label for="" class="pmt-form-label">保护隐私</label>
+                                <div class="pmt-form-controls">
+                                    <div class="w-text">
+                                        <span>请解释您的应用为何需要如下隐私权限：</span>
+                                        <ul class="pmt-rule-list">
+                                        </ul>
+                                    </div>
+                                    <textarea text-area-elastic="" id="app-permission" name="permissionStatement" ng-minlength="4" ng-maxlength="500" ng-required="$root.vm.dangerousPermissionsArray" ng-model="app.permissionStatement" class="ng-pristine ng-valid-maxlength ng-valid-minlength ng-valid ng-valid-required" style="overflow: hidden; word-wrap: break-word; resize: horizontal; height: 64px;">                                </textarea>
+                                    <div class="pmt-form-help-block" message="" for="permissionStatement" help="可输入 500 字" xrequired="必须给出权限的原因" maxlength="最多只可输入 500 字" validation="请输入正确的信息">可输入 500 字</div>
+                                </div>
+                            </div>
+                            <div class="pmt-form-row" pmt-application-ctn="">
+                                <label for="" class="pmt-form-label">版权证明</label>
+                                <div class="pmt-form-controls">
+                                    <div>
+                                        <button pmt-upload-button="" class="w-btn pmt-upload-btn" endpoint="app.application" style="position: relative; overflow: hidden; direction: ltr;">上传资质证明<input qq-button-id="76a59e17-b78b-4cde-924e-52b8c0d01ca6" multiple="" accept="image/jpeg,image/png" type="file" name="file" style="position: absolute; right: 0px; top: 0px; font-family: Arial; font-size: 118px; margin: 0px; padding: 0px; cursor: pointer; opacity: 0;"></button>
+                                        <input type="text" class="hide ng-pristine ng-valid" name="application" id="application" ng-model="app.application">
+                                        <br>
+                                        <div class="screenshot-container" style="margin-top: 20px">
+                                        </div>
+                                        <div class="pmt-form-help-block" message="" for="application" validation="请上传应用的版权证明"></div>
+                                        <span class="w-text-warning ng-binding">
+                                            
+                                        </span>
+                                    </div>
+                                    <span class="pmt-form-help-block">
+                                        <ul class="pmt-rule-list">
+                                            <li>请提供应用的软件著作权证明扫描件；未申请著作权证的开发者请上传<a href="http://developer.wandoujia.com/wp-content/uploads/2013/07/%E5%BC%80%E5%8F%91%E8%80%85%E6%9D%83%E5%88%A9%E5%A3%B0%E6%98%8E-%E8%B1%8C%E8%B1%86%E8%8D%9A.docx" target="_blank">开发者权利声明</a>，仅接受 JPEG/PNG格式</li>
+                                            <li>股票，医疗，彩票，银行业务等需要运营资源的应用必须提供相应资质证明。</li>
+                                        </ul>
+                                    </span>
+                                </div>
+                            </div>
+							
+							
+							
+                            <div class="pmt-form-row">
+                                <label for="publishDate" class="pmt-form-label">发布时间</label>
+                                <div class="pmt-form-controls">
+                                    <select ng-model="$root.vm.publishDateSelect" ng-init="publishDateSelect='a'" class="ng-pristine ng-valid">
+                                        <option value="a">审核通过后立即发布</option>
+                                        <option value="b">定时发布</option>
+                                    </select>
+                                    <div ng-show="$root.vm.publishDateSelect == 'b'" style="display: inline-block;" class="ng-hide">
+                                        <input name="publishDate" type="text" pmt-date-picker="" class="ng-pristine ng-valid">
+                                    </div>
+                                </div>
+                            </div>
+    
+							-->
+							
+                                <div class="pmt-form-row">
+                                    <label for="" class="pmt-form-label">
+                                        <div class="pmt-form-checkbox">
+                                            <input type="checkbox" name="agree" checked  class="ng-pristine ng-invalid ng-invalid-required">
+                                        </div>
+                                    </label>
+                                    <div class="pmt-form-controls">
+                                        <p class="hero">我同意以下权利声明</p>
+                                        <div class="pmt-form-help-block" message="" for="agree" xrequired="必须先同意协议" validation="必须同意"></div>
+                                        <p class="moretext">本公司 / 个人对该应用享有完整版权，不存在任何侵犯第三方合法权益的情形。本公司 / 个人上述承诺若是存在虚假，愿承担一切法律后果，并且赔偿因此而对豌豆荚造成的全部损失。</p>
+                                    </div>
+                                </div>
+                                <div class="pmt-form-row">
+                                    <div class="pmt-form-controls">
+                                        <button class="w-btn w-btn-kaiju w-btn-primary" type="submit">提交应用</button>
+                                    </div>
+                                </div>
+                            </div>
+    
+                           <!--
+						    <div class="pmt-popup ng-hide" ng-show="isShowDelAppDialog">
+                                <div class="popup-container warning">
+                                    <p class="popup-title ng-binding">删除『』</p>
+                                    <div class="popup-content">
+                                        <div class="delete-warning">
+                                            <p class="ng-binding">{一旦删除『』，它将会失去豌豆荚的『优质应用』认证，但用户仍然可以搜索到其他来源的版本。}</p>
+                                            <p>删除请求一旦审核通过，将无法撤销。</p>
+                                            <p>该操作将无法撤销要继续吗？</p>
+                                        </div>
+                                    </div>
+                                    <div class="popup-ctrl">
+                                        <a class="w-btn w-btn-grand w-btn-danger popup-delete-btn" ng-click="delAppHandler()">删除</a>
+                                        <a class="w-btn w-btn-grand w-btn-primary popup-close-btn" ng-click="isShowDelAppDialog = false">取消</a>
+                                    </div>
+                                </div>
+                            </div>
+							-->
+    
+                        </fieldset>
+                    </div>
+                </form>
+            </div>
+    		
+    				
+				
+            </div>
+        </div>	
+		
+		
+      </div>
+	  
+	  
+	  
+    <script language="JavaScript" type="text/javascript">   
+    	getSecondCat($appInfoDO.secondCatId);
+    </script>
+    	  
+ $widget.setTemplate("userFoot")
+ 
+
+
+	
+
+	 
+		

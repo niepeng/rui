@@ -1,0 +1,68 @@
+$(function() {
+	var imgup = window.parent.document.getElementById("imgup").value;
+	$("#qgimg").attr("src", imgup);
+	$('#qgimg').imgAreaSelect({
+		aspectRatio: '1:1',
+		minWidth: 120,
+		minHeight: 120,
+		handles: true,
+		x1: 90,
+		y1: 90,
+		x2: 210,
+		y2: 210,
+		onSelectEnd: function(img, selection) {
+			$('input[name="x1"]').val(selection.x1);
+			$('input[name="y1"]').val(selection.y1);
+			$('input[name="x2"]').val(selection.x2);
+			$('input[name="y2"]').val(selection.y2)
+		}
+	})
+});
+
+function Create() {
+	document.getElementById("imgbtn").value = "正在生成....";
+	var x1 = $('input[name="x1"]').val();
+	var y1 = $('input[name="y1"]').val();
+	var x2 = $('input[name="x2"]').val();
+	var y2 = $('input[name="y2"]').val();
+	var p = $("#qgimg").attr("src");
+	x = x1;
+	y = y1;
+	w = x2 - x1;
+	h = y2 - y1;
+	pw = 300;
+	ph = 300;
+	path = new Date().getTime();
+	$.ajax({
+		type: "POST",
+		url: "/my/abscutFace.htm",
+		dataType: 'html',
+		data:{
+			path:path,
+			p:p,
+			x:x,
+			y:y,
+			w:w,
+			h:h,
+			pw:pw,
+			ph:ph,
+			rd:Math.random()
+		},
+		success: function(msg) {
+		msg=$.trim(msg);
+			if (msg == "0") {
+				window.alert("您还没登录或者登录过期或者系统错误");
+			} else {
+				window.parent.document.getElementById("imgphoto").src = HtmlDecode(msg);
+				window.parent.document.getElementById("I_ImgCropper").style.display = "none";
+				window.parent.document.getElementById("mybg").style.display = "none"
+			}
+		}
+	})
+}
+
+function HtmlDecode(str) {
+	var t = document.createElement("div");
+	t.innerHTML = str;
+	return t.innerText || t.textContent
+}

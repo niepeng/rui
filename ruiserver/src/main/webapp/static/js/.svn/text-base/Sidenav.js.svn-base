@@ -1,0 +1,12 @@
+function getQueryFromUrl(url){
+	var s = url.split('?');
+	var o = {};
+	if(s.length > 1){
+		var qs = s[1].split('&')
+		for(var i = 0 ;i < qs.length; i++){
+			var q = qs[i].split('=');
+			o[q[0]] = q[1];
+		}
+	}
+	return o;
+}

@@ -1,0 +1,131 @@
+/*
+ ** 处理确认订单信息页面的地址编辑
+ **
+ */
+$(document).ready(function() {
+	var pop = $('#P_Address');
+	var form = $('#P_Address form');
+	var loadBg = $('#P_Address edi-bg');
+	var closeBtn = $('#P_Close');
+	var cancelBtn = $('#P_Cancel');
+	var submitBtn = $('#P_Submit');
+	var cache = {};
+
+	closeBtn.live('click', hideAddressPopup);
+	cancelBtn.live('click', hideAddressPopup);
+	submitBtn.live('click', function() {
+		if (!addressValidate()) {
+			return;
+		}
+		form.ajaxSubmit({
+			success: function(data){
+				if (data.code == -1) {
+					alert(data.msg);
+					//hideAddressPopup();
+					return;
+				}
+				var id = data.addressInfo.id;
+				var name = data.addressInfo.userName;
+				var address = data.addressInfo.address;
+				if ($('#B_Address' + id).length) {
+					$('#B_Address' + id).find('.name').html(name);
+					$('#B_Address' + id).find('.addr-bd').html(address);
+				} else {
+					var li = $('<li id="B_Address' + id + '" class="addressli" data-addressid="' + id + '"><div class="inner"><div class="addr-hd"><span class="name fl">'+ name +'</span><span class="fl"> 收</span><a href="javascript:void(0)" class="fr edit">编缉</a></div><p class="addr-bd">'+ address +'</p></div></li>');
+					$('#B_AddressList').prepend(li);
+					li.addClass("curr").siblings().removeClass("curr");
+				}
+				hideAddressPopup();
+			},
+			error: function() {
+
+			}
+		});
+	})
+
+	$('#B_NewAddress').click(showAddressPopup);
+
+	var ds;
+
+	$('.addressli .edit').live('click', function() {
+		var id = $(this).parents('li').attr('data-addressid');
+		showAddressPopup(id);
+	});
+
+	function showAddressPopup(id) {
+		pop.show();
+		if (!ds) {
+			ds = DistrictSelector.attach('D_Prov', 'D_City', 'D_Dist');
+		}
+		//选中某个区或者城市
+		// ds.selectDist('888');
+		// 获取选中城市的code
+		// ds.getSelectedCodes();
+		if (typeof id == 'string') {
+			form.attr('action', UX_Config.editAddressURL);
+			if (!loadBg.length) {
+				loadBg = jQuery('<div class="edi-bg"></div>').appendTo(pop);
+				loadBg.css({
+					width: pop.width(),
+					height: pop.height(),
+					background: '#fff',
+					opacity: 1,
+					position: 'absolute',
+					top: 0,
+					left: 0
+				});
+				loadBg.html('<img style="position:relative;left:50%;top:50%" src="$staticServer/images/white_loading.gif"/>')
+			} else {
+				loadBg.show();
+			}
+			var url = UX_Config.getAddressURL + '?' + 'id=' + id;
+//			if (cache[url]) {
+//				loadDataToForm(cache[url]);
+//				$('.edi-bg').hide();
+//			} else {
+//				
+//			}
+			jQuery.ajax({
+				method: 'GET',
+				url: url,
+				success: function(data) {
+					cache[url] = data.addressInfo;
+					loadDataToForm(data.addressInfo);
+					$('.edi-bg').hide();
+				},
+				error: function() {
+					$('.edi-bg').hide();
+				}
+			});
+		} else {
+			form.attr('action', UX_Config.newAddressURL);
+			form[0].reset();
+			if($('input[name=regionId]').val() > 0 ){
+				ds.selectDist($('input[name=regionId]').val()+'');
+			}
+		}
+	}
+
+	function hideAddressPopup() {
+		pop.hide();
+		if (loadBg.length) {
+			loadBg.hide();
+		}
+	}
+
+	function loadDataToForm(data) {
+
+		ds.selectDist(data.areaId);
+
+		for (var key in data) {
+			if (key == 'distCode') {
+				continue
+			}
+			if (key == 'address') {
+				$('textarea[name=' + key + ']').val(data[key]);
+				continue
+			}
+			$('input[name=' + key + ']').val(data[key]);
+		}
+	}
+})

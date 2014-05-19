@@ -1,0 +1,66 @@
+
+ $widget.setTemplate("userHeader").addToContext("tab",'1')
+
+    <div class="pmt-container ng-scope" ng-view="">
+        <div class="myapp-list pmt-white-box ng-scope">
+        	<div class="white-box-title"><p>所有应用</p></div>
+        	<div class="myapp-list-ctrl">
+                <!-- ngIf: !appList.length -->
+                <a class="w-btn w-btn-grand w-btn-primary btn-add-app" href="$adminModule.setTarget('viewAddAppFirst').param('userId',$!query.UserId)" target="_self">
+                    <i class="pmt-icon-add"></i>
+                    添加新应用
+                </a>
+            </div>
+            <div app-list="" data="appList" class="ng-isolate-scope">
+           	    <ul class="pmt-app-list ng-animate-fadedown" ng-show="appList.length">
+
+    				 #foreach($appInfoDO in $appInfoList)
+    					<li class="pmt-app-list-item pmt-white-box ng-scope GENERAL_PUBLISHED" ng-repeat="appItem in appList" ng-class="appItem.status.type">
+                            <div class="white-box-content">
+                                <div class="app-info">
+                                    <div class="app-icon">
+                                       #if($appInfoDO.iconUrl)
+										<img  src="$appInfoDO.iconUrl">
+									#else
+										<img  src="http://img.wdjimg.com/pmt/add-image.png">
+									#end
+                                    </div>
+                                    <div class="app-desc">
+                                        <p class="app-title ng-binding">$!appInfoDO.mainTitle</p>
+                                        <p class="app-meta">
+                                            <!-- ngIf: appItem.versionName -->
+                                            <span class="app-version ng-scope ng-binding">$applicationUtil.showSizeM($!appInfoDO.fileSize) M&nbsp;版本&nbsp;$appInfoDO.versionName<br></span>
+                                            <!-- end ngIf: appItem.versionName -->
+                                            <span class="app-date ng-binding">$dateUtil.format($!appInfoDO.gmtModified, 'yyyy-MM-dd')&nbsp;更新</span>
+                                        </p>
+                                        <span class="app-status ng-binding success">$applicationUtil.showAPPStatus($appInfoDO.status)</span>
+                                    </div>
+                                </div>
+                                <div class="app-ctrl">
+                                    <button class="w-btn w-btn-large btn-edit w-btn-primary" onclick="updateApp($!appInfoDO.id);">编辑/更新</button> 
+                                    <!--
+    								 <button class="w-btn w-btn-large"  ng-show="appItem.isShowPACKAGE">礼包管理</button>
+                                    <button class="w-btn w-btn-large"  ng-show="appItem.ownership">数据统计</button>
+    								 <a class="w-text-primary ng-scope" target="_blank" href="http://www.wandoujia.com/apps/com.linkshop.client.uxiang">详情页</a>
+    								-->
+    								 <a class="w-text-primary ng-scope" target="_blank" href="#">&nbsp;</a>
+                                </div>
+                            </div>
+                        </li>
+                       #end
+                   
+                </ul>
+            </div>
+        </div>
+    </div>
+	
+    $widget.setTemplate("userFoot")
+	
+	<script language="javascript">
+		function updateApp(appId) {
+			var urlPrefix = "$adminModule.setTarget('viewAppUpdateInfo')";
+			var url = urlPrefix + "?appId=" + appId;
+			window.location.href= url;
+		}
+    </script>
+	

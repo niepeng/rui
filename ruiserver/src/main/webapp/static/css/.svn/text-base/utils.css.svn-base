@@ -1,0 +1,34 @@
+.commonButton {
+   border-top: 1px solid #96d1f8;
+   background: #6d99b5;
+   background: -webkit-gradient(linear, left top, left bottom, from(#4185b0), to(#6d99b5));
+   background: -webkit-linear-gradient(top, #4185b0, #6d99b5);
+   background: -moz-linear-gradient(top, #4185b0, #6d99b5);
+   background: -ms-linear-gradient(top, #4185b0, #6d99b5);
+   background: -o-linear-gradient(top, #4185b0, #6d99b5);
+   padding: 5px 15px;
+   margin:5px 5px;
+   -webkit-border-radius: 5px;
+   -moz-border-radius: 5px;
+   border-radius: 5px;
+   -webkit-box-shadow: rgba(0,0,0,1) 0 1px 0;
+   -moz-box-shadow: rgba(0,0,0,1) 0 1px 0;
+   box-shadow: rgba(0,0,0,1) 0 1px 0;
+   text-shadow: rgba(0,0,0,.4) 0 1px 0;
+   color: white;
+   font-size: 12px;
+   font-family: Georgia, serif;
+   text-decoration: none;
+   vertical-align: middle;
+   cursor:pointer;
+   height:28px;
+   }
+.commonButton:hover {
+   border-top-color: #28597a;
+   background: #28597a;
+   color: #ccc;
+   }
+.commonButton:active {
+   border-top-color: #e4f2f1;
+   background: #e4f2f1;
+   }

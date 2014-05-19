@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE sqlMap PUBLIC "-//iBATIS.com//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<sqlMap namespace="UserAppOptInfoDAO">
+
+	<typeAlias type="com.baibutao.apps.linkshop.uxiang.ruiserver.biz.dal.dataobject.UserAppOptInfoDO" alias="userAppOptInfo" />
+
+	<resultMap id="userAppOptInfoMapping" class="userAppOptInfo">
+				<result property="gmtModified" column="gmt_modified"/>
+				<result property="id" column="id"/>
+				<result property="isDownload" column="is_download"/>
+				<result property="appId" column="app_id"/>
+				<result property="gmtCreate" column="gmt_create"/>
+				<result property="isFav" column="is_fav"/>
+				<result property="userId" column="user_id"/>
+				<result property="comment" column="comment"/>
+				<result property="isRecommend" column="is_recommend"/>
+				
+	</resultMap>
+	
+	<sql id="userAppOptInfo-full-columns">
+		t.gmt_modified, t.id, t.is_download, t.app_id, t.gmt_create, t.is_fav, t.user_id, t.comment, t.is_recommend
+	</sql>
+	
+	<insert id="create" parameterClass="userAppOptInfo">
+		<![CDATA[
+			insert into rui_db_user_app_opt_info(gmt_modified, is_download, app_id, gmt_create, is_fav, user_id, comment, is_recommend) 
+values (now(), #isDownload#, #appId#, now(), #isFav#, #userId#, #comment#, #isRecommend#)
+		]]>
+		<selectKey resultClass="long" keyProperty="id">
+			SELECT	LAST_INSERT_ID();
+	   	</selectKey>
+	</insert>
+	
+	<select id="queryById" resultMap="userAppOptInfoMapping" parameterClass="long">
+		select
+			<include refid="userAppOptInfo-full-columns" />
+		from
+			rui_db_user_app_opt_info t
+		where
+			t.id = #value#  and t.deleted = 0 
+	</select>
+	
+	<update id="delete" parameterClass="long">
+			update rui_db_user_app_opt_info t set t.deleted = 1  , t.gmt_modified = now()  where t.id = #value#
+		
+	</update>
+	
+	<update id="update" parameterClass="userAppOptInfo">
+		<![CDATA[
+			update 
+ 				rui_db_user_app_opt_info
+ 		set 
+ 				gmt_modified= now(),
+ 				is_download= #isDownload#,
+ 				app_id= #appId#,
+ 				is_fav= #isFav#,
+ 				user_id= #userId#,
+ 				comment= #comment#,
+ 				is_recommend= #isRecommend#
+ 		where 
+ 				id=#id#
+		]]>
+	</update>
+	
+</sqlMap>

@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="gbk"?>
+<!DOCTYPE beans PUBLIC
+    "-//SPRING//DTD BEAN//EN"
+     "http://www.springframework.org/dtd/spring-beans.dtd">
+<beans default-autowire="byName">
+	
+	<bean id="jndiTemplate" class="org.springframework.jndi.JndiTemplate"></bean>
+	
+	<bean id="dataSource" class="org.springframework.jndi.JndiObjectFactoryBean" destroy-method="close">
+		<property name="jndiName">
+			<value>${imageserver.jndi.name}</value>
+		</property>
+		<property name="jndiTemplate">
+			<ref local="jndiTemplate"/>
+		</property>
+	</bean>
+	
+	<bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager"></bean>
+	
+</beans>

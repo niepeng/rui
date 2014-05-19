@@ -1,0 +1,453 @@
+$(document).ready(function() {
+	//主图及小图滑动效果
+	var imgs = $('.sub-imgs').attr('data-imgs');
+	if (imgs != '') {
+		var imgArr = imgs.split(',');
+		var listString = '';
+		for (var i = 0; i < imgArr.length; i++) {
+			listString += '<li ' + (i == 0 ? 'class="selected"' : '') + '>' + '<img width="60" src="' + imgArr[i] + '!150px150px">' + '<span></span></li>';
+		}
+		$('.sub-imgs').html(listString);
+		if (imgArr.length > 1) {
+			$('.sub-imgs li').live('mouseenter', function() {
+				$('.sub-imgs li').removeClass('selected');
+				$(this).addClass('selected');
+				var index = $('.sub-imgs li').index($(this));
+				var imgURL = imgArr[index];
+				$('.main-img img').attr('src', imgURL + '!310px310px');
+			})
+		}
+	}
+	//推荐搭配，全部搭配个数
+	var totalNumber = 0;
+	$('.subcombo-number').each(function() {
+		var number = parseInt($(this).text());
+
+		totalNumber += number;
+	});
+	$('.combo-number').text(totalNumber);
+
+	//推荐搭配导航切换
+	var slide = new Slide({
+		ele: $('.combos'),
+		direction: 'up'
+	})
+	var combos = $('.combos li');
+	$('.combo-title').click(function() {
+		$('.combo-title').removeClass('selected');
+		$(this).addClass('selected');
+		var id = $(this).attr('data-catid') || '';
+		var list = combos;
+		list.each(function() {
+			var cateID = $(this).attr('data-cate');
+			if (cateID == id || id == '') {
+				$(this).css('display', 'inline-block')
+			} else {
+				$(this).css('display', 'none');
+			}
+		});
+		slide.list = [];
+		slide.reload();
+	});
+
+	//推荐搭配  选中商品价格
+	var chbxes = combos.find('.chbx');
+	chbxes.click(function() {
+		var number = 0;
+		var totalPrice = 0,
+			totalSave = 0;
+		chbxes.each(function() {
+			var $this = $(this);
+			var parent = $this.parents('li');
+			if ($this.attr('checked')) {
+				var price = accDiv(parent.attr('data-price'), 100)
+				var delprice = accDiv(parent.attr('data-delprice'), 100);
+				var save = 0;
+				if (price !=0 && delprice > 0) {
+					save = accAdd(delprice, -price);
+				}
+				
+				totalPrice = accAdd(totalPrice, price);
+				totalSave = accAdd(totalSave, save);
+				number++
+			}
+		});
+		/*
+		 *搭配价格最后加上主商品价格
+		 */
+		var price = accDiv($('.promo-price i').text()*100, 100);
+		var delprice = accDiv($('.promo-oldprice del').text().substring(1)*100, 100);
+		if (price !=0 && delprice > 0) {
+			var save = accAdd(delprice, -price);
+		}
+		totalPrice = accAdd(totalPrice, price);
+		totalSave = accAdd(totalSave, save);
+
+		$('#I_ComboNumber').html(number);
+		$('#I_ComboTotal').html('¥ ' + totalPrice);
+		$('#I_ComboSave').html('¥ ' + totalSave);
+	});
+
+	//推荐搭配加入购物车
+	$('#I_ComboCart').bind('click', function() {
+		var itemIDs = [];
+		chbxes.each(function() {
+			var $this = $(this);
+			var parent = $this.parents('li');
+			if ($this.attr('checked')) {
+				var id = parent.attr('data-id');
+				itemIDs.push(id);
+			}
+		})
+		if (itemIDs.length == 0) {
+			UX.alert('您还未选择任何商品');
+			return
+		}
+		itemIDs.push(getURLParamByName('id'));
+
+		for (var i = 0; i < itemIDs.length; i++) {
+			var id = itemIDs[i];
+			var status = UX.cart.add(id, 1, true);
+			if (status == 1 && i == (itemIDs.length - 1)) {
+				var popup = new UX.popup({
+					relater: $(this),
+					center: false,
+					className: 'C_Pop_Alert',
+					size: {
+						width: 200,
+						height: 20
+					},
+					offset: {
+						x: -60,
+						y: -60
+					},
+					x: false
+				});
+		$('#I_ComboNumber').html('0');
+		$('#I_ComboTotal').html('¥ ' + 0);
+		$('#I_ComboSave').html('¥ ' + 0);
+				popup.setContent('加入购物车成功！');
+				popup.show();
+				setTimeout(function() {
+					popup.hide();
+				}, 1000);
+				$('#A_Cart_Number').html(UX.cart.number());
+				chbxes.each(function() {
+					$(this)[0].checked = false;
+				})
+			}
+		}
+	});
+   
+    //侧边栏 '买了的人还买'
+	var boughtLoader = new Loader($('#I_BoughtItemURI'), $('#I_BoughtItem'), function(data) {
+		var list = '';
+		var length = Math.min(4, data.length);
+		for (var i = 0; i < length; i++) {
+			var item = data[i];
+			var id = item.id;
+			var imgs = item.imgs.split(',')[0] + '!310px310px';
+			var name = item.name;
+			var price = item.price;
+			var delPrice = item.marketPrice == 0 ? 0 : item.marketPrice;
+			var link = UX.basePath + 'item.htm?cityId=' + UX.city.id + '&id=' + id;
+			list += '<li><a class="hd" href="' + link + '" style="width:150px;height:150px;margin:0 auto;"><img style="width:150px;height:150px;" alt="' + name + '" src="' + imgs + '"></a><p class="bd"><a href="' + link + '">' + name + '</a></p><p class="ft"><span class="price-sugar"><span>￥ ' + UX.util.priceFormat(price) + '</span>' + (delPrice == 0 ? '' : ('<del>￥ ' + UX.util.priceFormat(delPrice, 1) + '</del>')) + '</span><span class="A_Cart_Add btn-cart cart-right" data-id="' + id + '"></span></p></li>';
+		}
+		return '<ul class="items">' + list + '</ul>'
+	}, {
+		autoload: true,
+		needRefresh: false
+	});
+
+	//同价位、同品牌
+	var brandLoader = new Loader($('.A_Loader_T'), $('.A_Loader_C'), function(data) {
+		var list = '';
+		var data = data.brandItems || data.priceItems || [];
+		var length = Math.min(4, data.length);
+		for (var i = 0; i < length; i++) {
+			var item = data[i];
+			var id = item.id;
+			var imgs = item.imgs.split(',')[0];
+			var name = item.name.split('#')[0];
+			var price = item.price;
+			var delPrice = item.marketPrice == 0 ? 0 : item.marketPrice;
+			var link = UX.basePath + 'item.htm?cityId=' + UX.city.id + '&id=' + id;
+			list += '<li><a class="hd" href="' + link + '" style="width:150px;height:150px;margin:0 auto;"><img style="width:150px;height:150px;" alt="' + name + '" src="' + imgs + '"></a><p class="bd"><a href="' + link + '">' + name + '</a></p><p class="ft"><span class="price-sugar"><span>￥ ' + UX.util.priceFormat(price) + '</span>' + (delPrice == 0 ? '' : ('<del>￥ ' + UX.util.priceFormat(delPrice) + '</del>')) + '</span><span class="A_Cart_Add btn-cart" data-id="' + id + '"></span></p></li>';
+		}
+		return '<ul class="items">' + list + '</ul>'
+	}, {
+		autoload: true,
+		needRefresh: false
+	});
+	//图片放大
+	var pop;
+	$('#I_Image').bind('mousemove', function(e) {
+		var cover = $('#I_Image').find('.cover');
+		var $this = $(this);
+		if (!cover.length) {
+			cover = $('<div class="cover">').appendTo($this);
+		}
+		var pH = pW = 358;
+		var cH = cW = 160;
+		var offset = $('#I_Image').offset();
+		var offsetX = e.pageX - offset.left,
+			offsetY = e.pageY - offset.top;
+		var coverX = offsetX - cW / 2,
+			coverY = offsetY - cH / 2;
+		if (coverX < 0) {
+			coverX = 0
+		} else if (coverX > pW - cW) {
+			coverX = pW - cW
+		}
+		if (coverY < 0) {
+			coverY = 0
+		} else if (coverY > pH - cH) {
+			coverY = pH - cH;
+		}
+		cover.css({
+			left: coverX,
+			top: coverY
+		});
+		if (!pop) {
+			pop = new UX.popup({
+				className: 'C_Pop_Zoom',
+				center: false,
+				offset: {
+					x: offset.left + pW + 2,
+					y: offset.top
+				},
+				size: {
+					width: 438,
+					height: 438
+				},
+				x: false
+			});
+			var src = $('#I_Image').find('img')[0].src;
+			src = src.replace('!310px310px', '');
+			pop.setContent('<div class="loading"><p>载入中……</p></div>');
+			var image = $('<img>');
+			image.attr('src', src);
+			image.one('load', function() {
+				pop.setContent(image);
+			});
+			pop.show();
+		} else {
+			pop.show();
+		}
+		var height = $('.C_Pop_Zoom img').height();
+		var width = $('.C_Pop_Zoom img').width();
+		if (width > 438) {
+			//var centerY = (height / pH) * (coverY + cH / 2);
+			//var centerX = (width / pH) * (coverX + cW / 2);
+			var centerX = coverX/(pW-cW)*(width-438);
+			var centerY = coverY/(pH-cH)*(height-438);
+			$('.C_Pop_Zoom img').css({
+				position: 'absolute',
+				top: -centerY ,
+				left: -centerX 
+			})
+		}
+
+	});
+    //放大效果 鼠标移出
+	$('#I_Image').bind('mouseleave', function() {
+		$('#I_Image').find('.cover').remove();
+		pop.hide();
+		pop = null;
+	});
+
+	//咨询购买
+	var counselClose = function() {
+		$('#I_CounselToggle').text('我要提问');
+		$('#I_CounselForm').slideUp()
+	}
+	var counselOpen = function() {
+		$('#I_CounselToggle').text('关闭提问');
+		$('#I_CounselForm').slideDown()
+	}
+	$('#I_CounselToggle').live('click', function() {
+		var text = $(this).text();
+		if (text == '我要提问') {
+			counselOpen();
+		} else {
+			counselClose();
+		}
+	});
+	$('#I_CounselSubmit').live('click', function() {
+		var text = $('#I_CounselText').val();
+		if (text == '') {
+			UX.alert('请填入您要咨询的问题');
+			return
+		}
+		$.ajax({
+			method: 'POST',
+			url: UX.basePath + 'ajax/postConsult.htm',
+			data: {
+				content: text,
+				itemId: getURLParamByName('id')
+			},
+			success: function(json) {
+				if (json.code == 0) {
+					UX.alert('问题提交成功，我们会尽快答复您！');
+					counselClose();
+				} else {
+					UX.alert(json.msg=="USER_NOT_LOGIN"?"请先登录":json.msg);
+				}
+				$('#I_CounselText').val('');
+			}
+		})
+	})
+	if ($('#I_Counsels').length) {
+		var productId = $('#I_Counsels').attr('data-productid');
+		$.ajax({
+			method: 'GET',
+			url: UX.basePath + 'ajax/showConsultList.htm',
+			data: {
+				productId: productId
+			},
+			success: function(json) {
+				if (json.code == 0) {
+					if (json.data.totalCount == 0) {
+						$('#I_Counsels').html('');
+						return;
+					}
+					var data = json.data.consultList;
+					var list = '';
+					for (var i = 0; i < data.length; i++) {
+						var consult = data[i];
+						list += '<li><p class="row name"><span class="t">网　　友：</span>' + consult.userName + '<i class="time">' + consult.gmtCreate + '</i></p><p class="row"><span class="t">咨询内容：</span>' + consult.content + '</p><p class="row reply"><span class="t">U箱回复：</span><span class="content"><span class="text">' + consult.reply + '</span><span class="time">' + consult.gmtModified + '</span></span></p></li>';
+					}
+					$('#I_Counsels').html('<ul>' + list + '</ul><div class="total"><span>共' + json.data.totalCount + '条</span></div>');
+				}
+			}
+		})
+	}
+
+	//收藏
+	$('.A_Collect').click(function() {
+		var $this = $(this);
+		var favoriteId = $this.attr('data-favoriteId');
+		var number = Number($this.attr('data-number'));
+		var itemId = $this.attr('data-itemId');
+		if (favoriteId == 0) {
+			$.ajax({
+				url: UX.basePath + 'ajax/postFavorite.htm',
+				method: 'GET',
+					data: {
+					itemId: itemId
+				},
+				success: function(msg) {
+					if(msg.code==0){
+    					number++;
+    					$this.attr('data-favoriteId', msg.favoriteId);
+    					$this.attr('data-number', number);
+    					$this.text('取消收藏('+number+')');
+    					$this.addClass('btn-collected');
+					}else{
+						UX.alert(msg.msg=="USER_NOT_LOGIN"?"请先登录":msg.msg);
+					}
+					
+				}
+			});
+		} else {
+			$.ajax({
+				url: UX.basePath + 'ajax/delFavorite.htm',
+				method: 'GET',
+					data: {
+					favoriteId : favoriteId
+				},
+				success: function(msg) {
+					if(msg.code==0){
+    					number--;
+    					$this.attr('data-favoriteId', 0);
+    				    $this.attr('data-number', number);
+    					$this.text('收藏('+number+')');
+    					$this.removeClass('btn-collected');
+					}else{
+						UX.alert(msg.msg=="USER_NOT_LOGIN"?"请先登录":msg.msg);
+					}
+				}
+			});
+		}
+	})
+
+	if ($('#I_Comment').length) {
+		var productId = $('#I_Comment').attr('data-productid');
+		var currentPage = 1;
+		var loadComment = function(page, callback) {
+			var callback = callback || $.noop;
+			$.ajax({
+				method: 'GET',
+				url: UX.basePath + 'ajax/showCommentList.htm',
+				data: {
+					productId: productId,
+					page: page
+				},
+				success: function(json) {
+					if (json.code == 0) {
+						if (json.data.totalCount == 0) {
+							$('#I_Comment').html('');
+							return;
+						}
+						var data = json.data.commentList;
+						var list = '';
+						for (var i = 0; i < data.length; i++) {
+							var comment = data[i];
+							list += '<li><div class="hd"><p class="avatar"><img width="60" src="' + (comment.userFace || (UX.staticPath + '/img/avatar_def.gif')) + '"/></p><p class="name">' + comment.userName + '</p></div><div class="bd"><p class="text">' + comment.content + '</p><p class="time">' + comment.gmtCreate + '</p><i class="i-icon"></i></div></li>';
+						}
+						$('#I_Comment').html('<div class="head gra-bg"><span>评论</span></div><div class="body"><ul>' + list + '</ul></div>');
+						var pagerContent = '';
+						if (page >= 2) {
+							pagerContent += '<a class="prev" href="javascript:void(0)">上一页</a>';
+						}
+						if (json.data.totalCount > page * 20) {
+							pagerContent += '<a class="next" href="javascript:void(0)">下一页</a>';
+						}
+						$('#I_Comment').append('<div class="foot">' + pagerContent + '</div>')
+						callback();
+					}
+				}
+			})
+		};
+		loadComment(currentPage);
+		$('#I_Comment .next').live('click', function() {
+			loadComment(currentPage + 1, function() {
+				currentPage += 1;
+			});
+		})
+		$('#I_Comment .prev').live('click', function() {
+			loadComment(currentPage - 1, function() {
+				currentPage -= 1;
+			});
+		})
+	}
+})
+
+// <div class="head gra-bg">
+// 						<span>全部评论</span>
+// 					</div>
+// 					<div class="body">
+// 						<ul>
+
+// 						</ul>
+// 					</div>
+/*
+ *商品详情导航定位
+ */
+
+//var headHeight=$('.item-detail .head').get(0).offsetTop+40;
+   $(window).bind('scroll',function(){
+   	  
+      var scrollTop=$(window).scrollTop();
+      if(scrollTop >= 963){
+        //$('.nav-minicart-btn').removeClass('none');
+        //$('.item-detail .head').addClass('nav-fixed');
+        $('.nav-fixed').show();
+        //alert('scrollTop'+scrollTop+'   headHeight'+headHeight);
+      }else{
+        //$('.nav-minicart-btn').addClass('none');
+        //$('.item-detail .head').removeClass('nav-fixed');
+        $('.nav-fixed').hide();
+      }
+
+   });

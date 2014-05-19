@@ -1,0 +1,57 @@
+#leftMenus {
+    background:#f9f9f9;
+    float: left;
+    border: 1px solid #ddd;
+    border-top: 0 none;
+}
+#leftMenus .side-list{
+    margin:0;
+}
+#leftMenus .side-list dt{
+    border-top:1px solid #ddd;
+}
+#leftMenus .side-list dt a{
+    display: block;
+    height:30px;
+    line-height: 30px;
+    text-align: left;
+    font-size: 12px;
+    padding-left:22px;
+    margin-left:12px;
+    background: url(../images/icons.png) -5px 8px no-repeat;
+}
+/*#leftMenus .side-list dt.selected{
+    background: #eee;
+    border-top:1px solid #ddd;
+    border-bottom:1px solid #ddd;
+}
+#leftMenus .folder {
+    background: url("../images/icons.png") no-repeat scroll -5px 10px transparent;
+    margin-left: 10px;
+}
+#leftMenus dt {
+    background: url("../images/menubg.gif") repeat-x scroll 0 0 transparent;
+    border-left: 1px solid #FFFFFF;
+    position: relative;
+}
+#leftMenus dt a {
+    color: #333333;
+    display: block;
+    height: 30px;
+    line-height: 30px;
+    padding-left: 20px;
+    text-decoration: none;
+}*/
+#leftMenus dd {
+/*    background-color: #F4F9FF;
+*/    background-image: url("../images/kit.gif");
+    background-position: 22px 10px;
+    background-repeat: no-repeat;
+    line-height: 25px;
+    padding-left: 34px;
+    margin:0;
+}
+#leftMenus dd a {
+    color: #3D6BAC;
+    text-decoration: none;
+}
