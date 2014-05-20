@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical" >
+
+    <Button
+        android:id="@+id/upgrade_version_btn"
+        style="@style/more_fragment_btn"
+        android:text="@string/upgrade_version" />
+
+    <Button
+        android:id="@+id/about_us_btn"
+        style="@style/more_fragment_btn"
+        android:text="@string/about_us" />
+
+    <Button
+        android:id="@+id/feedback_btn"
+        style="@style/more_fragment_btn"
+        android:text="@string/feedback" />
+
+</LinearLayout>
