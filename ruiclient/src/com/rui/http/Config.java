@@ -85,6 +85,7 @@ public class Config {
 		String APP_DETAIL_URL = "app.detail.url";
 		String GAME_LIST = "applist.game.url";
 		String CAT_LIST_URL = "cat.list.url";
+		String APP_LIST = "applist.url";
 	}
 
 	private static final String ENV_PATH = "configs/env.properties";

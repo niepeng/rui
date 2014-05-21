@@ -1,6 +1,8 @@
 package com.rui.android_client.model;
 
 public class AppCategory extends BaseModel {
+	
+	private long id;
 
 	private String name;
 
@@ -11,6 +13,14 @@ public class AppCategory extends BaseModel {
 	private int sortValue;
 
 	private String iconUrl;
+	
+	public long getId() {
+		return id;
+	}
+	
+	public void setId(long id) {
+		this.id = id;
+	}
 
 	public String getName() {
 		return name;

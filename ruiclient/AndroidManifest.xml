@@ -34,6 +34,9 @@
             </intent-filter>
         </activity>
         <activity android:name="com.rui.android_client.activity.AppDetailActivity" />
+        <activity
+            android:name="com.rui.android_client.activity.CategoryItemActivity"
+            android:launchMode="singleTask" />
         <activity android:name="com.rui.android_client.activity.UpdateClientActivity" />
         <activity android:name="com.rui.android_client.activity.AboutUsActivity" />
         <activity android:name="com.rui.android_client.activity.FeedbackActivity" />

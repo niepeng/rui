@@ -6,11 +6,14 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -53,6 +56,19 @@ public class CategoryFragment extends Fragment {
 		mListView = (ListView) rootView.findViewById(R.id.list_view);
 		mListAdapter = new ListAdapter();
 		mListView.setAdapter(mListAdapter);
+		
+		mListView.setOnItemClickListener(new OnItemClickListener() {
+
+			@Override
+			public void onItemClick(AdapterView<?> parent, View view,
+					int position, long id) {
+				AppCategory item = mListAdapter.getItem(position);
+				Intent intent = new Intent(getActivity(), CategoryItemActivity.class);
+				intent.putExtra("catId", item.getId());
+				getActivity().startActivity(intent);
+			}
+		});
+		
 		return rootView;
 	}
 
