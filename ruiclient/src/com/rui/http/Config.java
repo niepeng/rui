@@ -39,8 +39,6 @@ public class Config {
 		
 		String BARCODE_ITEM_URL = "uxiang.barcode.url";
 		
-		String CAT_LIST_URL = "uxiang.cat.list.url";
-		
 		String ADDRESS_URL = "uxiang.address.url";
 		
 		String SHOPPING_INDEX_URL = "uxiang.shopping.index.url";
@@ -86,6 +84,7 @@ public class Config {
 		String SEARCH_URL = "search.url";
 		String APP_DETAIL_URL = "app.detail.url";
 		String GAME_LIST = "applist.game.url";
+		String CAT_LIST_URL = "cat.list.url";
 	}
 
 	private static final String ENV_PATH = "configs/env.properties";

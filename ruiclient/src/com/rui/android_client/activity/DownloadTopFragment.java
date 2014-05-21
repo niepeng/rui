@@ -4,6 +4,8 @@ import java.util.HashMap;
 
 import com.rui.android_client.R;
 import com.rui.android_client.component.AppListView;
+import com.rui.android_client.component.IndexListView;
+import com.rui.http.Config;
 
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -19,12 +21,13 @@ public class DownloadTopFragment extends Fragment {
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
-		ListView rootView = (ListView) inflater.inflate(
-				R.layout.layout_app_listview, null);
-		mListView = new AppListView(getActivity(), rootView);
-		// TODO
-		String url = "";
+		View rootView = inflater.inflate(R.layout.layout_app_listview, null);
+		mListView = new IndexListView(getActivity(),
+				(ListView) rootView.findViewById(R.id.list_view));
+		
+		String url = Config.getConfig().getProperty(Config.Names.GAME_LIST);
 		HashMap<String, Object> params = new HashMap<String, Object>();
+		params.put("type", 3);
 		mListView.loadApps(url, params);
 		return rootView;
 	}

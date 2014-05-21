@@ -19,12 +19,10 @@ import com.rui.android_client.R;
 
 public class IndexFragment extends Fragment {
 
-	private static String[] tabName = new String[] { "游戏精品", "精品推荐", "下载排行",
-			"猜你喜欢" };
+	private static String[] tabName = new String[] { "游戏精品", "精品推荐", "下载排行"};
 	@SuppressWarnings("rawtypes")
 	private static Class[] tabFragments = new Class[] { GameFragment.class,
-			FineRecommendedFragment.class, DownloadTopFragment.class,
-			YouLikeFragment.class };
+			FineRecommendedFragment.class, DownloadTopFragment.class};
 
 	TabHost mTabHost;
 	ViewPager mViewPager;

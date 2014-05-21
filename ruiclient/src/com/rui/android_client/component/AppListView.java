@@ -27,6 +27,7 @@ import com.rui.android_client.R;
 import com.rui.android_client.activity.AppDetailActivity;
 import com.rui.android_client.activity.RuiApp;
 import com.rui.android_client.model.AppInfo;
+import com.rui.android_client.model.BaseModel;
 import com.rui.android_client.parse.AppInfoParser;
 import com.rui.android_client.utils.JsonUtil;
 import com.rui.android_client.utils.StringUtil;
@@ -122,7 +123,7 @@ public class AppListView {
 			super(context);
 		}
 
-		public void setViewContent(Object item) {
+		public void setViewContent(BaseModel item) {
 		}
 
 	}
@@ -139,7 +140,9 @@ public class AppListView {
 			titleView = (TextView) findViewById(R.id.title);
 		}
 
-		public void setViewContent(AppInfo app) {
+		@Override
+		public void setViewContent(BaseModel item) {
+			AppInfo app = (AppInfo) item;
 			// 异步加载图片
 			RuiApp.fb.display(iconView, app.getIconUrl());
 			titleView.setText(app.getMainTitle());

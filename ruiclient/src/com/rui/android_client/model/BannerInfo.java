@@ -1,6 +1,6 @@
 package com.rui.android_client.model;
 
-public class BannerInfo {
+public class BannerInfo extends BaseModel {
 
 	private long id;
 	private String name;

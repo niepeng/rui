@@ -1,6 +1,6 @@
 package com.rui.android_client.model;
 
-public class AppCategory {
+public class AppCategory extends BaseModel {
 
 	private String name;
 
