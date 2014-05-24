@@ -1,10 +1,8 @@
 package com.rui.android_client.component;
 
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-import org.apache.http.HttpResponse;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -12,7 +10,6 @@ import org.json.JSONObject;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
-import android.os.AsyncTask;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
@@ -30,6 +27,7 @@ import com.rui.android_client.R;
 import com.rui.android_client.activity.AppDetailActivity;
 import com.rui.android_client.activity.RuiApp;
 import com.rui.android_client.model.AppInfo;
+import com.rui.android_client.model.BaseModel;
 import com.rui.android_client.parse.AppInfoParser;
 import com.rui.android_client.utils.JsonUtil;
 import com.rui.android_client.utils.StringUtil;
@@ -66,9 +64,8 @@ public class AppListView {
 		footerView = View.inflate(activity, R.layout.listview_foot, null);
 		mListView.addFooterView(footerView);
 		footerView.setVisibility(View.GONE);
-
-		mAdapter = new ListAdapter();
-		mListView.setAdapter(mAdapter);
+		
+		initAdapter();
 
 		mListView.setOnScrollListener(mOnScrollListener);
 		mListView.setOnItemClickListener(mOnItemClickListener);
@@ -79,8 +76,13 @@ public class AppListView {
 		mParams = params;
 		loadMore();
 	}
+	
+	protected void initAdapter() {
+		mAdapter = new ListAdapter();
+		mListView.setAdapter(mAdapter);
+	}
 
-	private class ListAdapter extends BaseAdapter {
+	protected class ListAdapter extends BaseAdapter {
 
 		@Override
 		public int getCount() {
@@ -104,33 +106,46 @@ public class AppListView {
 		public View getView(int position, View convertView, ViewGroup parent) {
 			ViewHolder holder;
 			if (convertView == null) {
-				holder = new ViewHolder(mActivity);
+				holder = new AppInfoViewHolder(mActivity);
 			} else {
-				holder = (ViewHolder) convertView;
+				holder = (AppInfoViewHolder) convertView;
 			}
 			AppInfo app = getItem(position);
 			holder.setViewContent(app);
 			return holder;
 		}
 
-		private class ViewHolder extends LinearLayout {
+	}
+	
+	protected class ViewHolder extends LinearLayout {
 
-			public ImageView iconView;
-			public TextView titleView;
+		public ViewHolder(Context context) {
+			super(context);
+		}
 
-			public ViewHolder(Context context) {
-				super(context);
-				View.inflate(context, R.layout.layout_app_listview_item, this);
-				iconView = (ImageView) findViewById(R.id.icon);
-				titleView = (TextView) findViewById(R.id.title);
-			}
+		public void setViewContent(BaseModel item) {
+		}
 
-			public void setViewContent(AppInfo app) {
-				// 异步加载图片
-				RuiApp.fb.display(iconView, app.getIconUrl());
-				titleView.setText(app.getMainTitle());
-			}
+	}
+	
+	protected class AppInfoViewHolder extends ViewHolder {
 
+		public ImageView iconView;
+		public TextView titleView;
+
+		public AppInfoViewHolder(Context context) {
+			super(context);
+			View.inflate(context, R.layout.layout_app_listview_item, this);
+			iconView = (ImageView) findViewById(R.id.icon);
+			titleView = (TextView) findViewById(R.id.title);
+		}
+
+		@Override
+		public void setViewContent(BaseModel item) {
+			AppInfo app = (AppInfo) item;
+			// 异步加载图片
+			RuiApp.fb.display(iconView, app.getIconUrl());
+			titleView.setText(app.getMainTitle());
 		}
 
 	}
