@@ -19,11 +19,11 @@
 		</init-param>
 		<init-param>
 			<param-name>wint.app.env</param-name>
-			<param-value>product</param-value>
+			<param-value>dev</param-value>
 		</init-param>
 		<init-param>
 			<param-name>wint.session.cookie.domain</param-name>
-			<param-value>112.124.8.83</param-value>
+			<param-value>127.0.0.1</param-value>
 		</init-param>
 		<init-param>
 			<param-name>wint.session.use</param-name>

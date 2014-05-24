@@ -10,6 +10,7 @@ import com.baibutao.apps.linkshop.ruiserver.test.BaseImageserver;
 import com.baibutao.apps.linkshop.uxiang.ruiserver.biz.dal.daointerface.KeyValueDAO;
 import com.baibutao.apps.linkshop.uxiang.ruiserver.biz.dal.dataobject.KeyValueDO;
 import com.baibutao.apps.linkshop.uxiang.ruiserver.biz.dal.dataobject.enums.KeyValueTypeEnum;
+import com.baibutao.apps.linkshop.uxiang.ruiserver.biz.query.KeyValueQuery;
 
 /**
  * <p>标题: </p>
@@ -64,6 +65,15 @@ public class TestKeyValue extends BaseImageserver {
 		KeyValueDO fromDB = keyValueDAO.queryByKey(key);
 		Assert.assertTrue(fromDB != null);
 		Assert.assertEquals(KeyValueTypeEnum.PERMINSSION_MAP.getId(), fromDB.getType());
+	}
+	
+	public void testQuery() {
+		String keyName = "2";
+		KeyValueQuery query = new KeyValueQuery();
+		query.setKeyName(keyName);
+		
+		List<KeyValueDO> list = keyValueDAO.query(query);
+		Assert.assertTrue(!CollectionUtil.isEmpty(list));
 	}
 
 	public void setKeyValueDAO(KeyValueDAO keyValueDAO) {

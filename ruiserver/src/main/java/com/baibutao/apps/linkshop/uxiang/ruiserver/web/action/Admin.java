@@ -51,13 +51,16 @@ public class Admin extends BaseAction {
 		if (!checkSessionNeedRedrect(flowData, context)) {
 			return;
 		}
+		long fatherAppId = flowData.getParameters().getLong("fatherAppId");
 		context.put("title", "上传安装包");
+		context.put("fatherAppId", fatherAppId);
 		flowData.setLayout("/admin/addApp");
 	}
 	
 	@Action(defaultTarget="/admin/viewAddAppFirst") 
-	public void addAppFirst(FlowData flowData, Context context) {
-		Result result = adminAO.addAppFirst(flowData);
+	public void doAddAppFirst(FlowData flowData, Context context) {
+		long fatherAppId = flowData.getParameters().getLong("fatherAppId");
+		Result result = adminAO.addAppFirst(flowData, fatherAppId);
 		if (result.isSuccess()) {
 			flowData.redirectTo("adminModule", "viewAppUpdateInfo").param("appId", result.getModels().get("appId"));
 			return;

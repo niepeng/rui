@@ -1,5 +1,5 @@
 <div class="a-header">
         <div class="a-header-inner">
-            <h1 class="a-logo"><a href="http://www.wandoujia.com" class="pngfix">豌豆荚</a></h1>
+            <h1 class="a-logo"><a href="$baseModule.setTarget('index')" class="pngfix">豌豆荚</a></h1>
         </div>
       </div>

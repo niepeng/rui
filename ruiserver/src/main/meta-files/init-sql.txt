@@ -61,6 +61,7 @@ CREATE TABLE `rui_db_app_info` (
 `deleted` tinyint  not null default 0 
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
 
+ALTER TABLE `bairui`.`rui_db_app_info` ADD COLUMN `next_app_id` BIGINT NOT NULL DEFAULT 0  AFTER `permission_value` ;
 
 
 

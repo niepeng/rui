@@ -37,7 +37,12 @@
                                     </div>
                                 </div>
                                 <div class="app-ctrl">
-                                    <button class="w-btn w-btn-large btn-edit w-btn-primary" onclick="updateApp($!appInfoDO.id);">编辑/更新</button> 
+                                  #if($appInfoDO.isOnLine() && !$appInfoDO.hasNextAppId())
+										<a class="w-btn w-btn-large btn-edit w-btn-primary" href="$adminModule.setTarget('viewAddAppFirst').param('fatherAppId',$appInfoDO.id)">提交新版</a> 
+								  #end	
+								  #if((($appInfoDO.isOnLine() && !$appInfoDO.hasNextAppId()) || !$appInfoDO.isOnLine())   &&  !$appInfoDO.isTimeOut())
+										<a class="w-btn w-btn-large btn-edit w-btn-primary" href="$adminModule.setTarget('viewAppUpdateInfo').param('appId',$appInfoDO.id)">编辑当前版本内容</a> 
+								  #end
                                     <!--
     								 <button class="w-btn w-btn-large"  ng-show="appItem.isShowPACKAGE">礼包管理</button>
                                     <button class="w-btn w-btn-large"  ng-show="appItem.ownership">数据统计</button>

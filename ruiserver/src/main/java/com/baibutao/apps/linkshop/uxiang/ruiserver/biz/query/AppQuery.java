@@ -29,6 +29,9 @@ public class AppQuery  extends BaseQuery {
 	// 主标题搜索
 	private String keyword;
 	
+	// 0 默认， 3 是下载值排序高到低
+	private int sort;
+	
 
 	// -------------- extend attribute -----------------------
 
@@ -89,6 +92,14 @@ public class AppQuery  extends BaseQuery {
 
 	public void setKeyword(String keyword) {
 		this.keyword = keyword;
+	}
+
+	public int getSort() {
+		return sort;
+	}
+
+	public void setSort(int sort) {
+		this.sort = sort;
 	}
 	
 }

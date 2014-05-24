@@ -2,7 +2,9 @@ package com.baibutao.apps.linkshop.uxiang.ruiserver.biz.ao.impl;
 
 import java.io.File;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.servlet.http.HttpSession;
 
@@ -34,7 +36,9 @@ import com.baibutao.apps.linkshop.uxiang.ruiserver.biz.dal.dataobject.KeyValueDO
 import com.baibutao.apps.linkshop.uxiang.ruiserver.biz.dal.dataobject.enums.APPStsutsEnum;
 import com.baibutao.apps.linkshop.uxiang.ruiserver.biz.dal.dataobject.enums.KeyValueTypeEnum;
 import com.baibutao.apps.linkshop.uxiang.ruiserver.biz.dal.dataobject.enums.RoleEnum;
+import com.baibutao.apps.linkshop.uxiang.ruiserver.biz.dal.ibatis.AppInfoDAOIbatis;
 import com.baibutao.apps.linkshop.uxiang.ruiserver.biz.query.AppQuery;
+import com.baibutao.apps.linkshop.uxiang.ruiserver.biz.query.KeyValueQuery;
 import com.baibutao.apps.linkshop.uxiang.ruiserver.web.common.AdminResultCodes;
 import com.baibutao.apps.linkshop.uxiang.ruiserver.web.common.SessionKeys;
 
@@ -195,7 +199,7 @@ public class AdminAOImpl extends BaseAO implements AdminAO {
 	}
 	
 	@Override
-	public Result addAppFirst(FlowData flowData) {
+	public Result addAppFirst(FlowData flowData, long fatherAppId) {
 		Result result = new ResultSupport(false);
 		try {
 			// 登陆和权限判断
@@ -220,38 +224,67 @@ public class AdminAOImpl extends BaseAO implements AdminAO {
 			appInfoDO.setStatus(APPStsutsEnum.READY_SAVE.getValue());
 			appInfoDO.setUploadDate(new Date());
 			appInfoDO.setUploadUserId(getLoginUserId(flowData));
-			
-			
+
 			String visitUrl = fileService.uploadFile(file);
-			/*
-			 * 1. 解析出包名以及版本 
-			 * 2. 原有系统中不存在的，app
-			 */
-			if(!StringUtil.isBlank(visitUrl)) {
-				String fileName = visitUrl.substring(visitUrl.lastIndexOf("/")+ 1);
-				File apkFile = fileService.getFileByName(fileName);
-				if (apkFile.exists()) {
-					AndroidApk apk = new AndroidApk(apkFile);
-					long fileSize = apkFile.length();
-					appInfoDO.setPackageName(apk.getPackageName());
-					appInfoDO.setVersionName(apk.getAppVersion());
-					appInfoDO.setVersionValue(apk.getAppVersionCode());
-					appInfoDO.setFileSize((int) (fileSize / 1024));
-					List<String> permissionList = apk.getUsesPermission();
-					String permissoinValues = CollectionUtil.join(permissionList, ",");
-					if (!StringUtil.isBlank(permissoinValues)) {
-						appInfoDO.setPermissionValue(permissoinValues);
-					}
-					AppInfoDO fromDB = appInfoDAO.queryByPackageName(appInfoDO.getPackageName());
-					if (fromDB != null) {
-						result.setResultCode(new StringResultCode("该app已经存在"));
-						return result;
-					}
+			if(StringUtil.isBlank(visitUrl)) {
+				result.setResultCode(new StringResultCode("上传apk文件失败"));
+				return result;
+			}
+			
+			// 1. 解析出包名以及版本 
+			String fileName = visitUrl.substring(visitUrl.lastIndexOf("/") + 1);
+			File apkFile = fileService.getFileByName(fileName);
+			if (!apkFile.exists()) {
+				result.setResultCode(new StringResultCode("上传apk文件分析文件信息失败"));
+				return result;
+			}
+			
+			AndroidApk apk = new AndroidApk(apkFile);
+			long fileSize = apkFile.length();
+			appInfoDO.setPackageName(apk.getPackageName());
+			appInfoDO.setVersionName(apk.getAppVersion());
+			appInfoDO.setVersionValue(apk.getAppVersionCode());
+			appInfoDO.setFileSize((int) (fileSize / 1024));
+			List<String> permissionList = apk.getUsesPermission();
+			String permissoinValues = CollectionUtil.join(permissionList, ",");
+			if (!StringUtil.isBlank(permissoinValues)) {
+				appInfoDO.setPermissionValue(permissoinValues);
+			}
+			appInfoDO.setDownUrl(visitUrl);
+			
+			// 2. 新增app:原有系统中不存在的app
+			// 	  更新app:原有系统中要有app，并把信息复制过去
+			boolean isUpdateApp = false;
+			AppInfoDO fatherAppInfoDO = null;
+			if(fatherAppId > 0) {
+				fatherAppInfoDO = appInfoDAO.queryById(fatherAppId);
+				if(isSameApp(appInfoDO, fatherAppInfoDO)) {
+					isUpdateApp = true;
+				} else {
+					// 标记当前参数fatherAppId有问题，设置空
+					fatherAppId = 0;
 				}
-				appInfoDO.setDownUrl(visitUrl);
+				
+			}
+			
+			
+			AppInfoDO fromDB = appInfoDAO.queryByPackageName(appInfoDO.getPackageName());
+			if (fromDB != null && !isUpdateApp) {
+				result.setResultCode(new StringResultCode("该app已经存在"));
+				return result;
+			}
+
+			if(isUpdateApp) {
+				copyAppInfo(appInfoDO, fatherAppInfoDO);
 			}
 			
 			long id = appInfoDAO.create(appInfoDO);
+			
+			// 并在原有的app中记录nextAppId
+			if (isUpdateApp && fatherAppInfoDO != null) {
+				fatherAppInfoDO.setNextAppId(id);
+				appInfoDAO.update(fatherAppInfoDO);
+			}
 			
 			result.getModels().put("appId", id);
 			result.setSuccess(true);
@@ -262,6 +295,29 @@ public class AdminAOImpl extends BaseAO implements AdminAO {
 		return result;
 	}
 	
+	private void copyAppInfo(AppInfoDO appInfoDO, AppInfoDO fatherAppInfoDO) {
+		if(appInfoDO == null || fatherAppInfoDO == null) {
+			return;
+		}
+		
+		appInfoDO.setReferMainAppId(fatherAppInfoDO.getId());
+		appInfoDO.setIconUrl(fatherAppInfoDO.getIconUrl());
+		appInfoDO.setMainTitle(fatherAppInfoDO.getMainTitle());
+		appInfoDO.setSubTitle(fatherAppInfoDO.getSubTitle());
+		appInfoDO.setFirstCatId(fatherAppInfoDO.getFirstCatId());
+		appInfoDO.setSecondCatId(fatherAppInfoDO.getSecondCatId());
+		appInfoDO.setInfo(fatherAppInfoDO.getInfo());
+		appInfoDO.setScreenshots(fatherAppInfoDO.getScreenshots());
+		
+	}
+
+	private boolean isSameApp(AppInfoDO appInfoDO, AppInfoDO fatherAppInfoDO) {
+		if (fatherAppInfoDO == null) {
+			return false;
+		}
+		return appInfoDO.getUploadUserId() == fatherAppInfoDO.getUploadUserId() && appInfoDO.getPackageName().equals(fatherAppInfoDO.getPackageName());
+	}
+
 	@Override
 	public Result viewAddUpdateInfo(FlowData flowData, long appId) {
 		Result result = new ResultSupport(false);
@@ -305,7 +361,7 @@ public class AdminAOImpl extends BaseAO implements AdminAO {
 			}
 			
 			AppInfoDO fromDB = appInfoDAO.queryById(appInfoDO.getId());
-			if (fromDB == null || (!isAdmin(flowData) && getLoginUserId(flowData) != fromDB.getUploadUserId())) {
+			if (fromDB == null || (!isAdmin(flowData) && getLoginUserId(flowData) != fromDB.getUploadUserId()) || fromDB.isTimeOut()) {
 				result.setResultCode(AdminResultCodes.APP_ARGS_ERROR);
 				return result;
 			}
@@ -369,6 +425,9 @@ public class AdminAOImpl extends BaseAO implements AdminAO {
 			}
 			
 			fromDB.setScreenshots(mergeString(screenShotUrls, ","));
+			if (!isAdmin(flowData) || (!fromDB.isOnLine())) {
+				fromDB.setStatus(APPStsutsEnum.READY_CHECK.getValue());
+			}
 			
 			appInfoDAO.update(fromDB);
 			result.getModels().put("appInfoDO", fromDB);
@@ -408,6 +467,64 @@ public class AdminAOImpl extends BaseAO implements AdminAO {
 			result.setSuccess(true);
 		} catch (Exception e) {
 			log.error("adminAppList error", e);
+		}
+		return result;
+	}
+	
+	@Override
+	public Result appCheckSuccess(FlowData flowData, long appId) {
+		Result result = new ResultSupport(false);
+		try {
+			// 登陆和权限判断
+			if (!ensureUserLogin(result, flowData) && !isAdmin(flowData)) {
+				return result;
+			}
+			
+			/*
+			 * 最终上线的appId的值还是老的appId的值，就是当前的referMainAppId对应的app，信息使用新的
+			 * 
+			 * 1. 根据传递过来的appId，获取他的referMainApp，把appId对应的与referMainApp对应的信息互换
+			 * 2. appId的修改为过期，referMainApp在线
+			 * 3. appId对应的referMainAppId=referMainApp.id,nextAppId=0
+			 * 4. referMainApp对应的referMainAppId=0，next=0
+			 */
+			
+			AppInfoDO appInfoDO = appInfoDAO.queryById(appId);
+			if(appInfoDO == null || appInfoDO.isOnLine() || appInfoDO.isTimeOut()) {
+				result.setResultCode(new StringResultCode("当前app不存在或已经上线了"));
+				return result;
+			}
+			
+			AppInfoDO fatherAppDO = appInfoDAO.queryById(appInfoDO.getReferMainAppId());
+			if(fatherAppDO == null || !fatherAppDO.isOnLine()) {
+				result.setResultCode(new StringResultCode("当前参数错误"));
+				return result;
+			}
+			
+			AppInfoDO lastOnlineAppInfoDO = appInfoDO.clone();
+			
+			// 设置最终上线的信息
+			lastOnlineAppInfoDO.setId(fatherAppDO.getId());
+			lastOnlineAppInfoDO.setStatus(APPStsutsEnum.ONLINE.getValue());
+			lastOnlineAppInfoDO.setNextAppId(0);
+			lastOnlineAppInfoDO.setReferMainAppId(0);
+			lastOnlineAppInfoDO.setPublishDate(new Date());
+			lastOnlineAppInfoDO.setDownloadNum(fatherAppDO.getDownloadNum());
+			lastOnlineAppInfoDO.setFavNum(fatherAppDO.getFavNum());
+			lastOnlineAppInfoDO.setRecommendNum(fatherAppDO.getRecommendNum());
+			lastOnlineAppInfoDO.setCommentNum(fatherAppDO.getCommentNum());
+			appInfoDAO.update(lastOnlineAppInfoDO);
+			
+			// 设置过期
+			fatherAppDO.setId(appInfoDO.getId());
+			fatherAppDO.setStatus(APPStsutsEnum.SUCCESS_VERSION_OUT.getValue());
+			fatherAppDO.setNextAppId(0);
+			fatherAppDO.setReferMainAppId(lastOnlineAppInfoDO.getId());
+			appInfoDAO.update(fatherAppDO);
+			
+			result.setSuccess(true);
+		} catch (Exception e) {
+			log.error("appCheckSuccess error", e);
 		}
 		return result;
 	}
@@ -815,6 +932,201 @@ public class AdminAOImpl extends BaseAO implements AdminAO {
 			log.error("deletePermission error", e);
 		}
 		return result;
+	}
+	
+	@Override
+	public Result recommendAppList(FlowData flowData, int type, int page) {
+		Result result = new ResultSupport(false);
+		try {
+			// 登陆和权限判断
+			if (!ensureUserLogin(result, flowData) || !isAdmin(flowData)) {
+				return result;
+			}
+
+			if (type != 1 && type != 2) {
+				result.setResultCode(new StringResultCode("当前参数错误"));
+				return result;
+			}
+			result.getModels().put("type", type);
+
+			KeyValueQuery query = new KeyValueQuery();
+			query.setPageNo(page);
+			query.setPageSize(JsonAOImpl.APP_LIST_NUM);
+			if (type == 1) {
+				query.setKeyName(KeyValueTypeEnum.RECOMMEND_APP_GAME.getKeyName());
+			} else {
+				query.setKeyName(KeyValueTypeEnum.RECOMMEND_APP_GOOD.getKeyName());
+			}
+
+			result.setSuccess(true);
+			List<AppInfoDO> appInfoList = getAppListFByKeyValueQuery(keyValueDAO, appInfoDAO, query);
+
+			result.getModels().put("appInfoList", appInfoList);
+
+		} catch (Exception e) {
+			log.error("recommendAppList error", e);
+		}
+		return result;
+
+	}
+
+	public static List<AppInfoDO> getAppListFByKeyValueQuery(KeyValueDAO keyValueDAO, AppInfoDAO appInfoDAO, KeyValueQuery query) {
+		List<KeyValueDO> keyList = keyValueDAO.query(query);
+		if (CollectionUtil.isEmpty(keyList)) {
+			return null;
+		}
+
+		StringBuilder sb = new StringBuilder();
+		for (int i = 0; i < keyList.size(); i++) {
+			if (i != 0) {
+				sb.append(",");
+			}
+			sb.append(keyList.get(i).getValue());
+		}
+		List<AppInfoDO> appInfoList = appInfoDAO.queryByIds(sb.toString());
+		for (int i = 0; i < appInfoList.size();) {
+			if (!appInfoList.get(i).isOnLine()) {
+				appInfoList.remove(i);
+				continue;
+			}
+			i++;
+		}
+		return appInfoList;
+	}
+	
+	@Override
+	public Result managerAppList(FlowData flowData, int type, int page) {
+		Result result = new ResultSupport(false);
+		try {
+			// 登陆和权限判断
+			if (!ensureUserLogin(result, flowData) || !isAdmin(flowData)) {
+				return result;
+			}
+
+			if (type != 1 && type != 2) {
+				result.setResultCode(new StringResultCode("当前参数错误"));
+				return result;
+			}
+			result.getModels().put("type", type);
+			AppQuery query = new AppQuery();
+			query.setStatus(APPStsutsEnum.ONLINE.getValue());
+			query.setPageNo(page);
+			query.setPageSize(JsonAOImpl.APP_LIST_NUM);
+			List<AppInfoDO> appInfoList = appInfoDAO.query(query);
+
+			setAppInfoListRecommend(appInfoList, type);
+			result.getModels().put("appInfoList", appInfoList);
+			result.setSuccess(true);
+		} catch (Exception e) {
+			log.error("managerAppList error", e);
+		}
+		return result;
+
+	}
+	
+	@Override
+	public Result updateRecommendApps(FlowData flowData, int type, long[] nonRecommendAppIds, long[] recommendAppIds) {
+		Result result = new ResultSupport(false);
+		try {
+			// 登陆和权限判断
+			if (!ensureUserLogin(result, flowData) || !isAdmin(flowData)) {
+				return result;
+			}
+
+			if (type != 1 && type != 2) {
+				result.setResultCode(new StringResultCode("当前参数错误"));
+				return result;
+			}
+			
+			Map<Long, KeyValueDO> map = getRecommendAppByType(type);
+			
+			
+			if (nonRecommendAppIds != null && map != null) {
+				for (long non : nonRecommendAppIds) {
+					if (non == 0) {
+						continue;
+					}
+					// 如果数据库存在，那么删除改记录
+					KeyValueDO keyValueDO = map.get(non);
+					if (keyValueDO != null) {
+						keyValueDAO.delete(keyValueDO.getId());
+					}
+				}
+			}
+			
+			if(recommendAppIds != null) {
+				for (long recommendAppId : recommendAppIds) {
+					if (recommendAppId == 0) {
+						continue;
+					}
+					// 如果数据库不存在，那么需要添加推荐app
+					KeyValueDO keyValueDO = map.get(recommendAppId);
+					if (keyValueDO == null) {
+						keyValueDO = new KeyValueDO();
+						if (type == 1) {
+							keyValueDO.setKeyName(KeyValueTypeEnum.RECOMMEND_APP_GAME.getKeyName());
+							keyValueDO.setType(KeyValueTypeEnum.RECOMMEND_APP_GAME.getId());
+						} else {
+							keyValueDO.setKeyName(KeyValueTypeEnum.RECOMMEND_APP_GOOD.getKeyName());
+							keyValueDO.setType(KeyValueTypeEnum.RECOMMEND_APP_GOOD.getId());
+						}
+						keyValueDO.setValue(String.valueOf(recommendAppId));
+						keyValueDAO.create(keyValueDO);
+					}
+				}
+			}
+			
+			result.setSuccess(true);
+		} catch (Exception e) {
+			log.error("updateRecommendApps error", e);
+		}
+		return result;
+
+	
+	}
+
+	private void setAppInfoListRecommend(List<AppInfoDO> appInfoList, int type) {
+		if (CollectionUtil.isEmpty(appInfoList)) {
+			return;
+		}
+		
+		// 获取当前的所有的推荐app
+		Map<Long, KeyValueDO> map = getRecommendAppByType(type);
+		if(map == null) {
+			return;
+		}
+		
+		// 遍历当前appList，设置推荐值
+		for (AppInfoDO appInfoDO : appInfoList) {
+			if (map.containsKey(appInfoDO.getId())) {
+				appInfoDO.setRecommendApp(true);
+			}
+		}
+
+	}
+
+	private Map<Long, KeyValueDO> getRecommendAppByType(int type) {
+		KeyValueQuery query = new KeyValueQuery();
+		query.setPageSize(200);
+		if (type == 1) {
+			query.setKeyName(KeyValueTypeEnum.RECOMMEND_APP_GAME.getKeyName());
+		} else {
+			query.setKeyName(KeyValueTypeEnum.RECOMMEND_APP_GOOD.getKeyName());
+		}
+
+		List<KeyValueDO> keyValueList = keyValueDAO.query(query);
+		if (keyValueList == null) {
+			return null;
+		}
+
+		Map<Long, KeyValueDO> map = new HashMap<Long, KeyValueDO>();
+		for (KeyValueDO keyValueDO : keyValueList) {
+			Long appId = Long.valueOf(keyValueDO.getValue());
+			if (appId > 0) {
+				map.put(appId, keyValueDO);
+			}
+		}
+		return map;
 	}
 
 	public void setAdminDAO(AdminDAO adminDAO) {

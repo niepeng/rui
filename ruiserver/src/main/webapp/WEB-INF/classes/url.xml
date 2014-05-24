@@ -2,7 +2,7 @@
 <url-config>
 
 	<url name="baseModule" >
-		<server-url>http://112.124.8.83:8225</server-url>
+		<server-url>http://127.0.0.1:8080</server-url>
 	</url>
 
 	<url name="adminModule" extends="baseModule">
@@ -14,7 +14,7 @@
 	</url>
 	
 	<url name="staticServer">
-		<server-url>http://img.uxiang.com/ruiserver/static</server-url>
+		<server-url>http://127.0.0.1:8080/static</server-url>
 	</url>
 	
 	<url name="jsServer" extends="staticServer">

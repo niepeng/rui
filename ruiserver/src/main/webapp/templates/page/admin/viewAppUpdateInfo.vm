@@ -34,12 +34,14 @@
 				
             <!-- SHOW @UPLOAD RETRY | @UPDATE | @EDIT -->
             <div class="pmt-upload-progress ng-scope ng-hide">
-                <span class="progress-title">安装包</span>
+               <!--
+			    <span class="progress-title">安装包</span>
                 <button class="w-btn w-btn-primary" style="position: relative; overflow: hidden; direction: ltr;">
 					上传新安装包
 					<input type="file" name="file" style="position: absolute; right: 0px; top: 0px; font-family: Arial; font-size: 118px; margin: 0px; padding: 0px; cursor: pointer; opacity: 0;">
 				</button>
                 <button class="w-btn ng-hide">上传</button>
+			   -->
                
                 <div class="apk-info-section ng-hide">
                     <table>

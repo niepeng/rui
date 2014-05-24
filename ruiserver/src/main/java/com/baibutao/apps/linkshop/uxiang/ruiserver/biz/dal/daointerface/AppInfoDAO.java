@@ -24,4 +24,6 @@ public interface AppInfoDAO {
     
     public AppInfoDO queryByPackageName(String packageName);
     
+    public List<AppInfoDO> queryByIds(String ids);
+    
 }

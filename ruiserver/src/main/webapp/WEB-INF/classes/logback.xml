@@ -11,7 +11,7 @@
     </appender>
     
     <appender name="PROJECT" class="wint.lang.logback.WintRollingFileAppender">
-		<File>/home/admin/ruiserver/logs/imageserver.log</File>
+		<File>/Volumes/data/log/bairui/imageserver.log</File>
 		<append>true</append>
 		<rollingPolicy class="ch.qos.logback.core.rolling.FixedWindowRollingPolicy">
 			<FileNamePattern>imageserver.log.%i.bak</FileNamePattern>
@@ -28,7 +28,7 @@
     </appender>
     
     <appender name="PROJECT-DEBUG" class="wint.lang.logback.WintRollingFileAppender">
-        <File>/home/admin/ruiserver/logs/imageserver-debug.log</File>
+        <File>/Volumes/data/log/bairui/imageserver-debug.log</File>
         <append>false</append>
 		<rollingPolicy class="ch.qos.logback.core.rolling.FixedWindowRollingPolicy">
 			<FileNamePattern>imageserver-debug.log.%i.bak</FileNamePattern>
@@ -45,7 +45,7 @@
     </appender>
     
     <appender name="BIZ" class="wint.lang.logback.WintRollingFileAppender">
-		<File>/home/admin/ruiserver/logs/imageserver-biz.log</File>
+		<File>/Volumes/data/log/bairui/imageserver-biz.log</File>
 		<append>true</append>
 		<rollingPolicy class="ch.qos.logback.core.rolling.FixedWindowRollingPolicy">
 			<FileNamePattern>imageserver-biz.log.%i.bak</FileNamePattern>
@@ -62,7 +62,7 @@
     </appender>
     
     <appender name="FILTER" class="wint.lang.logback.WintRollingFileAppender">
-        <File>/home/admin/ruiserver/logs/imageserver-filter.log</File>
+        <File>/Volumes/data/log/bairui/imageserver-filter.log</File>
         <append>true</append>
 		<rollingPolicy class="ch.qos.logback.core.rolling.FixedWindowRollingPolicy">
 			<FileNamePattern>imageserver-filter.log.%i.bak</FileNamePattern>
@@ -79,7 +79,7 @@
     </appender>
     
     <appender name="APACHE" class="wint.lang.logback.WintFileAppender">
-        <File>/home/admin/ruiserver/logs/imageserver-apache.log</File>
+        <File>/Volumes/data/log/bairui/imageserver-apache.log</File>
         <append>true</append>
 		<rollingPolicy class="ch.qos.logback.core.rolling.FixedWindowRollingPolicy">
 			<FileNamePattern>imageserver-apache.log.%i.bak</FileNamePattern>
@@ -96,7 +96,7 @@
     </appender>
     
     <appender name="TEMPLATE" class="wint.lang.logback.WintRollingFileAppender">
-        <File>/home/admin/ruiserver/logs/imageserver-template.log</File>
+        <File>/Volumes/data/log/bairui/imageserver-template.log</File>
         <append>true</append>
 		<rollingPolicy class="ch.qos.logback.core.rolling.FixedWindowRollingPolicy">
 			<FileNamePattern>imageserver-template.log.%i.bak</FileNamePattern>

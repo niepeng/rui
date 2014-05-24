@@ -74,6 +74,15 @@ public class TestAppInfo  extends BaseImageserver {
 		Assert.assertTrue(fromDB != null);
 		Assert.assertEquals(fromDB.getId(), id);
 	}
+	
+	public void testQueryByIds() {
+		AppInfoDO appInfoDO = new AppInfoDO();
+		appInfoDO.setPackageName("a.b.c");
+		long id = appInfoDAO.create(appInfoDO);
+		
+		List<AppInfoDO> list = appInfoDAO.queryByIds(String.valueOf(id));
+		Assert.assertTrue(!CollectionUtil.isEmpty(list));
+	}
 
 	public void setAppInfoDAO(AppInfoDAO appInfoDAO) {
 		this.appInfoDAO = appInfoDAO;

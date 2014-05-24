@@ -50,5 +50,11 @@ public class  AppInfoDAOIbatis extends BaseIbatisDAO implements AppInfoDAO {
 	public AppInfoDO queryByPackageName(String packageName) {
 		return (AppInfoDO) this.getSqlMapClientTemplate().queryForObject("AppInfoDAO.queryByPackageName", packageName);
 	}
+	
+	@SuppressWarnings("unchecked")
+	@Override
+	public List<AppInfoDO> queryByIds(String ids) {
+		return (List<AppInfoDO>) this.getSqlMapClientTemplate().queryForList("AppInfoDAO.queryByIds", ids);
+	}
 
 }

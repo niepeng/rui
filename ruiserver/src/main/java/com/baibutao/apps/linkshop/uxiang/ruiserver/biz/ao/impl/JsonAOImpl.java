@@ -23,6 +23,7 @@ import com.baibutao.apps.linkshop.uxiang.ruiserver.biz.dal.dataobject.KeyValueDO
 import com.baibutao.apps.linkshop.uxiang.ruiserver.biz.dal.dataobject.UserDO;
 import com.baibutao.apps.linkshop.uxiang.ruiserver.biz.dal.dataobject.enums.KeyValueTypeEnum;
 import com.baibutao.apps.linkshop.uxiang.ruiserver.biz.query.AppQuery;
+import com.baibutao.apps.linkshop.uxiang.ruiserver.biz.query.KeyValueQuery;
 
 /**
  * <p>标题: </p>
@@ -47,17 +48,13 @@ public class JsonAOImpl extends BaseAO implements JsonAO {
 	
 	private String default_version_url = "http://static.uxiang.com/uxiang/uxiang-v2.0.0.apk";
 	
-	private static final int APP_LIST_NUM = 10;
+	public static final int APP_LIST_NUM = 10;
 
 	@Override
 	public Result index(int type, int page) {
 		Result result = new ResultSupport(false);
 		try {
-			List<AppInfoDO> appList = null;
-			AppQuery query = new AppQuery();
-			query.setPageNo(page);
-			query.setPageSize(APP_LIST_NUM);
-			appList = appInfoDAO.query(query);
+			List<AppInfoDO> appList = getAppListByType(type, page);
 			
 			// 只有当page=1的时候，获取bannerList
 			if(page <= 1) {
@@ -72,6 +69,42 @@ public class JsonAOImpl extends BaseAO implements JsonAO {
 		}
 		return result;
 	}
+
+	/*
+	 * 1是游戏精选，2是精品推荐，3下载排行
+	 */
+	private List<AppInfoDO> getAppListByType(int type, int page) {
+		List<AppInfoDO> appList = null;
+
+		AppQuery query = new AppQuery();
+		query.setPageNo(page);
+		query.setPageSize(APP_LIST_NUM);
+
+		switch (type) {
+		case 1:
+			KeyValueQuery keyValueQuery = new KeyValueQuery();
+			keyValueQuery.setPageNo(page);
+			keyValueQuery.setPageSize(APP_LIST_NUM);
+			keyValueQuery.setKeyName(KeyValueTypeEnum.RECOMMEND_APP_GAME.getKeyName());
+			appList = AdminAOImpl.getAppListFByKeyValueQuery(keyValueDAO, appInfoDAO, keyValueQuery);
+			break;
+		case 2:
+			KeyValueQuery valueQuery = new KeyValueQuery();
+			valueQuery.setPageNo(page);
+			valueQuery.setPageSize(APP_LIST_NUM);
+			valueQuery.setKeyName(KeyValueTypeEnum.RECOMMEND_APP_GOOD.getKeyName());
+			appList = AdminAOImpl.getAppListFByKeyValueQuery(keyValueDAO, appInfoDAO, valueQuery);
+			break;
+		case 3:
+			query.setSort(3);
+			appList = appInfoDAO.query(query);
+			break;
+		default:
+			appList = appInfoDAO.query(query);
+		}
+
+		return appList;
+	}
 	
 	@Override
 	public Result appDetail(long appId) {
@@ -82,6 +115,13 @@ public class JsonAOImpl extends BaseAO implements JsonAO {
 				result.setResultCode(new StringResultCode("app参数错误:" + appId));
 				return result;
 			}
+
+			// 根据随机，1/4概率命中，认为是下载数量+1
+			if ((int) (Math.random() * 4) == 1) {
+				appInfoDO.setDownloadNum(appInfoDO.getDownloadNum() + 1);
+				appInfoDAO.update(appInfoDO);
+			}
+			
 			result.getModels().put("appInfoDO", appInfoDO);
 			result.setSuccess(true);
 		} catch (Exception e) {
@@ -230,6 +270,7 @@ public class JsonAOImpl extends BaseAO implements JsonAO {
 
 			KeyValueDO keyValue = new KeyValueDO();
 			keyValue.setType(KeyValueTypeEnum.FEED_BACK.getId());
+			// keyName是用户id
 			keyValue.setKeyName(String.valueOf(fromDB.getId()));
 			keyValue.setValue(content);
 			keyValueDAO.create(keyValue);

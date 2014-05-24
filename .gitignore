@@ -1,3 +1,9 @@
 *.DS_Store
 */bin/
 */gen/
+*/.classpath
+*/.project
+*/.settings
+*/target
+tmpcode
+*/WEB-INF

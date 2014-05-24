@@ -11,7 +11,9 @@ public enum KeyValueTypeEnum {
 	
 	VERSION_UPDATE(1, "version_update","版本升级"),
 	FEED_BACK(2, "feddback", "反馈"),
-	PERMINSSION_MAP(3, "permission", "权限中文对应");
+	PERMINSSION_MAP(3, "permission", "权限中文对应"),
+	RECOMMEND_APP_GAME(100, "recommend_app_game", "游戏精选"),
+	RECOMMEND_APP_GOOD(101, "recommend_app_good", "精品推荐");
 
 	private final int id;
 	

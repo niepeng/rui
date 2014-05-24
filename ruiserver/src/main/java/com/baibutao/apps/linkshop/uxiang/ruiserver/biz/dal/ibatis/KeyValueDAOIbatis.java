@@ -3,9 +3,10 @@ package com.baibutao.apps.linkshop.uxiang.ruiserver.biz.dal.ibatis;
 
 import java.util.List;
 
-import com.baibutao.apps.linkshop.uxiang.ruiserver.biz.dal.daointerface.KeyValueDAO; 
-import com.baibutao.apps.linkshop.uxiang.ruiserver.biz.dal.dataobject.KeyValueDO; 
+import com.baibutao.apps.linkshop.uxiang.ruiserver.biz.dal.daointerface.KeyValueDAO;
+import com.baibutao.apps.linkshop.uxiang.ruiserver.biz.dal.dataobject.KeyValueDO;
 import com.baibutao.apps.linkshop.uxiang.ruiserver.biz.dal.dataobject.enums.KeyValueTypeEnum;
+import com.baibutao.apps.linkshop.uxiang.ruiserver.biz.query.KeyValueQuery;
 
 
 /*
@@ -42,7 +43,17 @@ public class KeyValueDAOIbatis extends BaseIbatisDAO implements KeyValueDAO {
 	@Override
 	public List<KeyValueDO> queryByType(KeyValueTypeEnum type) {
 		return (List<KeyValueDO> ) this.getSqlMapClientTemplate().queryForList("KeyValueDAO.queryByType", type.getId());
-
+	}
+	
+	@SuppressWarnings("unchecked")
+	@Override
+	public List<KeyValueDO> query(KeyValueQuery query) {
+		Integer count = (Integer) this.getSqlMapClientTemplate().queryForObject("KeyValueDAO.queryCount", query);
+		if (count != null) {
+			query.setTotalResultCount(count);
+		}
+		List<KeyValueDO> list = (List<KeyValueDO>) this.getSqlMapClientTemplate().queryForList("KeyValueDAO.query", query);
+		return list;
 	}
 
 }

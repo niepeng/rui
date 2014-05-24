@@ -6,9 +6,11 @@
 
 <div class="slide-reveal up-step pmt-step ng-scope">
     <!-- SHOW @UPLOAD UPLOAD BOX -->
- <form name="fom" id="fom" method="post" action="addAppFirst.htm" enctype="multipart/form-data">
+ <form name="fom" id="fom" method="post" action="doAddAppFirst.htm" enctype="multipart/form-data">
+	<input type="hidden" name="fatherAppId" value="$!fatherAppId" />
         <div class="step-header">
             <h1 class="pmt-text-success pmt-section-title">上传安装包</h1>
+			 #errorMessage($!resultmessage.message)
         </div>
         <div class="step-body" pmt-upload-drop-zone="" data-endpoint="app.firstapk">
             <div class="up-apppkg-dragupload pmt-container">

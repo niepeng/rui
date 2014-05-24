@@ -5,6 +5,7 @@ import java.util.List;
 
 import com.baibutao.apps.linkshop.uxiang.ruiserver.biz.dal.dataobject.KeyValueDO; 
 import com.baibutao.apps.linkshop.uxiang.ruiserver.biz.dal.dataobject.enums.KeyValueTypeEnum;
+import com.baibutao.apps.linkshop.uxiang.ruiserver.biz.query.KeyValueQuery;
 
 
 /*
@@ -23,5 +24,7 @@ public interface KeyValueDAO {
     public KeyValueDO queryByKey(String key);
     
     public List<KeyValueDO> queryByType(KeyValueTypeEnum type);
+    
+    public List<KeyValueDO> query(KeyValueQuery query);
 
 }

@@ -23,6 +23,7 @@
             		<li><a href="$adminModule.setTarget('cat/list')" #if("$tab" == "1") class="nav-item current" #else class="nav-item" #end target="">类目管理</a></li>
             		<li><a href="$adminModule.setTarget('banner/list')" #if("$tab" == "2") class="nav-item current" #else class="nav-item" #end target="">banner管理</a></li>
             		<li><a href="$adminModule.setTarget('permission/list')" #if("$tab" == "3") class="nav-item current" #else class="nav-item" #end target="">app权限翻译</a></li>
+            		<li><a href="$adminModule.setTarget('recommendApp/list')" #if("$tab" == "4") class="nav-item current" #else class="nav-item" #end target="">client推荐管理</a></li>
             	</ul>
             	<ul class="sub-nav">
             		<li><a href="http://developer.wandoujia.com/getting-started/" target="_blank" class="nav-item">帮助中心</a></li>

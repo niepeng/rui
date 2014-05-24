@@ -33,17 +33,18 @@
 				<result property="recommendNum" column="recommend_num"/>
 				<result property="mainTitle" column="main_title"/>
 				<result property="permissionValue" column="permission_value"/>
+				<result property="nextAppId" column="next_app_id"/>
 				
 	</resultMap>
 	
 	<sql id="appInfo-full-columns">
-		t.gmt_modified, t.package_name, t.icon_url, t.info, t.version_value, t.file_size, t.id, t.sub_title, t.second_cat_id, t.refer_main_app_id, t.screenshots, t.upload_date, t.publish_date, t.first_cat_id, t.download_num, t.fav_num, t.upload_user_id, t.gmt_create, t.status, t.version_name, t.down_url, t.update_info, t.comment_num, t.recommend_num, t.main_title, t.permission_value 
+		t.gmt_modified, t.package_name, t.icon_url, t.info, t.version_value, t.file_size, t.id, t.sub_title, t.second_cat_id, t.refer_main_app_id, t.screenshots, t.upload_date, t.publish_date, t.first_cat_id, t.download_num, t.fav_num, t.upload_user_id, t.gmt_create, t.status, t.version_name, t.down_url, t.update_info, t.comment_num, t.recommend_num, t.main_title, t.permission_value, t.next_app_id  
 	</sql>
 	
 	<insert id="create" parameterClass="appInfo">
 		<![CDATA[
-			insert into rui_db_app_info(gmt_modified, package_name, icon_url, info, version_value, file_size, sub_title, second_cat_id, refer_main_app_id, screenshots, upload_date, publish_date, first_cat_id, download_num, fav_num, upload_user_id, gmt_create, status, version_name, down_url, update_info, comment_num, recommend_num, main_title,permission_value) 
-values (now(), #packageName#, #iconUrl#, #info#, #versionValue#, #fileSize#, #subTitle#, #secondCatId#, #referMainAppId#, #screenshots#, #uploadDate#, #publishDate#, #firstCatId#, #downloadNum#, #favNum#, #uploadUserId#, now(), #status#, #versionName#, #downUrl#, #updateInfo#, #commentNum#, #recommendNum#, #mainTitle#, #permissionValue#)
+			insert into rui_db_app_info(gmt_modified, package_name, icon_url, info, version_value, file_size, sub_title, second_cat_id, refer_main_app_id, screenshots, upload_date, publish_date, first_cat_id, download_num, fav_num, upload_user_id, gmt_create, status, version_name, down_url, update_info, comment_num, recommend_num, main_title,permission_value, next_app_id) 
+values (now(), #packageName#, #iconUrl#, #info#, #versionValue#, #fileSize#, #subTitle#, #secondCatId#, #referMainAppId#, #screenshots#, #uploadDate#, #publishDate#, #firstCatId#, #downloadNum#, #favNum#, #uploadUserId#, now(), #status#, #versionName#, #downUrl#, #updateInfo#, #commentNum#, #recommendNum#, #mainTitle#, #permissionValue#, #nextAppId#)
 		]]>
 		<selectKey resultClass="long" keyProperty="id">
 			SELECT	LAST_INSERT_ID();
@@ -66,6 +67,15 @@ values (now(), #packageName#, #iconUrl#, #info#, #versionValue#, #fileSize#, #su
 			rui_db_app_info t
 		where
 			t.package_name = #value#  and t.deleted = 0 
+	</select>
+	
+	<select id="queryByIds" resultMap="appInfoMapping" parameterClass="string">
+		select
+			<include refid="appInfo-full-columns" />
+		from
+			rui_db_app_info t
+		where
+			t.id in ($value$) and t.deleted = 0 
 	</select>
 	
 	
@@ -115,8 +125,14 @@ values (now(), #packageName#, #iconUrl#, #info#, #versionValue#, #fileSize#, #su
 		<isNotNull property="keyword" prepend="and">
 			 t.main_title like #keyword#
 		</isNotNull>
-		order by 
-            gmt_create desc
+		<isEqual property="sort" compareValue="3">
+		    order by 
+            	download_num desc
+		</isEqual>
+		<isEqual property="sort" compareValue="0">
+		    order by 
+            	gmt_create desc
+		</isEqual>    
         limit
             #startRow#, #pageSize# 
 	</select>
@@ -155,7 +171,8 @@ values (now(), #packageName#, #iconUrl#, #info#, #versionValue#, #fileSize#, #su
  				comment_num= #commentNum#,
  				recommend_num= #recommendNum#,
  				main_title= #mainTitle#,
- 				permission_value= #permissionValue#
+ 				permission_value= #permissionValue#,
+ 				next_app_id = #nextAppId#
  		where 
  				id=#id#
 		]]>

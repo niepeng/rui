@@ -52,7 +52,24 @@
                                     </div>
                                 </div>
                                 <div class="app-ctrl">
-                                    <button class="w-btn w-btn-large btn-edit w-btn-primary" onclick="updateApp($!appInfoDO.id);">编辑/更新</button> 
+									#if($appInfoDO.isOnLine())
+										#if($appInfoDO.hasNextAppId())
+											<!--  编辑下一个版本的内容  -->
+											<a class="w-btn w-btn-large btn-edit w-btn-primary" href="$adminModule.setTarget('viewAppUpdateInfo').param('appId',$appInfoDO.nextAppId)">编辑新版内容</a> 
+										#else	
+											<!-- 编辑内容  -->
+											<a class="w-btn w-btn-large btn-edit w-btn-primary" href="$adminModule.setTarget('viewAppUpdateInfo').param('appId',$appInfoDO.id)">编辑当前版本内容</a> 
+											<!--  提交新版  -->
+											<a class="w-btn w-btn-large btn-edit w-btn-primary" href="$adminModule.setTarget('viewAddAppFirst').param('fatherAppId',$appInfoDO.id)">提交新版</a> 
+										#end	
+									#else
+										<!--  编辑当前版本  -->
+										<button class="w-btn w-btn-large btn-edit w-btn-primary" onclick="updateApp($!appInfoDO.id);">编辑</button> 
+										#if(!$appInfoDO.isTimeOut())
+											<a class="w-btn w-btn-large btn-edit w-btn-primary" href="$adminModule.setTarget('app/checkSuccess').param('appId', $appInfoDO.id)" onclick="return confirm('确定审核通过该app');">审核通过，上线</button> 
+										#end	
+									#end	
+                                    
                                     <!--
     								 <button class="w-btn w-btn-large"  ng-show="appItem.isShowPACKAGE">礼包管理</button>
                                     <button class="w-btn w-btn-large"  ng-show="appItem.ownership">数据统计</button>

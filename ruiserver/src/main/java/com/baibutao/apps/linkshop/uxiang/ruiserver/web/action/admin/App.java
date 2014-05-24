@@ -32,6 +32,12 @@ public class App extends BaseAction {
 		result.getModels().put("title", "app管理");
 		handleResult(result, flowData, context);
 	}
+	
+	public void checkSuccess(FlowData flowData, Context context) {
+		long appId = flowData.getParameters().getLong("appId");
+		adminAO.appCheckSuccess(flowData, appId);
+		flowData.redirectTo("adminModule", "app/list");
+	}
 
 	public void setAdminAO(AdminAO adminAO) {
 		this.adminAO = adminAO;

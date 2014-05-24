@@ -3,6 +3,8 @@
 <sqlMap namespace="KeyValueDAO">
 
 	<typeAlias type="com.baibutao.apps.linkshop.uxiang.ruiserver.biz.dal.dataobject.KeyValueDO" alias="keyValue" />
+	<typeAlias type="com.baibutao.apps.linkshop.uxiang.ruiserver.biz.query.KeyValueQuery" alias="keyValueQuery" />
+	
 
 	<resultMap id="keyValueMapping" class="keyValue">
 				<result property="gmtModified" column="gmt_modified"/>
@@ -54,6 +56,35 @@ values (now(), #keyName#, now(), #value#, #type#)
 		where
 			t.type = #value#  and t.deleted = 0 
 	</select>
+	
+	<select id="queryCount" resultClass="int" parameterClass="keyValueQuery">
+		select
+			count(t.id) 
+		from
+			rui_db_key_value t
+		where
+		    t.deleted = 0 
+		<isNotNull property="keyName" prepend="and">
+			 t.key_name = #keyName#
+		</isNotNull>
+	</select>
+	
+	<select id="query" resultMap="keyValueMapping" parameterClass="keyValueQuery">
+		select
+			<include refid="keyValue-full-columns" />
+		from
+			rui_db_key_value t
+		where
+		    t.deleted = 0 
+		<isNotNull property="keyName" prepend="and">
+			 t.key_name = #keyName#
+		</isNotNull>
+		    order by 
+              gmt_create desc
+        limit
+            #startRow#, #pageSize# 
+	</select>
+	
 	
 	<update id="delete" parameterClass="long">
 			update rui_db_key_value t set t.deleted = 1  , t.gmt_modified = now()  where t.id = #value#

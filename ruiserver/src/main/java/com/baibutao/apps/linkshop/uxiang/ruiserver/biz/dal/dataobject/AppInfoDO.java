@@ -11,7 +11,7 @@ import com.baibutao.apps.linkshop.uxiang.ruiserver.biz.dal.dataobject.enums.APPS
  * <p>创建时间: Mar 21, 2014  10:36:07 AM</p>
  * <p>作者：聂鹏</p>
  */
-public class AppInfoDO extends BaseDO {
+public class AppInfoDO extends BaseDO implements Cloneable {
 	
 	/*
 	 * 当前状态：
@@ -66,8 +66,11 @@ public class AppInfoDO extends BaseDO {
 	// 截图s
 	private String screenshots;
 	
-	// 本表自身关联，为了实现更新审核，关联的父appId
+	// 本表自身关联，父appId
 	private long referMainAppId;
+	
+	// 本表自身关联，下一个版本的appId
+	private long nextAppId;
 	
 //	// 本表自身关联，为了实现查看历史审核通过的版本
 //	private String historyAppIds;
@@ -90,12 +93,35 @@ public class AppInfoDO extends BaseDO {
 	
 	// -------------- extend attribute -----------------------
 
+	// 当前是否为推荐app
+	private boolean recommendApp;
+	
 	// -------------- normal moethod -------------------------
 	
 	public boolean isOnLine() {
 		return status == APPStsutsEnum.ONLINE.getValue();
 	}
-
+	
+	public boolean isTimeOut() {
+		return status == APPStsutsEnum.SUCCESS_VERSION_OUT.getValue();
+	}
+	
+	/*
+	 * 该app是否有下一个版本，已经提交
+	 */
+	public boolean hasNextAppId() {
+		return nextAppId > 0;
+	}
+	
+	
+	public AppInfoDO clone() {
+		try {
+			return (AppInfoDO) super.clone();
+		} catch (Exception e) {
+			return null;
+		}
+	}
+	
 	// -------------- setter/getter --------------------------
 
 	public String getDownUrl() {
@@ -280,6 +306,22 @@ public class AppInfoDO extends BaseDO {
 
 	public void setPermissionValue(String permissionValue) {
 		this.permissionValue = permissionValue;
+	}
+
+	public boolean isRecommendApp() {
+		return recommendApp;
+	}
+
+	public void setRecommendApp(boolean recommendApp) {
+		this.recommendApp = recommendApp;
+	}
+
+	public long getNextAppId() {
+		return nextAppId;
+	}
+
+	public void setNextAppId(long nextAppId) {
+		this.nextAppId = nextAppId;
 	}
 	
 }

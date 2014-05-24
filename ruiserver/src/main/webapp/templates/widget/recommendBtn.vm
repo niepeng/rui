@@ -1,0 +1,21 @@
+<div class="home-todo-list pmt-white-box" ng-show="appList.length">
+                <div class="white-box-title">
+                    <p>
+    					<a href="$adminModule.setTarget('recommendApp/list').param('type', 1)" #if($type == 1) style="color:red;" #end>游戏精选</a>
+    					<a href="$adminModule.setTarget('recommendApp/list').param('type', 2)" #if($type == 2) style="color:red;" #end>精品推荐</a>
+                    </p>
+				</div> 
+				
+			</div>
+			
+        	<div class="myapp-list-ctrl">
+                <a class="w-btn w-btn-grand w-btn-primary btn-add-app" href="$adminModule.setTarget('recommendApp/managerAppList').param('type', 1)" target="_self">
+                    <i class="pmt-icon-add"></i>
+                    管理游戏精选
+                </a>
+				<a class="w-btn w-btn-grand w-btn-primary btn-add-app" href="$adminModule.setTarget('recommendApp/managerAppList').param('type', 2)" target="_self">
+                    <i class="pmt-icon-add"></i>
+                    管理精品推荐
+                </a>
+            </div>
+			
