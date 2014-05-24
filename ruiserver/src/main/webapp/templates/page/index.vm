@@ -12,7 +12,7 @@
                         #if(!$loginUserDO)
             				<p class="actions"><a href="$adminModule.setTarget('login')" class="button-grey button-small login-button">登录</a></p>
             			#else
-							<a href="$adminModule.setTarget('index')">&nbsp;&nbsp;  $loginUserDO.userName &nbsp;&nbsp; </a>
+							<a href="$adminModule.setTarget('index')">&nbsp;&nbsp; $loginUserDO.userName &nbsp;&nbsp; </a>
 						#end	
                 </div>
 			
@@ -138,28 +138,31 @@
     <!-- <a href="" class="android-popup-btn" data-track="home/popup/p4">在手机上安装$!applicationUtil.websiteName()</a>  -->
 </div>
 <!--download-wrapper-->
-<!--android-popup-->
-<div class="android-popup">
-    <div class="popup-wrapper">
-        <div class="popup-section">
-            <p class="popup-title">扫描二维码</p>
-            <p class="popup-subtitle">通过手机登录 m.wandoujia.com 或扫描二维码下载。</p>
-            <img src="http://img.wdjimg.com/image/www/qr.png" alt="$!applicationUtil.websiteName()安卓版二维码" class="phoenix-qr">
+	<!--android-popup-->
+    <!--
+    <div class="android-popup">
+        <div class="popup-wrapper">
+            <div class="popup-section">
+                <p class="popup-title">扫描二维码</p>
+                <p class="popup-subtitle">通过手机登录 m.wandoujia.com 或扫描二维码下载。</p>
+                <img src="http://img.wdjimg.com/image/www/qr.png" alt="$!applicationUtil.websiteName()安卓版二维码" class="phoenix-qr">
+            </div>
+            <div class="popup-section">
+                <p class="popup-title">短信获取下载链接</p>
+                <p class="popup-subtitle">输入手机号，通过短信获取下载链接，接收该条短信完全免费。</p>
+                <input class="tel-number" type="text" placeholder="请输入手机号">
+                <button class="submit-tel">发送</button>
+                <p class="popup-warning">请输入正确的手机号</p>
+                <p class="popup-primary">已发送，请注意查收</p>
+            </div>
+            <a href="" class="popup-close-btn">×</a>
+            <a rel="nofollow" id="download-p3" href="http://dl.wandoujia.com/files/phoenix/latest/wandoujia-wandoujia_web.apk?timestamp=1400642976574" track="home/download/p4-popup">下载安装文件到电脑</a>
+            <div class="popup-split"></div>
         </div>
-        <div class="popup-section">
-            <p class="popup-title">短信获取下载链接</p>
-            <p class="popup-subtitle">输入手机号，通过短信获取下载链接，接收该条短信完全免费。</p>
-            <input class="tel-number" type="text" placeholder="请输入手机号">
-            <button class="submit-tel">发送</button>
-            <p class="popup-warning">请输入正确的手机号</p>
-            <p class="popup-primary">已发送，请注意查收</p>
-        </div>
-        <a href="" class="popup-close-btn">×</a>
-        <a rel="nofollow" id="download-p3" href="http://dl.wandoujia.com/files/phoenix/latest/wandoujia-wandoujia_web.apk?timestamp=1400642976574" track="home/download/p4-popup">下载安装文件到电脑</a>
-        <div class="popup-split"></div>
     </div>
-</div>
-<!--android-popup-->
+    
+    -->
+	<!--android-popup-->
 <!--footer-->
 <div class="footer footer-dark w-footer clearfix">
     <div class="ft-inner">
