@@ -10,4 +10,22 @@
         android:id="@+id/title"
         style="@style/listview_item_title" />
 
+    <RelativeLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" >
+
+        <Button
+            android:id="@+id/open_btn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="打开" />
+
+        <Button
+            android:id="@+id/update_btn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/open_btn"
+            android:text="更新" />
+    </RelativeLayout>
+
 </LinearLayout>
