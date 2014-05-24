@@ -2,6 +2,8 @@ package com.rui.android_client.model;
 
 import java.util.Calendar;
 
+import android.graphics.drawable.Drawable;
+
 public class AppInfo extends BaseModel {
 
 	private long id;
@@ -72,6 +74,11 @@ public class AppInfo extends BaseModel {
 
 	// 评论数量
 	private int commentNum;
+	
+	// 本地属性
+	private boolean isInstalled;
+	private boolean isNeedUpdate;
+	private Drawable icon;
 	
 	public long getId() {
 		return id;
@@ -247,6 +254,30 @@ public class AppInfo extends BaseModel {
 
 	public void setCommentNum(int commentNum) {
 		this.commentNum = commentNum;
+	}
+	
+	public boolean isInstalled() {
+		return isInstalled;
+	}
+	
+	public void setInstalled(boolean isInstalled) {
+		this.isInstalled = isInstalled;
+	}
+	
+	public boolean isNeedUpdate() {
+		return isNeedUpdate;
+	}
+	
+	public void setNeedUpdate(boolean isNeedUpdate) {
+		this.isNeedUpdate = isNeedUpdate;
+	}
+	
+	public Drawable getIcon() {
+		return icon;
+	}
+	
+	public void setIcon(Drawable icon) {
+		this.icon = icon;
 	}
 
 }

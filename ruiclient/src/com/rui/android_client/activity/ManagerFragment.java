@@ -13,14 +13,14 @@ import android.content.Intent;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
-import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
 import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.ImageView;
@@ -29,6 +29,8 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import com.rui.android_client.R;
+import com.rui.android_client.model.AppInfo;
+import com.rui.android_client.parse.AppInfoParser;
 import com.rui.android_client.utils.JsonUtil;
 import com.rui.http.Config;
 import com.rui.http.RemoteManager;
@@ -39,7 +41,7 @@ public class ManagerFragment extends Fragment {
 
 	private RuiApp mApp;
 
-	private ArrayList<InstalledAppInfo> mAppInfos;
+	private ArrayList<AppInfo> mAppInfos;
 	private HashMap<String, Integer> mInstalledAppInfosIndex;
 
 	private ListView mListView;
@@ -62,6 +64,22 @@ public class ManagerFragment extends Fragment {
 		mListView = (ListView) rootView.findViewById(R.id.list_view);
 		mListAdapter = new ListAdapter();
 		mListView.setAdapter(mListAdapter);
+		
+		mListView.setOnItemClickListener(new OnItemClickListener() {
+
+			@Override
+			public void onItemClick(AdapterView<?> parent, View view,
+					int position, long id) {
+				AppInfo app = mListAdapter.getItem(position);
+				if (app.getId() == 0) {
+					return;
+				}
+				Intent intent = new Intent(getActivity(), AppDetailActivity.class);
+				intent.putExtra("ID", app.getId());
+				getActivity().startActivity(intent);
+			}
+		});
+		
 		loadInstalledApps();
 		return rootView;
 	}
@@ -82,7 +100,7 @@ public class ManagerFragment extends Fragment {
 		}
 
 		@Override
-		public InstalledAppInfo getItem(int position) {
+		public AppInfo getItem(int position) {
 			return mAppInfos.get(position);
 		}
 
@@ -99,7 +117,7 @@ public class ManagerFragment extends Fragment {
 			} else {
 				holder = (ViewHolder) convertView;
 			}
-			InstalledAppInfo app = getItem(position);
+			AppInfo app = getItem(position);
 			holder.setViewContent(position, app);
 			return holder;
 		}
@@ -122,13 +140,18 @@ public class ManagerFragment extends Fragment {
 				openBtn.setOnClickListener(new OpenAppClick());
 			}
 
-			public void setViewContent(int position, InstalledAppInfo item) {
-				iconView.setImageDrawable(item.appLogo);
-				titleView.setText(item.appName);
-				if (item.needUpdate) {
+			public void setViewContent(int position, AppInfo item) {
+				iconView.setImageDrawable(item.getIcon());
+				titleView.setText(item.getMainTitle());
+				if (item.isNeedUpdate()) {
 					updateBtn.setVisibility(View.VISIBLE);
 				} else {
 					updateBtn.setVisibility(View.GONE);
+				}
+				if (item.isInstalled()) {
+					openBtn.setVisibility(View.VISIBLE);
+				} else {
+					openBtn.setVisibility(View.GONE);
 				}
 
 				openBtn.setTag(position);
@@ -138,11 +161,11 @@ public class ManagerFragment extends Fragment {
 
 				@Override
 				public void onClick(View v) {
-					InstalledAppInfo appInfo = mListAdapter.getItem(Integer
+					AppInfo appInfo = mListAdapter.getItem(Integer
 							.parseInt(v.getTag().toString()));
 					PackageManager pm = getActivity().getPackageManager();
 					Intent appStartIntent = pm
-							.getLaunchIntentForPackage(appInfo.packageName);
+							.getLaunchIntentForPackage(appInfo.getPackageName());
 					if (null != appStartIntent) {
 						getActivity().startActivity(appStartIntent);
 					}
@@ -175,8 +198,8 @@ public class ManagerFragment extends Fragment {
 			String url = Config.getConfig().getProperty(
 					Config.Names.INSTALLED_APPS_PACKAGE);
 			ArrayList<String> packageNames = new ArrayList<String>();
-			for (InstalledAppInfo item : mAppInfos) {
-				packageNames.add(item.packageName);
+			for (AppInfo item : mAppInfos) {
+				packageNames.add(item.getPackageName());
 			}
 			RemoteManager remoteManager = RemoteManager
 					.getPostOnceRemoteManager();
@@ -205,16 +228,19 @@ public class ManagerFragment extends Fragment {
 				if (!mInstalledAppInfosIndex.containsKey(packageName)) {
 					return;
 				}
-				long versionCode = Long.parseLong(JsonUtil.getString(
-						jsonObject, "versionValue", null));
-				String downUrl = JsonUtil
-						.getString(jsonObject, "downUrl", null);
-				int index = mInstalledAppInfosIndex.get(packageName);
-				InstalledAppInfo appInfo = mAppInfos.get(index);
-				if (appInfo.versionCode < versionCode) {
-					appInfo.needUpdate = true;
+				AppInfo appInfoFromServer = AppInfoParser.getInstance().parse(jsonObject);
+				if (appInfoFromServer == null) {
+					return;
 				}
-				appInfo.downUrl = downUrl;
+				long versionCode = Long.parseLong(appInfoFromServer.getVersionValue());
+				String downUrl = appInfoFromServer.getDownUrl();
+				int index = mInstalledAppInfosIndex.get(packageName);
+				AppInfo appInfo = mAppInfos.get(index);
+				if (Integer.parseInt(appInfo.getVersionValue()) < versionCode) {
+					appInfo.setNeedUpdate(true);
+				}
+				appInfo.setDownUrl(downUrl);
+				appInfo.setId(appInfoFromServer.getId());
 			} catch (JSONException e) {
 				e.printStackTrace();
 			}
@@ -229,22 +255,10 @@ public class ManagerFragment extends Fragment {
 
 	}
 
-	private class InstalledAppInfo {
-		public String appName = null;
-		public String packageName = null;
-		public String versionName = null;
-		public int versionCode = 0;
-		public Drawable appLogo;
-
-		public boolean needUpdate;
-		public String downUrl;
-
-	}
-
-	private ArrayList<InstalledAppInfo> getInstalledApps(boolean includeSysApps) {
+	private ArrayList<AppInfo> getInstalledApps(boolean includeSysApps) {
 		PackageManager packageManager = getActivity().getPackageManager();
 		mInstalledAppInfosIndex = new HashMap<String, Integer>();
-		ArrayList<InstalledAppInfo> res = new ArrayList<InstalledAppInfo>();
+		ArrayList<AppInfo> res = new ArrayList<AppInfo>();
 		List<PackageInfo> packs = packageManager.getInstalledPackages(0);
 		for (int i = 0; i < packs.size(); i++) {
 			PackageInfo pkInfo = packs.get(i);
@@ -259,14 +273,16 @@ public class ManagerFragment extends Fragment {
 				continue;
 			}
 
-			InstalledAppInfo appInfo = new InstalledAppInfo();
-			appInfo.appName = pkInfo.applicationInfo.loadLabel(packageManager)
-					.toString();
-			appInfo.packageName = packageName;
-			appInfo.versionName = pkInfo.versionName;
-			appInfo.versionCode = pkInfo.versionCode;
-			appInfo.appLogo = pkInfo.applicationInfo.loadIcon(packageManager);
-			mInstalledAppInfosIndex.put(appInfo.packageName, i);
+			AppInfo appInfo = new AppInfo();
+			appInfo.setMainTitle(pkInfo.applicationInfo.loadLabel(packageManager)
+					.toString());
+			appInfo.setPackageName(packageName);
+			appInfo.setVersionName(pkInfo.versionName);
+			appInfo.setVersionValue(pkInfo.versionCode + "");
+			appInfo.setIcon(pkInfo.applicationInfo.loadIcon(packageManager));
+			appInfo.setInstalled(true);
+			
+			mInstalledAppInfosIndex.put(packageName, i);
 
 			res.add(appInfo);
 		}

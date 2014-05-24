@@ -10,22 +10,28 @@
         android:id="@+id/title"
         style="@style/listview_item_title" />
 
-    <RelativeLayout
+    <LinearLayout
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content" >
+        android:layout_height="wrap_content"
+        android:orientation="vertical" >
+
+        <Button
+            android:id="@+id/install_btn"
+            style="@style/listview_item_btn"
+            android:text="安装"
+            android:visibility="gone" />
 
         <Button
             android:id="@+id/open_btn"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="打开" />
+            style="@style/listview_item_btn"
+            android:text="打开"
+            android:visibility="gone" />
 
         <Button
             android:id="@+id/update_btn"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@+id/open_btn"
-            android:text="更新" />
-    </RelativeLayout>
+            style="@style/listview_item_btn"
+            android:text="更新"
+            android:visibility="gone" />
+    </LinearLayout>
 
 </LinearLayout>
