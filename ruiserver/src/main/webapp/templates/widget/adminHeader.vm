@@ -1,14 +1,15 @@
  <div class="pmt-header">
         <div class="pmt-container">
             <h1 class="logo" logo="">
-            	<a class="logo-text">豌豆荚</a>
+            	<a class="logo-text" href="$adminModule.setTarget('app/list')"></a>
             	<span>开发者中心</span>
             </h1>
             <div class="pmt-account-field ng-isolate-scope" ng-show="account" account="" accountdata="$root.account">
-            	<img ng-src="http://tp2.sinaimg.cn/2158026077/180/5627908465/1" class="pmt-account-avatar" src="http://tp2.sinaimg.cn/2158026077/180/5627908465/1">
+            	<img  class="pmt-account-avatar" src="$staticServer/images/default_img.jpg">
+					<!--   http://tp2.sinaimg.cn/2158026077/180/5627908465/1  -->
             	<div class="pmt-account-info">
-            		<span class="pmt-account-nickname ng-binding">GimponG</span>
-            		<span class="pmt-account-email ng-binding">gimpong@hotmail.com</span>
+            		<span class="pmt-account-nickname ng-binding">$loginUserDO.userName</span>
+            		<span class="pmt-account-email ng-binding">$applicationUtil.roleName($loginUserDO.roleId)</span>
             	</div>
             	<ul class="account-dropdown-menu hide">
             		<li><a href="$adminModule.setTarget('updatePsw')">修改密码</a></li>
@@ -25,7 +26,7 @@
             		<li><a href="$adminModule.setTarget('recommendApp/list')" #if("$tab" == "4") class="nav-item current" #else class="nav-item" #end target="">client推荐管理</a></li>
             	</ul>
             	<ul class="sub-nav">
-            		<li><a href="http://developer.wandoujia.com/getting-started/" target="_blank" class="nav-item">帮助中心</a></li>
+            		<li><a  onclick="return alert('联系管理员，电话：$!applicationUtil.phone()');" class="nav-item">帮助中心</a></li>
             	</ul>
             </div>
         </div>

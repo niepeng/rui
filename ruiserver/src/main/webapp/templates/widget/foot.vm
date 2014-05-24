@@ -1,13 +1,13 @@
  <div class="a-footer">
-        <p class="copyright">© 2010 - 2014 豌豆实验室 北京卓易讯畅科技有限公司</p>
-        <p class="intellectual">除非特别注明，应用程序由第三方市场提供，豌豆荚仅根据您的指令提供搜索结果链接，与出处无关，详情请参阅 <a target="_blank" href="http://www.wandoujia.com/intellectual_property" rel="nofollow">知识产权保护声明</a></p>
+        <p class="copyright">© 2013 - 2014 $!applicationUtil.websiteName() </p>
+        <p class="intellectual">除非特别注明，应用程序由第三方市场提供，$!applicationUtil.websiteName()仅根据您的指令提供搜索结果链接，与出处无关.</p>
         <p class="useless">
-            <a target="_blank" rel="nofollow" href="http://www.miitbeian.gov.cn" class="meta">京ICP备11035207号-2</a>
+            <a target="_blank" rel="nofollow" href="http://www.miitbeian.gov.cn" class="meta">京ICP备xxx号-q</a>
             <span class="meta">・</span>
-            <a target="_blank" rel="nofollow" href="http://www.miitbeian.gov.cn" class="meta">京ICP证111039号</a>
+            <a target="_blank" rel="nofollow" href="http://www.miitbeian.gov.cn" class="meta">京xxxx证xxxxx号</a>
             <span class="meta">・</span>
-            <a target="_blank" rel="nofollow" href="http://www.bjgaj.gov.cn/" class="meta">京公网安备110102005683</a>
+            <a target="_blank" rel="nofollow" href="http://www.bjgaj.gov.cn/" class="meta">京公网安备xxxxx</a>
             <span class="meta">・</span>
-            <a target="_blank" rel="nofollow" href="javascript:;" class="meta">京网文[2012]0895-295号</a>
+            <a target="_blank" rel="nofollow" href="javascript:;" class="meta">京网文[2014]xxxx-xxx号</a>
         </p>
     </div>

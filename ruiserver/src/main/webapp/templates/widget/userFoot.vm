@@ -1,1 +1,1 @@
-<div class="pmt-container pmt-footer"><a href="https://devrel.zendesk.com/anonymous_requests/new" target="_blank">联系开发者客服</a>&nbsp;&nbsp;©<script>document.write(new Date().getFullYear());</script>2014豌豆实验室</div>
+<div class="pmt-container pmt-footer"><a onclick="return alert('请联系客服，电话：$!applicationUtil.phone()');">联系开发者客服</a>&nbsp;&nbsp;©<script>document.write(new Date().getFullYear());</script>$!applicationUtil.websiteName()实验室</div>

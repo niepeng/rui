@@ -1,5 +1,5 @@
 
-$widget.setTemplate("adminHeader").addToContext("tab",'3')
+$widget.setTemplate("adminHeader").addToContext("tab",'3').addToContext('loginUserDO', $!loginUserDO)
 
 
 <div class="pmt-main-section pmt-container ng-scope" ng-view="">

@@ -1,5 +1,5 @@
 
- $widget.setTemplate("userHeader").addToContext("tab",'0')
+ $widget.setTemplate("userHeader").addToContext("tab",'0').addToContext('loginUserDO', $!loginUserDO)
  
     <div class="pmt-container ng-scope" ng-view="">
     	<div class="home-todo-list pmt-white-box" ng-show="appList.length">
@@ -19,7 +19,7 @@
                                     #if($appInfoDO.iconUrl)
 										<img  src="$appInfoDO.iconUrl">
 									#else
-										<img  src="http://img.wdjimg.com/pmt/add-image.png">
+										<img  src="$staticServer/images/add-image.png">
 									#end
                                 </div>
                                 <div class="app-desc">
@@ -77,12 +77,12 @@
                     <a href="$adminModule.setTarget('viewAddAppFirst').param('userId',$!query.UserId)" target="_self">
                         <span class="feature-icon feature-icon-add" ng-class="shortcut.icon"></span>
                         <span class="feature-desc">
-                            <span class="feature-title ng-binding">添加 / 认领应用</span>
+                            <span class="feature-title ng-binding">添加应用</span>
                             <span class="feature-meta ng-binding">上传应用并提交审核</span>
                         </span>
                     </a>
                 </li><!-- end ngRepeat: shortcut in shortcutList --><li class="feature-item ng-scope" ng-repeat="shortcut in shortcutList">
-                    <a href="/ads/agreement" target="_self">
+                    <a onclick="return alert('功能建设中...');" target="_self">
                         <span class="feature-icon feature-icon-promote" ng-class="shortcut.icon"></span>
                         <span class="feature-desc">
                             <span class="feature-title ng-binding">推广应用</span>
@@ -90,11 +90,11 @@
                         </span>
                     </a>
                 </li><!-- end ngRepeat: shortcut in shortcutList --><li class="feature-item ng-scope" ng-repeat="shortcut in shortcutList">
-                    <a href="/game/type" target="_self">
+                    <a onclick="return alert('功能建设中...');" target="_self">
                         <span class="feature-icon feature-icon-game" ng-class="shortcut.icon"></span>
                         <span class="feature-desc">
                             <span class="feature-title ng-binding">联运游戏</span>
-                            <span class="feature-meta ng-binding">与豌豆荚发行和分成</span>
+                            <span class="feature-meta ng-binding">与$!applicationUtil.websiteName()发行和分成</span>
                         </span>
                     </a>
                 </li><!-- end ngRepeat: shortcut in shortcutList -->
@@ -107,29 +107,35 @@
         </div>
         <!-- ngIf: faqList --><div class="white-box-content ng-animate-fadedown ng-scope" ng-if="faqList">
             <ul class="green-list">
-                <!-- ngRepeat: faq in  faqList --><li ng-repeat="faq in  faqList" class="ng-scope">
-                    <a href="http://developer.wandoujia.com/adnetwork/adnetwork-101/" target="_blank" class="ng-binding">豌豆荚移动广告平台简介</a>
+               <li ng-repeat="faq in  faqList" class="ng-scope">
+                    <a onclick="return alert('暂无信息');"  class="ng-binding">应用审核指引</a>
+                </li>
+				<li ng-repeat="faq in  faqList" class="ng-scope">
+                    <a onclick="return alert('暂无信息');" class="ng-binding">应用审核最常见的问题</a>
+                </li>
+				<li ng-repeat="faq in  faqList" class="ng-scope">
+                    <a onclick="return alert('暂无信息');" class="ng-binding">「应用审核」了解更多</a>
+                </li>
+				<li ng-repeat="faq in  faqList" class="ng-scope">
+                    <a onclick="return alert('暂无信息');"  class="ng-binding">如何在$!applicationUtil.websiteName()推广我的应用</a>
                 </li><!-- end ngRepeat: faq in  faqList --><li ng-repeat="faq in  faqList" class="ng-scope">
-                    <a href="http://developer.wandoujia.com/adnetwork/adnetworkworkflow/" target="_blank" class="ng-binding">如何集成豌豆荚移动广告平台 SDK</a>
+                    <a onclick="return alert('暂无信息');" class="ng-binding">「推广应用」了解更多</a>
                 </li><!-- end ngRepeat: faq in  faqList --><li ng-repeat="faq in  faqList" class="ng-scope">
-                    <a href="http://developer.wandoujia.com/adnetwork/dev-docs/" target="_blank" class="ng-binding">[移动广告] 了解更多</a>
+                    <a onclick="return alert('暂无信息');" class="ng-binding">如何与$!applicationUtil.websiteName()联运网游</a>
                 </li><!-- end ngRepeat: faq in  faqList --><li ng-repeat="faq in  faqList" class="ng-scope">
-                    <a href="http://developer.wandoujia.com/apps/review-guideline/" target="_blank" class="ng-binding">应用审核指引</a>
+                    <a onclick="return alert('暂无信息');"  class="ng-binding">如何与$!applicationUtil.websiteName()联运休闲游戏</a>
                 </li><!-- end ngRepeat: faq in  faqList --><li ng-repeat="faq in  faqList" class="ng-scope">
-                    <a href="http://developer.wandoujia.com/apps/faq/" target="_blank" class="ng-binding">应用审核最常见的问题</a>
-                </li><!-- end ngRepeat: faq in  faqList --><li ng-repeat="faq in  faqList" class="ng-scope">
-                    <a href="http://developer.wandoujia.com/apps/faq/" target="_blank" class="ng-binding">「应用审核」了解更多</a>
-                </li><!-- end ngRepeat: faq in  faqList --><li ng-repeat="faq in  faqList" class="ng-scope">
-                    <a href="http://developer.wandoujia.com/ads/liucheng/" target="_blank" class="ng-binding">如何在豌豆荚推广我的应用</a>
-                </li><!-- end ngRepeat: faq in  faqList --><li ng-repeat="faq in  faqList" class="ng-scope">
-                    <a href="http://developer.wandoujia.com/ads/changjianwenti/" target="_blank" class="ng-binding">「推广应用」了解更多</a>
-                </li><!-- end ngRepeat: faq in  faqList --><li ng-repeat="faq in  faqList" class="ng-scope">
-                    <a href="http://developer.wandoujia.com/games/mmo/" target="_blank" class="ng-binding">如何与豌豆荚联运网游</a>
-                </li><!-- end ngRepeat: faq in  faqList --><li ng-repeat="faq in  faqList" class="ng-scope">
-                    <a href="http://developer.wandoujia.com/games/single-player/" target="_blank" class="ng-binding">如何与豌豆荚联运休闲游戏</a>
-                </li><!-- end ngRepeat: faq in  faqList --><li ng-repeat="faq in  faqList" class="ng-scope">
-                    <a href="http://developer.wandoujia.com/games/olgfaq/" target="_blank" class="ng-binding">「联运游戏」了解更多</a>
-                </li><!-- end ngRepeat: faq in  faqList -->
+                    <a onclick="return alert('暂无信息');" class="ng-binding">「联运游戏」了解更多</a>
+                </li>
+				 <li ng-repeat="faq in  faqList" class="ng-scope">
+                    <a onclick="return alert('暂无信息');" class="ng-binding">$!applicationUtil.websiteName()移动广告平台简介</a>
+                </li>
+				<li ng-repeat="faq in  faqList" class="ng-scope">
+                    <a onclick="return alert('暂无信息');" class="ng-binding">如何集成$!applicationUtil.websiteName()移动广告平台 SDK</a>
+                </li>
+				<li ng-repeat="faq in  faqList" class="ng-scope">
+                    <a onclick="return alert('暂无信息');"  class="ng-binding">[移动广告] 了解更多</a>
+                </li>
             </ul>
         </div><!-- end ngIf: faqList -->
         </div>

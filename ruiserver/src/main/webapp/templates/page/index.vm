@@ -1,15 +1,23 @@
 <!--header-->
      <div class="header">
     <div class="header-inner">
-        <h1 class="logo"><a href="http://www.wandoujia.com/" class="pngFix">豌豆荚</a></h1>
-        <div id="device-info"><div class="devicecenter devicecenter-signin">
-    <div class="device-menu">
-        <p class="icon"><span class="img"><span class="vam"></span><img alt="豌豆荚" src="http://static.wandoujia.com/files/devices_2/wdj/wdj-default-small.png"></span></p>
-        <p class="actions">
-            <a href="$adminModule.setTarget('login')" class="button-grey button-small login-button">登录</a>
-        </p>
-    </div>
-</div></div>
+        <h1 class="logo"><a href="$baseModule.setTarget('index')" class="pngFix">$!applicationUtil.websiteName()</a></h1>
+        <div id="device-info">
+			<div class="devicecenter devicecenter-signin">
+                <div class="device-menu">
+                    <!-- <p class="icon">
+            			<span class="img"><span class="vam"></span>
+            				<img alt="$!applicationUtil.websiteName()" src="http://static.wandoujia.com/files/devices_2/wdj/wdj-default-small.png"></span>
+            		</p> -->
+                        #if(!$loginUserDO)
+            				<p class="actions"><a href="$adminModule.setTarget('login')" class="button-grey button-small login-button">登录</a></p>
+            			#else
+							<a href="$adminModule.setTarget('index')">&nbsp;&nbsp;  $loginUserDO.userName &nbsp;&nbsp; </a>
+						#end	
+                </div>
+			
+			 </div>
+		</div>
         <!--
 		<form class="search-box" action="http://www.wandoujia.com/search">
             <input class="search-ipt" name="key" value="" autocomplete="off" placeholder="搜索安卓软件和游戏">
@@ -25,16 +33,18 @@
 
         <div class="txts">
             <strong class="slogan">你的手机娱乐中心</strong>
-            <p class="full">在豌豆荚，你可以轻松免费获取超过 89 万集视频，95 万部小说，121 万张壁纸和 150 万款安卓手机应用游戏。</p>
+            <p class="full">在$!applicationUtil.websiteName()，你可以轻松免费获取很多视频、小说、壁纸和安卓手机应用和游戏。</p>
             <div class="download-field">
-                <a rel="nofollow" id="download-windows" href="http://mir.wandoujia.com/getwdj/homepage_1400642976574" data-track="home/download/homepage" target="_self" class="download-button download-windows-client">
-                    <i class="pngFix"></i>下载豌豆荚
+                <a rel="nofollow" id="download-windows" href="#" target="_self" class="download-button download-windows-client">
+                    下载$!applicationUtil.websiteName()
                 </a>
                 <span id="download-beta" data-track="home/download/beta">Beta 测试版</span>
             </div>
-            <div class="others">
-                <a href="" class="android-popup-btn" data-track="home/popup/p4">在手机上安装豌豆荚</a>
+            <!-- 
+			<div class="others">
+                <a href="" class="android-popup-btn" data-track="home/popup/p4">在手机上安装$!applicationUtil.websiteName()</a>
             </div>
+			-->
         </div>
         <div class="screenshot">
             <div class="pc-frame pngFix">
@@ -64,9 +74,9 @@
                 <div class="features-desc">
                     <h3>想到，就能找到。</h3>
                     <p>
-                        豌豆荚收录了超过 112 万款优质 Android 应用和游戏，以及 130 多家内容提供商提供的音乐、视频、电子书、壁纸和主题。让你的手机比你想象中更强大更好玩。
+                        $!applicationUtil.websiteName()收录了超过很多优质 Android 应用和游戏，以及多家内容提供商提供的音乐、视频、电子书、壁纸和主题。让你的手机比你想象中更强大更好玩。
                     </p>
-                    <a class="more" href="http://www.wandoujia.com/apps">前往豌豆荚应用搜索<i class="more-arrow"></i></a>
+                    <!--  <a class="more" href="http://www.wandoujia.com/apps">前往$!applicationUtil.websiteName()应用搜索<i class="more-arrow"></i></a>    -->
                 </div>
                 <span class="strut"></span>
             </div>
@@ -76,7 +86,7 @@
                 <div class="features-desc">
                     <h3>省心，更要放心。</h3>
                     <p>
-                        豌豆荚提供的应用都清晰标示了安全、隐私、广告和官方验证信息。特色的 <strong><a href="http://www.wandoujia.com/xibaibai">豌豆洗白白</a> </strong>功能，可将山寨应用、广告应用替换成官方版或无广告版，让你使用更放心。
+                        $!applicationUtil.websiteName()提供的应用都清晰标示了安全、隐私、广告和官方验证信息。特色的 <!-- <strong><a href="http://www.wandoujia.com/xibaibai">豌豆洗白白</a> </strong>  -->功能，可将山寨应用、广告应用替换成官方版或无广告版，让你使用更放心。
                     </p>
                 </div>
                 <div class="img-wrapper pngFix"></div>
@@ -89,7 +99,7 @@
                 <div class="features-desc">
                     <h3>管理，得心应手。</h3>
                     <p>
-                       在手机上操作起来很繁琐的事情，在电脑上变得好高效。你可以使用豌豆荚收发短信，管理手机中的应用、联系人、图片和视频，备份手机数据到电脑和云端，管理手机就是这样得心应手。
+                       在手机上操作起来很繁琐的事情，在电脑上变得好高效。你可以使用$!applicationUtil.websiteName()收发短信，管理手机中的应用、联系人、图片和视频，备份手机数据到电脑和云端，管理手机就是这样得心应手。
                     </p>
                 </div>
                 <span class="strut"></span>
@@ -98,32 +108,34 @@
     </ul>
 </div>
 <!--features-->
-<!--apps-->
-<div class="apps">
-    <div class="apps-inner clearfix">
-        <div class="app-box">
-            <div class="box-title">
-                <h2>精选安卓软件</h2>
-                <a class="more" href="http://www.wandoujia.com/tag/app">查看更多安卓软件<i class="more-arrow"></i></a>
+        <!--apps-->
+        <!--
+        <div class="apps">
+            <div class="apps-inner clearfix">
+                <div class="app-box">
+                    <div class="box-title">
+                        <h2>精选安卓软件</h2>
+                        <a class="more" href="http://www.wandoujia.com/tag/app">查看更多安卓软件<i class="more-arrow"></i></a>
+                    </div>
+                    <ul class="clearfix">
+                    <li class="app-item"><a href="http://www.wandoujia.com/apps/com.tencent.mm"><img alt="微信" src="http://img.wdjimg.com/mms/icon/v1/3/bd/5295ac6a9c6d51e8285690bdbe1b1bd3_48_48.png"><span class="name">微信</span></a></li><li class="app-item"><a href="http://www.wandoujia.com/apps/com.tencent.mobileqq"><img alt="QQ" src="http://img.wdjimg.com/mms/icon/v1/2/fd/453c5c37cc3d366d32ecee33e1247fd2_48_48.png"><span class="name">QQ</span></a></li><li class="app-item"><a href="http://www.wandoujia.com/apps/com.taobao.taobao"><img alt="淘宝" src="http://img.wdjimg.com/mms/icon/v1/a/b4/1c80a39ccb9bc0070aa7b0f476675b4a_48_48.png"><span class="name">淘宝</span></a></li><li class="app-item"><a href="http://www.wandoujia.com/apps/com.immomo.momo"><img alt="陌陌" src="http://img.wdjimg.com/mms/icon/v1/9/aa/427c9386c1721880ab4e3704068aeaa9_48_48.png"><span class="name">陌陌</span></a></li><li class="app-item"><a href="http://www.wandoujia.com/apps/com.kugou.android"><img alt="酷狗音乐" src="http://img.wdjimg.com/mms/icon/v1/8/ce/5f9a602b49f09795c7edc47b381fece8_48_48.png"><span class="name">酷狗音乐</span></a></li><li class="app-item"><a href="http://www.wandoujia.com/apps/com.UCMobile"><img alt="UC浏览器" src="http://img.wdjimg.com/mms/icon/v1/a/5f/2fc8afed32938550693c79136f5b15fa_48_48.png"><span class="name">UC浏览器</span></a></li><li class="app-item"><a href="http://www.wandoujia.com/apps/com.sohu.inputmethod.sogou"><img alt="搜狗手机输入法" src="http://img.wdjimg.com/mms/icon/v1/6/c0/0793c9cbecf961d8be47f502062edc06_48_48.png"><span class="name">搜狗手机输入法</span></a></li><li class="app-item"><a href="http://www.wandoujia.com/apps/com.snda.wifilocating"><img alt="WiFi万能钥匙" src="http://img.wdjimg.com/mms/icon/v1/9/48/648e711d06d23445c87d055c4c75e489_48_48.png"><span class="name">WiFi万能钥匙</span></a></li></ul>
+                </div>
+                <div class="app-box left-box">
+                    <div class="box-title">
+                        <h2>精选安卓游戏</h2>
+                        <a class="more" href="http://www.wandoujia.com/tag/game">查看更多安卓游戏<i class="more-arrow"></i></a>
+                    </div>
+                    <ul class="clearfix">
+                    <li class="app-item"><a href="http://www.wandoujia.com/apps/com.umonistudio.tile"><img alt="别踩白块儿" src="http://img.wdjimg.com/mms/icon/v1/4/cb/51c63c2887f15c0eccb03c502f692cb4_48_48.png"><span class="name">别踩白块儿</span></a></li><li class="app-item"><a href="http://www.wandoujia.com/apps/com.happyelements.AndroidAnimal.wdj"><img alt="开心消消乐" src="http://img.wdjimg.com/mms/icon/v1/f/b0/0bf36a51d34073a4ac36d54352035b0f_48_48.png"><span class="name">开心消消乐</span></a></li><li class="app-item"><a href="http://www.wandoujia.com/apps/com.popcap.pvz2cthdwdj"><img alt="植物大战僵尸2高清版" src="http://img.wdjimg.com/mms/icon/v1/1/d8/9e8a6ec68f164605682b39fbc8367d81_48_48.png"><span class="name">植物大战僵尸2高清版</span></a></li><li class="app-item"><a href="http://www.wandoujia.com/apps/com.carrot.iceworld"><img alt="保卫萝卜2" src="http://img.wdjimg.com/mms/icon/v1/0/f8/ed3a5e3eb8f279d748ef41153377bf80_48_48.png"><span class="name">保卫萝卜2</span></a></li><li class="app-item"><a href="http://www.wandoujia.com/apps/com.imangi.templerun2"><img alt="神庙逃亡2柳岩版" src="http://img.wdjimg.com/mms/icon/v1/5/a2/9a3b441faef0e480e34009fbfdc09a25_48_48.png"><span class="name">神庙逃亡2柳岩版</span></a></li><li class="app-item"><a href="http://www.wandoujia.com/apps/com.brianbaek.popstar"><img alt="popstar消灭星星官方正版" src="http://img.wdjimg.com/mms/icon/v1/b/df/e59ebc00ebe67971ef8ed0f0f6546dfb_48_48.png"><span class="name">popstar消灭星星官方正版</span></a></li><li class="app-item"><a href="http://www.wandoujia.com/apps/org.cocos2dx.FishingJoy2"><img alt="捕鱼达人2" src="http://img.wdjimg.com/mms/icon/v1/8/19/65a0cbe348a07f28ee4ed57c28064198_48_48.png"><span class="name">捕鱼达人2</span></a></li><li class="app-item"><a href="http://www.wandoujia.com/apps/com.tencent.game.rhythmmaster"><img alt="节奏大师" src="http://img.wdjimg.com/mms/icon/v1/4/8e/422afc5ccdcace483f847e84a57dc8e4_48_48.png"><span class="name">节奏大师</span></a></li></ul>
+                </div>
             </div>
-            <ul class="clearfix">
-            <li class="app-item"><a href="http://www.wandoujia.com/apps/com.tencent.mm"><img alt="微信" src="http://img.wdjimg.com/mms/icon/v1/3/bd/5295ac6a9c6d51e8285690bdbe1b1bd3_48_48.png"><span class="name">微信</span></a></li><li class="app-item"><a href="http://www.wandoujia.com/apps/com.tencent.mobileqq"><img alt="QQ" src="http://img.wdjimg.com/mms/icon/v1/2/fd/453c5c37cc3d366d32ecee33e1247fd2_48_48.png"><span class="name">QQ</span></a></li><li class="app-item"><a href="http://www.wandoujia.com/apps/com.taobao.taobao"><img alt="淘宝" src="http://img.wdjimg.com/mms/icon/v1/a/b4/1c80a39ccb9bc0070aa7b0f476675b4a_48_48.png"><span class="name">淘宝</span></a></li><li class="app-item"><a href="http://www.wandoujia.com/apps/com.immomo.momo"><img alt="陌陌" src="http://img.wdjimg.com/mms/icon/v1/9/aa/427c9386c1721880ab4e3704068aeaa9_48_48.png"><span class="name">陌陌</span></a></li><li class="app-item"><a href="http://www.wandoujia.com/apps/com.kugou.android"><img alt="酷狗音乐" src="http://img.wdjimg.com/mms/icon/v1/8/ce/5f9a602b49f09795c7edc47b381fece8_48_48.png"><span class="name">酷狗音乐</span></a></li><li class="app-item"><a href="http://www.wandoujia.com/apps/com.UCMobile"><img alt="UC浏览器" src="http://img.wdjimg.com/mms/icon/v1/a/5f/2fc8afed32938550693c79136f5b15fa_48_48.png"><span class="name">UC浏览器</span></a></li><li class="app-item"><a href="http://www.wandoujia.com/apps/com.sohu.inputmethod.sogou"><img alt="搜狗手机输入法" src="http://img.wdjimg.com/mms/icon/v1/6/c0/0793c9cbecf961d8be47f502062edc06_48_48.png"><span class="name">搜狗手机输入法</span></a></li><li class="app-item"><a href="http://www.wandoujia.com/apps/com.snda.wifilocating"><img alt="WiFi万能钥匙" src="http://img.wdjimg.com/mms/icon/v1/9/48/648e711d06d23445c87d055c4c75e489_48_48.png"><span class="name">WiFi万能钥匙</span></a></li></ul>
         </div>
-        <div class="app-box left-box">
-            <div class="box-title">
-                <h2>精选安卓游戏</h2>
-                <a class="more" href="http://www.wandoujia.com/tag/game">查看更多安卓游戏<i class="more-arrow"></i></a>
-            </div>
-            <ul class="clearfix">
-            <li class="app-item"><a href="http://www.wandoujia.com/apps/com.umonistudio.tile"><img alt="别踩白块儿" src="http://img.wdjimg.com/mms/icon/v1/4/cb/51c63c2887f15c0eccb03c502f692cb4_48_48.png"><span class="name">别踩白块儿</span></a></li><li class="app-item"><a href="http://www.wandoujia.com/apps/com.happyelements.AndroidAnimal.wdj"><img alt="开心消消乐" src="http://img.wdjimg.com/mms/icon/v1/f/b0/0bf36a51d34073a4ac36d54352035b0f_48_48.png"><span class="name">开心消消乐</span></a></li><li class="app-item"><a href="http://www.wandoujia.com/apps/com.popcap.pvz2cthdwdj"><img alt="植物大战僵尸2高清版" src="http://img.wdjimg.com/mms/icon/v1/1/d8/9e8a6ec68f164605682b39fbc8367d81_48_48.png"><span class="name">植物大战僵尸2高清版</span></a></li><li class="app-item"><a href="http://www.wandoujia.com/apps/com.carrot.iceworld"><img alt="保卫萝卜2" src="http://img.wdjimg.com/mms/icon/v1/0/f8/ed3a5e3eb8f279d748ef41153377bf80_48_48.png"><span class="name">保卫萝卜2</span></a></li><li class="app-item"><a href="http://www.wandoujia.com/apps/com.imangi.templerun2"><img alt="神庙逃亡2柳岩版" src="http://img.wdjimg.com/mms/icon/v1/5/a2/9a3b441faef0e480e34009fbfdc09a25_48_48.png"><span class="name">神庙逃亡2柳岩版</span></a></li><li class="app-item"><a href="http://www.wandoujia.com/apps/com.brianbaek.popstar"><img alt="popstar消灭星星官方正版" src="http://img.wdjimg.com/mms/icon/v1/b/df/e59ebc00ebe67971ef8ed0f0f6546dfb_48_48.png"><span class="name">popstar消灭星星官方正版</span></a></li><li class="app-item"><a href="http://www.wandoujia.com/apps/org.cocos2dx.FishingJoy2"><img alt="捕鱼达人2" src="http://img.wdjimg.com/mms/icon/v1/8/19/65a0cbe348a07f28ee4ed57c28064198_48_48.png"><span class="name">捕鱼达人2</span></a></li><li class="app-item"><a href="http://www.wandoujia.com/apps/com.tencent.game.rhythmmaster"><img alt="节奏大师" src="http://img.wdjimg.com/mms/icon/v1/4/8e/422afc5ccdcace483f847e84a57dc8e4_48_48.png"><span class="name">节奏大师</span></a></li></ul>
-        </div>
-    </div>
-</div>
-<!--apps-->
+        -->
+        <!--apps-->
 <!--download-wrapper-->
 <div class="download-wrapper">
-    <a rel="nofollow" href="http://mir.wandoujia.com/getwdj/homepage_1400642976574" data-track="home/download/windows-popup" target="_self" class="download-button download-windows-client"><i class="pngFix"></i>下载豌豆荚</a>
-    <a href="" class="android-popup-btn" data-track="home/popup/p4">在手机上安装豌豆荚</a>
+    <a rel="nofollow" href="#"  target="_self" class="download-button download-windows-client">下载$!applicationUtil.websiteName()</a>
+    <!-- <a href="" class="android-popup-btn" data-track="home/popup/p4">在手机上安装$!applicationUtil.websiteName()</a>  -->
 </div>
 <!--download-wrapper-->
 <!--android-popup-->
@@ -132,7 +144,7 @@
         <div class="popup-section">
             <p class="popup-title">扫描二维码</p>
             <p class="popup-subtitle">通过手机登录 m.wandoujia.com 或扫描二维码下载。</p>
-            <img src="http://img.wdjimg.com/image/www/qr.png" alt="豌豆荚安卓版二维码" class="phoenix-qr">
+            <img src="http://img.wdjimg.com/image/www/qr.png" alt="$!applicationUtil.websiteName()安卓版二维码" class="phoenix-qr">
         </div>
         <div class="popup-section">
             <p class="popup-title">短信获取下载链接</p>
@@ -152,14 +164,15 @@
 <div class="footer footer-dark w-footer clearfix">
     <div class="ft-inner">
         
-        <dl class="clearfix">
+        <!--
+		<dl class="clearfix">
             <dt>我们的产品</dt>
             <dd>
                 <ul>
-                    <li><a rel="nofollow" href="http://www.wandoujia.com/android">豌豆荚手机客户端</a></li>
+                    <li><a rel="nofollow" href="http://www.wandoujia.com/android">$!applicationUtil.websiteName()手机客户端</a></li>
                     <li><a rel="nofollow" href="http://www.wandoujia.com/cloud">云备份</a></li>
                     <li><a rel="nofollow" href="http://www.wandoujia.com/ios">云相册</a></li>
-                    <li><a rel="nofollow" href="http://www.wandoujia.com/screen">豌豆荚锁屏</a></li>
+                    <li><a rel="nofollow" href="http://www.wandoujia.com/screen">$!applicationUtil.websiteName()锁屏</a></li>
                     <li><a rel="nofollow" href="http://www.wandoujia.com/pay">豌豆币充值中心</a></li>
                     <li><a rel="nofollow" href="http://dl.wandoujia.com/files/mac/AppInstaller_v1.0.7.dmg">应用安装器 Mac 版</a></li>
                     <li><a rel="nofollow" href="http://www.snappea.com">SnapPea</a></li>
@@ -190,34 +203,18 @@
         </dl>
 
         <div class="socials">
-            <a href="http://user.qzone.qq.com/1405248419" title="豌豆荚 QQ 空间" rel="nofollow" class="sc-icon qzone-icon" target="_blank"></a>
-            <a href="http://weibo.com/wandoulabs" title="豌豆荚官方微博" rel="nofollow" class="sc-icon weibo-icon" target="_blank"></a>
-            <a href="http://twitter.com/wandoujia" title="豌豆荚@twitter" rel="nofollow" class="sc-icon twitter-icon" target="_blank"></a>
-            <a href="http://bbs.wandoujia.com/" title="豌豆荚论坛" rel="nofollow" class="sc-icon bbs-icon" target="_blank"></a>
-            <a href="http://www.wandoujia.com/blog/" title="豌豆荚 Blog" rel="nofollow" class="sc-icon blog-icon" target="_blank"></a>
+            <a href="http://user.qzone.qq.com/1405248419" title="$!applicationUtil.websiteName() QQ 空间" rel="nofollow" class="sc-icon qzone-icon" target="_blank"></a>
+            <a href="http://weibo.com/wandoulabs" title="$!applicationUtil.websiteName()官方微博" rel="nofollow" class="sc-icon weibo-icon" target="_blank"></a>
+            <a href="http://twitter.com/wandoujia" title="$!applicationUtil.websiteName()@twitter" rel="nofollow" class="sc-icon twitter-icon" target="_blank"></a>
+            <a href="http://bbs.wandoujia.com/" title="$!applicationUtil.websiteName()论坛" rel="nofollow" class="sc-icon bbs-icon" target="_blank"></a>
+            <a href="http://www.wandoujia.com/blog/" title="$!applicationUtil.websiteName() Blog" rel="nofollow" class="sc-icon blog-icon" target="_blank"></a>
         </div>
-
-        
-
-        <div class="split"></div>
-
-        <div class="others">
-            <p class="copyright">© 2010 - 2014 豌豆实验室</p>
-            <p class="intellectual">除非特别注明，应用程序由第三方市场提供，豌豆荚仅根据你的指令提供搜索结果链接，与出处无关，详情请参阅
-                <a target="_blank" href="http://www.wandoujia.com/intellectual_property" rel="nofollow">知识产权保护声明</a>
-            </p>
-            <p class="useless">
-                <a target="_blank" rel="nofollow" href="http://www.miitbeian.gov.cn" class="meta">京ICP备11035207号-2</a>
-                <span class="meta">・</span>
-                <a target="_blank" rel="nofollow" href="http://www.miitbeian.gov.cn" class="meta">京ICP证111039号</a>
-                <span class="meta">・</span>
-                <a target="_blank" rel="nofollow" href="http://www.bjgaj.gov.cn/" class="meta">京公网安备110102005683</a>
-                <span class="meta">・</span>
-                <a target="_blank" rel="nofollow" href="javascript:;" class="meta">京网文[2012]0895-295号</a>
-                <span class="meta">・</span>
-                <a target="_blank" rel="nofollow" href="/kidcare/" class="meta">未成年人家长监护工程</a>
-            </p>
-        </div>
+		
+		 <div class="split"></div>
+		-->
+		<div class="others">
+			$widget.setTemplate("foot")
+		</div>
     </div>
 </div>
 <!--footer-->

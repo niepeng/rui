@@ -1,5 +1,7 @@
 package com.baibutao.apps.linkshop.uxiang.ruiserver.web.action;
 
+import wint.help.biz.result.Result;
+import wint.help.biz.result.ResultSupport;
 import wint.mvc.flow.FlowData;
 import wint.mvc.template.Context;
 
@@ -13,7 +15,9 @@ import wint.mvc.template.Context;
 public class Index extends BaseAction {
 	
 	public void execute(FlowData flowData, Context context) {
-		context.put("msg", "showmsg:" + System.currentTimeMillis());
+		Result result = new ResultSupport(true);
+		addLoginInfo(result, flowData);
+		handleResult(result, flowData, context);
 	}
 
 }

@@ -8,6 +8,7 @@ import wint.lang.utils.StringUtil;
 
 import com.baibutao.apps.linkshop.uxiang.ruiserver.biz.dal.dataobject.CatDO;
 import com.baibutao.apps.linkshop.uxiang.ruiserver.biz.dal.dataobject.enums.APPStsutsEnum;
+import com.baibutao.apps.linkshop.uxiang.ruiserver.biz.dal.dataobject.enums.RoleEnum;
 
 /**
  * <p>标题: </p>
@@ -20,6 +21,19 @@ public class ApplicationUtil {
 
 	public static String div(int a, int b) {
 		return String.valueOf(ArithUtil.div(Double.valueOf(a),Double.valueOf(b)));
+	}
+	
+	public static String websiteName() {
+		return "百百锐锐";
+	}
+	
+	public static String phone() {
+		return "139-8949-8009";
+	}
+	
+	public static String roleName(int roleId) {
+		RoleEnum roleEnum = RoleEnum.valueOf(roleId);
+		return roleEnum == null ? StringUtil.EMPTY : roleEnum.getName();
 	}
 	
 	public static String showSizeM(int size) {

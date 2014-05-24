@@ -107,8 +107,7 @@ img{
 }
 
 .header .logo a{
-	background-image:url(http://img.wdjimg.com/www/images/icons-s581146f84b.png);
-	background-position:0 -217px;
+	background-image:url(../images/logo_new_latest.png);
 	background-repeat:no-repeat;
 	cursor:pointer;
 	display:block;

@@ -83,58 +83,10 @@
                         </tr>
                     </tbody></table>
                 </div>
-				
-              <!--
-			    <div class="apk-warning-section">
-                    <span class="pmt-form-help-inline w-text-warning ng-binding"></span>
-                    <div class="ng-hide">
-                        <p class="w-text-warning ng-binding">您新上传的安装包版本号是旧版本，如果您不清楚后果，建议您<a class="w-btn">取消本次上传</a></p>
-                    </div>
-    
-                    <form class="pmt-form pmt-form-horizontal ng-pristine ng-valid ng-hide" name="apkAlertSignForm" id="apkAlertSignForm">
-                        <p class="w-text-warning">您新上传的安装包签名与现有安装包的签名不一致，会造成用户升级应用时数据丢失。豌豆荚强烈反对这一做法。如果您不清楚后果，建议取消本次上传</p>
-                        <p class="w-text-warning">如果您明确后果，请阐述您的理由，以供审核：</p>
-                        <div class="pmt-form">
-                            <textarea text-area-elastic="" name="" id="" cols="60" rows="5" class="pmt-form-danger ng-pristine ng-valid" ng-model="apkAlertSignReasons" style="overflow: hidden; word-wrap: break-word; resize: horizontal; height: 102px;"></textarea>
-                        </div>
-                        <button type="submit" class="w-btn">提交</button>
-                    </form>
-    
-                    <span ng-show="$root.vm.afterAlter" class="pmt-form-help-inline w-text-warning ng-hide">您的签名更改申请已经提交成功，将需要 1-3个工作日完成，审核结果将以邮件形式通知您。</span>
-                </div>
-			  -->
-				
-               <!--
-			    <div class="pmt-popup ng-hide" ng-show="$root.vm.isShowApkManager">
-                    <div class="popup-container" ng-show="!isShowDelApkDialog">
-                        <p class="popup-title ng-binding">管理『』的安装包</p>
-                        <div class="popup-content">
-                            <div class="pkg-management">
-                                <p>豌豆荚将把已经审核通过的，版本号最高的安装包默认提供给用户。</p>
-                                <table class="pmt-standard-table">
-                                    <tbody><tr>
-                                        <th>上传日期</th>
-                                        <th>版本号</th>
-                                        <th>版本名</th>
-                                        <th>大小</th>
-                                        <th>MD5</th>
-                                        <th>状态</th>
-                                        <th>删除</th>
-                                    </tr>
-                                </tbody></table>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-			   -->
     			
             </div>
     
 			
-			
-			<!-- insert to values  -->
-			
-
 
             <div ng-controller="apkInfoCtrl" class="ng-scope">
 				
@@ -396,7 +348,7 @@
                                     <div class="pmt-form-controls">
                                         <p class="hero">我同意以下权利声明</p>
                                         <div class="pmt-form-help-block" message="" for="agree" xrequired="必须先同意协议" validation="必须同意"></div>
-                                        <p class="moretext">本公司 / 个人对该应用享有完整版权，不存在任何侵犯第三方合法权益的情形。本公司 / 个人上述承诺若是存在虚假，愿承担一切法律后果，并且赔偿因此而对豌豆荚造成的全部损失。</p>
+                                        <p class="moretext">本公司 / 个人对该应用享有完整版权，不存在任何侵犯第三方合法权益的情形。本公司 / 个人上述承诺若是存在虚假，愿承担一切法律后果，并且赔偿因此而对$!applicationUtil.websiteName()造成的全部损失。</p>
                                     </div>
                                 </div>
                                 <div class="pmt-form-row">
@@ -405,25 +357,6 @@
                                     </div>
                                 </div>
                             </div>
-    
-                           <!--
-						    <div class="pmt-popup ng-hide" ng-show="isShowDelAppDialog">
-                                <div class="popup-container warning">
-                                    <p class="popup-title ng-binding">删除『』</p>
-                                    <div class="popup-content">
-                                        <div class="delete-warning">
-                                            <p class="ng-binding">{一旦删除『』，它将会失去豌豆荚的『优质应用』认证，但用户仍然可以搜索到其他来源的版本。}</p>
-                                            <p>删除请求一旦审核通过，将无法撤销。</p>
-                                            <p>该操作将无法撤销要继续吗？</p>
-                                        </div>
-                                    </div>
-                                    <div class="popup-ctrl">
-                                        <a class="w-btn w-btn-grand w-btn-danger popup-delete-btn" ng-click="delAppHandler()">删除</a>
-                                        <a class="w-btn w-btn-grand w-btn-primary popup-close-btn" ng-click="isShowDelAppDialog = false">取消</a>
-                                    </div>
-                                </div>
-                            </div>
-							-->
     
                         </fieldset>
                     </div>

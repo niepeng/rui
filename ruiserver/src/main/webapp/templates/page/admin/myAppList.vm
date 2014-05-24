@@ -1,5 +1,5 @@
 
- $widget.setTemplate("userHeader").addToContext("tab",'1')
+ $widget.setTemplate("userHeader").addToContext("tab",'1').addToContext('loginUserDO', $!loginUserDO)
 
     <div class="pmt-container ng-scope" ng-view="">
         <div class="myapp-list pmt-white-box ng-scope">

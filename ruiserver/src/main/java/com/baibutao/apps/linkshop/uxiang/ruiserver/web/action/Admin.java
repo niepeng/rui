@@ -8,6 +8,7 @@ import wint.mvc.template.Context;
 
 import com.baibutao.apps.linkshop.uxiang.ruiserver.biz.ao.AdminAO;
 import com.baibutao.apps.linkshop.uxiang.ruiserver.biz.bean.UserBean;
+import com.baibutao.apps.linkshop.uxiang.ruiserver.biz.common.ApplicationUtil;
 import com.baibutao.apps.linkshop.uxiang.ruiserver.biz.dal.dataobject.AdminDO;
 import com.baibutao.apps.linkshop.uxiang.ruiserver.biz.dal.dataobject.AppInfoDO;
 import com.baibutao.apps.linkshop.uxiang.ruiserver.biz.query.AppQuery;
@@ -121,8 +122,13 @@ public class Admin extends BaseAction {
 		handleError(result, flowData, context);
 	}
 	
+	public void login(FlowData flowData, Context context) {
+		context.put("title", "登录-" + ApplicationUtil.websiteName());
+	}
+	
 	public void register(FlowData flowData, Context context) {
 		flowData.setLayout("/admin/login");
+		context.put("title", "注册-" + ApplicationUtil.websiteName());
 	}
 	
 	

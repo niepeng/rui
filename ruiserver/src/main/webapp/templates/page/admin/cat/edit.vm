@@ -1,5 +1,5 @@
 	
-$widget.setTemplate("adminHeader").addToContext("tab",'1')
+$widget.setTemplate("adminHeader").addToContext("tab",'1').addToContext('loginUserDO', $!loginUserDO)
 
 #set($form = $formFactory.getForm('cat.edit'))
 	<div class="pmt-main-section pmt-container ng-scope" ng-view="">

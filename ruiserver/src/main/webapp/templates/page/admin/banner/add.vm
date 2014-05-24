@@ -1,6 +1,6 @@
 	
 
-    $widget.setTemplate("adminHeader").addToContext("tab",'2')
+    $widget.setTemplate("adminHeader").addToContext("tab",'2').addToContext('loginUserDO', $!loginUserDO)
     	
     	#set($form = $formFactory.getForm('banner.add'))
     	<div class="pmt-main-section pmt-container ng-scope" ng-view="">

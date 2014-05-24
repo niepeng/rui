@@ -5,7 +5,7 @@
                 <form novalidate="" autocomplete="off" action="/admin/doRegister.htm" method="post">
                      
             <fieldset class="a-show-phone">
-                <legend class="h3">注册豌豆荚 <span class="w-text-info"></span></legend>
+                <legend class="h3">注册$!applicationUtil.websiteName() <span class="w-text-info"></span></legend>
                 <div class="w-control-group a-field-username-group">
                     <div class="a-field-phone">
                         <label class="w-text-secondary" for="a-register-phone">用户名，建议手机号</label>
@@ -46,13 +46,6 @@
                 </div>
                 <div class="w-control-group a-notice w-cf a-hr-bottom">
                     <a class="a-pull-left js-switch-log" href="$adminModule.setTarget('login')">已有账号登录</a>
-                    <!--
-					<a class="a-pull-right a-use-email js-register-username-switcher" href="javascript:;">使用 email 注册</a>
-                    <a class="a-pull-right a-use-phone js-register-username-switcher" href="javascript:;">使用手机号注册</a>
-					-->
-                </div>
-                <div class="w-control-group a-field-terms w-text-info w-cf">
-                    <p>注册豌豆荚账号表示您同意<a href="http://www.wandoujia.com/terms" target="_default">最终用户协议</a></p>
                 </div>
             </fieldset>
         </form>

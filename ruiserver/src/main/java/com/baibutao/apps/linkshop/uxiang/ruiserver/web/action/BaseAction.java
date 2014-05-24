@@ -14,6 +14,7 @@ import wint.lang.utils.StringUtil;
 import wint.mvc.flow.FlowData;
 import wint.mvc.template.Context;
 
+import com.baibutao.apps.linkshop.uxiang.ruiserver.biz.dal.dataobject.AdminDO;
 import com.baibutao.apps.linkshop.uxiang.ruiserver.biz.dal.dataobject.enums.RoleEnum;
 import com.baibutao.apps.linkshop.uxiang.ruiserver.web.common.AdminResultCodes;
 import com.baibutao.apps.linkshop.uxiang.ruiserver.web.common.SessionKeys;
@@ -88,9 +89,25 @@ public class BaseAction {
 			result.setResultCode(AdminResultCodes.USER_NOT_LOGIN);
 			return false;
 		}
+		
+		addLoginInfo(result, flowData);
+		
 		return true;
 	}
 	
+	protected void addLoginInfo(Result result, FlowData flowData) {
+		AdminDO adminDO = new AdminDO();
+		HttpSession session = flowData.getSession();
+		Integer roleId = (Integer) session.getAttribute(SessionKeys.ROLE_ID);
+		Long userId = (Long) session.getAttribute(SessionKeys.USER_ID);
+		String userName = (String) session.getAttribute(SessionKeys.USER_NAME);
+		
+		adminDO.setId(userId != null ? userId.longValue() : 0);
+		adminDO.setRoleId(roleId != null ? roleId.intValue() : 0);
+		adminDO.setUserName(userName);
+		result.getModels().put("loginUserDO", adminDO);
+	}
+
 	protected boolean isAdmin(FlowData flowData) {
 		HttpSession session = flowData.getSession();
 		Integer roleId = (Integer) session.getAttribute(SessionKeys.ROLE_ID);
