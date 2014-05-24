@@ -59,7 +59,14 @@ public class Request implements Cloneable {
 	}
 
 	public Request addParameter(String name, Object value) {
-		parameters.add(new Parameter(name, (value == null ? "" : String.valueOf(value))));
+		if (value instanceof List<?>) {
+			List<?> items = (List<?>) value;
+			for (Object item : items) {
+				parameters.add(new Parameter(name, (item == null ? "" : String.valueOf(item))));
+			}
+		} else {
+			parameters.add(new Parameter(name, (value == null ? "" : String.valueOf(value))));
+		}
 		return this;
 	}
 	
