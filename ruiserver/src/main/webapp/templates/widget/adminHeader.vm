@@ -11,9 +11,8 @@
             		<span class="pmt-account-email ng-binding">gimpong@hotmail.com</span>
             	</div>
             	<ul class="account-dropdown-menu hide">
-            		<li><a href="/account/info" target="_self">修改注册信息</a></li>
-            		<li><a ng-click="changePwdHandler()">修改密码</a></li>
-            		<li><a ng-click="logoutHandler()">退出登录</a></li>
+            		<li><a href="$adminModule.setTarget('updatePsw')">修改密码</a></li>
+            		<li><a href="$adminModule.setTarget('quit')" onclick="return confirm('确认要退出登录？');" >退出登录</a></li>
             	</ul>
             </div>
             <!-- TODO: conf mainnav, subnav via attrs -->

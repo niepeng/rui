@@ -21,6 +21,7 @@ import com.baibutao.apps.linkshop.uxiang.ruiserver.biz.dal.dataobject.BannerDO;
 import com.baibutao.apps.linkshop.uxiang.ruiserver.biz.dal.dataobject.CatDO;
 import com.baibutao.apps.linkshop.uxiang.ruiserver.biz.dal.dataobject.KeyValueDO;
 import com.baibutao.apps.linkshop.uxiang.ruiserver.biz.dal.dataobject.UserDO;
+import com.baibutao.apps.linkshop.uxiang.ruiserver.biz.dal.dataobject.enums.APPStsutsEnum;
 import com.baibutao.apps.linkshop.uxiang.ruiserver.biz.dal.dataobject.enums.KeyValueTypeEnum;
 import com.baibutao.apps.linkshop.uxiang.ruiserver.biz.query.AppQuery;
 import com.baibutao.apps.linkshop.uxiang.ruiserver.biz.query.KeyValueQuery;
@@ -175,9 +176,9 @@ public class JsonAOImpl extends BaseAO implements JsonAO {
 			}
 
 			for (String packageName : packages) {
-				AppInfoDO appInfoDO = appInfoDAO.queryByPackageName(packageName);
-				if (appInfoDO != null) {
-					appList.add(appInfoDO);
+				List<AppInfoDO> currentList = appInfoDAO.queryByPackageNameStatus(packageName, APPStsutsEnum.ONLINE.getValue());
+				if (!CollectionUtil.isEmpty(currentList)) {
+					appList.add(currentList.get(0));
 				}
 			}
 		} catch (Exception e) {

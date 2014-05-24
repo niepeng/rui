@@ -16,9 +16,17 @@
 	<form name="admin.register">
 		<field name="userName" label="用户名">
 			<validator type="required" message="${field.label}不能为空。"></validator>
+			<validator type="string" message="${field.label}的长度必须在3~20个字符之间!">
+				<param name="min" value="3" />
+				<param name="max" value="20" />
+			</validator>
 		</field>
 		<field name="psw" label="密码">
 			<validator type="required" message="${field.label}不能为空。"></validator>
+			<validator type="string" message="${field.label}的长度必须在6~20个字符之间!">
+				<param name="min" value="6" />
+				<param name="max" value="20" />
+			</validator>
 		</field>
 		<field name="nick" label="姓名">
 			<validator type="required" message="${field.label}不能为空。"></validator>
@@ -27,6 +35,31 @@
 			<validator type="required" message="${field.label}不能为空。"></validator>
 		</field>
 	</form>
+	
+	<form name="admin.updatepsw">
+		<field name="psw" label="原密码">
+			<validator type="required" message="${field.label}不能为空。"></validator>
+			<validator type="string" message="${field.label}的长度必须在6~20个字符之间!">
+				<param name="min" value="6" />
+				<param name="max" value="20" />
+			</validator>
+		</field>
+		<field name="psw1" label="新密码">
+			<validator type="required" message="${field.label}不能为空。"></validator>
+			<validator type="string" message="${field.label}的长度必须在6~20个字符之间!">
+				<param name="min" value="6" />
+				<param name="max" value="20" />
+			</validator>
+		</field>
+		<field name="psw2" label="确认新密码">
+			<validator type="required" message="${field.label}不能为空。"></validator>
+			<validator type="string" message="${field.label}的长度必须在6~20个字符之间!">
+				<param name="min" value="6" />
+				<param name="max" value="20" />
+			</validator>
+		</field>
+	</form>
+	
 	
 
 	<form name="user.login" extends="user">

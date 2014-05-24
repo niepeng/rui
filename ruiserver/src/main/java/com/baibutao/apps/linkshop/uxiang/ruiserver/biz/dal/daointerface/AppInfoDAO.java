@@ -22,7 +22,9 @@ public interface AppInfoDAO {
     
     public List<AppInfoDO> query(AppQuery query);
     
-    public AppInfoDO queryByPackageName(String packageName);
+    public List<AppInfoDO> queryByPackageName(String packageName);
+    
+    public List<AppInfoDO> queryByPackageNameStatus(String packageName, int status);
     
     public List<AppInfoDO> queryByIds(String ids);
     

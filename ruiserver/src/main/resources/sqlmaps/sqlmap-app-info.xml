@@ -69,6 +69,19 @@ values (now(), #packageName#, #iconUrl#, #info#, #versionValue#, #fileSize#, #su
 			t.package_name = #value#  and t.deleted = 0 
 	</select>
 	
+	<select id="queryByPackageNameStatus" resultMap="appInfoMapping" parameterClass="map">
+		select
+			<include refid="appInfo-full-columns" />
+		from
+			rui_db_app_info t
+		where
+			t.package_name = #packageName#  
+		and 
+			t.deleted = 0 
+		and
+			t.status = #status#
+	</select>
+	
 	<select id="queryByIds" resultMap="appInfoMapping" parameterClass="string">
 		select
 			<include refid="appInfo-full-columns" />

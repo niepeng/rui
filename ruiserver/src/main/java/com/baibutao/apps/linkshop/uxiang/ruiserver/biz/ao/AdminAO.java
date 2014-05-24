@@ -26,6 +26,8 @@ public interface AdminAO {
 	
 	Result register(FlowData flowData, AdminDO adminDO);
 	
+	Result updatePsw(FlowData flowData, AdminDO adminDO);
+	
 	// --------------------------------------------------
 	// -------------  普通用户相关操作 --------------------
 	// --------------------------------------------------

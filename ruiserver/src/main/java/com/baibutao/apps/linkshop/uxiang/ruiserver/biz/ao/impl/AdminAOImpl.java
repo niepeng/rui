@@ -36,7 +36,6 @@ import com.baibutao.apps.linkshop.uxiang.ruiserver.biz.dal.dataobject.KeyValueDO
 import com.baibutao.apps.linkshop.uxiang.ruiserver.biz.dal.dataobject.enums.APPStsutsEnum;
 import com.baibutao.apps.linkshop.uxiang.ruiserver.biz.dal.dataobject.enums.KeyValueTypeEnum;
 import com.baibutao.apps.linkshop.uxiang.ruiserver.biz.dal.dataobject.enums.RoleEnum;
-import com.baibutao.apps.linkshop.uxiang.ruiserver.biz.dal.ibatis.AppInfoDAOIbatis;
 import com.baibutao.apps.linkshop.uxiang.ruiserver.biz.query.AppQuery;
 import com.baibutao.apps.linkshop.uxiang.ruiserver.biz.query.KeyValueQuery;
 import com.baibutao.apps.linkshop.uxiang.ruiserver.web.common.AdminResultCodes;
@@ -135,6 +134,42 @@ public class AdminAOImpl extends BaseAO implements AdminAO {
 
 		} catch (Exception e) {
 			log.error("register error", e);
+		}
+		return result;
+	}
+	
+	@Override
+	public Result updatePsw(FlowData flowData, AdminDO adminDO) {
+		Result result = new ResultSupport(false);
+		try {
+			// 登陆和权限判断
+			if (!ensureUserLogin(result, flowData)) {
+				return result;
+			}
+
+			if (!adminDO.getPsw1().equals(adminDO.getPsw2())) {
+				result.setResultCode(new StringResultCode("2次输入的密码不相同"));
+				return result;
+			}
+
+			long userId = getLoginUserId(flowData);
+			AdminDO fromDB = adminDAO.queryById(userId);
+			if (fromDB == null) {
+				result.setResultCode(new StringResultCode("当前的用户已经不存在了"));
+				return result;
+			}
+
+			if (!fromDB.getPsw().equals(MD5.encrypt(adminDO.getPsw()))) {
+				result.setResultCode(new StringResultCode("原密码错误，请重新输入"));
+				return result;
+			}
+
+			fromDB.setPsw(MD5.encrypt(adminDO.getPsw1()));
+			adminDAO.update(fromDB);
+			result.setSuccess(true);
+
+		} catch (Exception e) {
+			log.error("updatePsw error", e);
 		}
 		return result;
 	}
@@ -268,8 +303,8 @@ public class AdminAOImpl extends BaseAO implements AdminAO {
 			}
 			
 			
-			AppInfoDO fromDB = appInfoDAO.queryByPackageName(appInfoDO.getPackageName());
-			if (fromDB != null && !isUpdateApp) {
+			List<AppInfoDO> dbAppList = appInfoDAO.queryByPackageName(appInfoDO.getPackageName());
+			if (!CollectionUtil.isEmpty(dbAppList) && !isUpdateApp) {
 				result.setResultCode(new StringResultCode("该app已经存在"));
 				return result;
 			}

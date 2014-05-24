@@ -33,6 +33,12 @@ public class AdminDO extends BaseDO {
 	private String phone;
 
 	// -------------- extend attribute -----------------------
+	
+	// 新密码
+	private String psw1;
+	
+	// 确认密码
+	private String psw2;
 
 	// -------------- normal moethod -------------------------
 	
@@ -105,6 +111,22 @@ public class AdminDO extends BaseDO {
 
 	public void setPhone(String phone) {
 		this.phone = phone;
+	}
+
+	public String getPsw1() {
+		return psw1;
+	}
+
+	public void setPsw1(String psw1) {
+		this.psw1 = psw1;
+	}
+
+	public String getPsw2() {
+		return psw2;
+	}
+
+	public void setPsw2(String psw2) {
+		this.psw2 = psw2;
 	}
 	
 }

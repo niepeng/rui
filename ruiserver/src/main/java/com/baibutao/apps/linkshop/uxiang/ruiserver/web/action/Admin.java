@@ -10,7 +10,6 @@ import com.baibutao.apps.linkshop.uxiang.ruiserver.biz.ao.AdminAO;
 import com.baibutao.apps.linkshop.uxiang.ruiserver.biz.bean.UserBean;
 import com.baibutao.apps.linkshop.uxiang.ruiserver.biz.dal.dataobject.AdminDO;
 import com.baibutao.apps.linkshop.uxiang.ruiserver.biz.dal.dataobject.AppInfoDO;
-import com.baibutao.apps.linkshop.uxiang.ruiserver.biz.dal.dataobject.enums.APPStsutsEnum;
 import com.baibutao.apps.linkshop.uxiang.ruiserver.biz.query.AppQuery;
 
 public class Admin extends BaseAction {
@@ -146,6 +145,32 @@ public class Admin extends BaseAction {
 		handleResult(result, flowData, context);
 	}
 	
+	public void updatePsw(FlowData flowData, Context context) {
+		if (!isUserLogin(flowData)) {
+			flowData.redirectTo("adminModule", "login");
+			return;
+		}
+		flowData.setLayout("/admin/login");
+	}
+	
+	/**
+	 * 修改密码
+	 */
+	@Action(defaultTarget="admin/updatePsw") 
+	public void doUpdatePsw(FlowData flowData, Context context) {
+		Form form = flowData.getForm("admin.updatepsw");
+		AdminDO adminDO = new AdminDO();
+		if (!form.apply(adminDO)) {
+			return;
+		}
+
+		Result result = adminAO.updatePsw(flowData, adminDO);
+		if (result.isSuccess()) {
+			flowData.redirectTo("adminModule", "login");
+			return;
+		}
+		handleResult(result, flowData, context);
+	}
 	
 	
 	public void quit(FlowData flowData, Context context) {

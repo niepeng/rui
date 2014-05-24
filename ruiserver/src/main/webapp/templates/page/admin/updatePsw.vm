@@ -1,0 +1,42 @@
+<div class="a-ctn">
+    	<div class="w-container">
+            <div class="w-account-ctn a-module-register">
+				#set($form = $formFactory.getForm('admin.updatepsw'))
+                <form novalidate="" autocomplete="off" action="/admin/doUpdatePsw.htm" method="post">
+                     
+            <fieldset class="a-show-phone">
+                <legend class="h3">修改密码 <span class="w-text-info"> #errorMessage($!resultmessage.message)</span></legend>
+                <div class="w-control-group a-field-password">
+                    <label class="w-text-secondary" for="a-register-password">原密码<span></span></label>
+                    <input class="w-input w-input-block w-input-kaiju js-readable-password" type="password" name="$form.psw.name" value="$!form.psw.value"  placeholder="原密码" id="a-register-password1">
+                   #errorMessage($!form.psw.message)<span class="a-input-clear">×</span>
+                    <div class="w-text-warning a-error"></div>
+                </div>
+               <div class="w-control-group a-field-password">
+                    <label class="w-text-secondary" for="a-register-password">新密码<span></span></label>
+                    <input class="w-input w-input-block w-input-kaiju js-readable-password" type="password" name="$form.psw1.name" value="$!form.psw1.value"  placeholder="新密码" id="a-register-password2">
+                    #errorMessage($!form.psw1.message)<span class="a-input-clear">×</span>
+                    <div class="w-text-warning a-error"></div>
+                </div>
+               <div class="w-control-group a-field-password">
+                    <label class="w-text-secondary" for="a-register-password">确认新密码<span></span></label>
+                    <input class="w-input w-input-block w-input-kaiju js-readable-password" type="password" name="$form.psw2.name" value="$!form.psw2.value"  placeholder="确认新密码" id="a-register-password3">
+                    #errorMessage($!form.psw2.message)<span class="a-input-clear">×</span>
+                    <div class="w-text-warning a-error"></div>
+                </div>
+                <div class="w-control-group a-field-action">
+                    <button class="w-btn w-btn-primary w-btn-kaiju w-btn-block" type="submit">确认修改</button>
+                    <div class="w-text-warning a-error"></div>
+                </div>
+                <div class="w-control-group a-notice w-cf a-hr-bottom">
+                    <a class="a-pull-left js-switch-log" href="$baseModule.setTarget('index')">返回首页</a>
+                    <!--
+					<a class="a-pull-right a-use-email js-register-username-switcher" href="javascript:;">使用 email 注册</a>
+                    <a class="a-pull-right a-use-phone js-register-username-switcher" href="javascript:;">使用手机号注册</a>
+					-->
+                </div>
+            </fieldset>
+        </form>
+    </div>
+        </div>
+    </div>

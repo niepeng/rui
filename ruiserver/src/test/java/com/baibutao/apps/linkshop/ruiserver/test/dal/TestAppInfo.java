@@ -9,6 +9,7 @@ import junit.framework.Assert;
 import com.baibutao.apps.linkshop.ruiserver.test.BaseImageserver;
 import com.baibutao.apps.linkshop.uxiang.ruiserver.biz.dal.daointerface.AppInfoDAO;
 import com.baibutao.apps.linkshop.uxiang.ruiserver.biz.dal.dataobject.AppInfoDO;
+import com.baibutao.apps.linkshop.uxiang.ruiserver.biz.dal.dataobject.enums.APPStsutsEnum;
 import com.baibutao.apps.linkshop.uxiang.ruiserver.biz.query.AppQuery;
 
 /**
@@ -67,12 +68,21 @@ public class TestAppInfo  extends BaseImageserver {
 	}
 	
 	public void testQueryByPackageName() {
-		AppInfoDO appInfoDO = new AppInfoDO();
-		appInfoDO.setPackageName("a.b.c");
-		long id = appInfoDAO.create(appInfoDO);
-		AppInfoDO fromDB = appInfoDAO.queryByPackageName(appInfoDO.getPackageName());
-		Assert.assertTrue(fromDB != null);
-		Assert.assertEquals(fromDB.getId(), id);
+//		AppInfoDO appInfoDO = new AppInfoDO();
+//		appInfoDO.setPackageName("a.b.c");
+//		long id = appInfoDAO.create(appInfoDO);
+//		AppInfoDO fromDB = appInfoDAO.queryByPackageName(appInfoDO.getPackageName());
+//		Assert.assertTrue(fromDB != null);
+//		Assert.assertEquals(fromDB.getId(), id);
+		String packageName = "flipboard.app";
+		List<AppInfoDO> fromDB = appInfoDAO.queryByPackageName(packageName);
+		Assert.assertTrue(!CollectionUtil.isEmpty(fromDB));
+	}
+	
+	public void testQueryByPackageNameStatus() {
+		String packageName = "flipboard.app";
+		List<AppInfoDO> fromDB = appInfoDAO.queryByPackageNameStatus(packageName, APPStsutsEnum.ONLINE.getValue());
+		Assert.assertTrue(!CollectionUtil.isEmpty(fromDB));
 	}
 	
 	public void testQueryByIds() {
