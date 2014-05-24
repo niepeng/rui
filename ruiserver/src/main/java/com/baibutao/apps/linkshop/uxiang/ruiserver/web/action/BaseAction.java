@@ -105,6 +105,9 @@ public class BaseAction {
 		adminDO.setId(userId != null ? userId.longValue() : 0);
 		adminDO.setRoleId(roleId != null ? roleId.intValue() : 0);
 		adminDO.setUserName(userName);
+		if(adminDO.getId() == 0) {
+			return;
+		}
 		result.getModels().put("loginUserDO", adminDO);
 	}
 
