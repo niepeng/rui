@@ -25,6 +25,7 @@ import android.util.DisplayMetrics;
 import android.view.Display;
 import android.view.WindowManager;
 
+import com.rui.android_client.db.Persist;
 import com.rui.android_client.utils.DateUtils;
 import com.rui.android_client.utils.PreferenceUtil;
 import com.rui.android_client.utils.StringUtil;
@@ -40,6 +41,8 @@ public class RuiApp extends Application {
 	public static FinalBitmap fb;
 	
 	public static SharedPreferences mPref;
+	
+	public static Persist mPersist;
 	
 	private boolean needInit = true;
 	
@@ -70,6 +73,8 @@ public class RuiApp extends Application {
 		
 		Config config = Config.getConfig();
 		config.init(this);
+		
+		mPersist = new Persist(context);
 		
 		fb = FinalBitmap.create(this);// 初始化FinalBitmap模块
 		fb.configCompressFormat(CompressFormat.PNG);
