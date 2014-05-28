@@ -23,6 +23,13 @@ public class AppInfoParser {
 		app.setMainTitle(JsonUtil.getString(json, "mainTitle", null));
 		app.setIconUrl(JsonUtil.getString(json, "iconUrl", null));
 		app.setDownUrl(JsonUtil.getString(json, "downUrl", null));
+		app.setVersionValue(JsonUtil.getString(json, "versionValue", null));
+		app.setVersionName(JsonUtil.getString(json, "versionName", null));
+		app.setInfo(JsonUtil.getString(json, "info", null));
+		app.setPackageName(JsonUtil.getString(json, "packageName", null));
+		app.setFileSize(JsonUtil.getInt(json, "fileSize", 0));
+		app.setFirstCatId(JsonUtil.getLong(json, "firstCatId", 0));
+		app.setUpdateInfo(JsonUtil.getString(json, "updateInfo", null));
 		return app;
 	}
 

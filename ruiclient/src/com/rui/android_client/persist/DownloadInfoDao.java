@@ -40,8 +40,8 @@ public class DownloadInfoDao extends BaseDao<DownloadInfo> {
 		ContentValues values = new ContentValues();
 		values.put(THREAD_ID, threadId);
 		values.put(COMPLETE_SIZE, compeleteSize);
-		String updateClause = URL + "=" + urlstr;
-		db.update(tableName, values, updateClause, null);
+		String updateClause = URL + "=?";
+		db.update(tableName, values, updateClause, new String[] { urlstr });
 	}
 
 	/**
@@ -56,17 +56,17 @@ public class DownloadInfoDao extends BaseDao<DownloadInfo> {
 	 * 查看数据库中是否有数据
 	 */
 	public boolean isHasInfors(String url) {
-		String sql = URL + "=" + url;
-		int count = count(sql);
+		String sql = URL + "=?";
+		int count = count(sql, new String[] { url });
 		return count == 0;
 	}
 
 	/**
 	 * 得到下载具体信息
 	 */
-	public List<DownloadInfo> getInfos(String urlstr) {
-		String clause = URL + "=" + urlstr;
-		return findList(clause);
+	public List<DownloadInfo> getInfos(String url) {
+		String clause = URL + "=?";
+		return findList(clause, new String[] { url });
 	}
 
 	@Override

@@ -17,7 +17,11 @@ public abstract class BaseDao<T> {
 	}
 
 	public int count(String clause) {
-		Cursor c = db.query(tableName, colunms(), clause, null, null, null, order());
+		return count(clause, null);
+	}
+	
+	public int count(String clause, String[] values) {
+		Cursor c = db.query(tableName, colunms(), clause, values, null, null, order());
 		int numRows = c.getCount();
 		c.close();
 		return numRows;

@@ -1,8 +1,10 @@
 package com.rui.android_client.activity;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -15,6 +17,9 @@ import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Environment;
+import android.os.Handler;
+import android.os.Message;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -26,9 +31,13 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.rui.android_client.R;
+import com.rui.android_client.download.Downloader;
+import com.rui.android_client.download.LoadInfo;
 import com.rui.android_client.model.AppInfo;
 import com.rui.android_client.parse.AppInfoParser;
 import com.rui.android_client.utils.JsonUtil;
@@ -41,13 +50,21 @@ public class ManagerFragment extends Fragment {
 
 	private RuiApp mApp;
 
+	private String DIR_NAME = "rui";
+	private File rootFile;
+
 	private ArrayList<AppInfo> mAppInfos;
-	private HashMap<String, Integer> mInstalledAppInfosIndex;
+	private ArrayList<String> mInstalledAppInfosIndex;
 
 	private ListView mListView;
 	private ListAdapter mListAdapter;
 
 	private LoadInstalledAppsTask mLoadInstalledAppsTask;
+
+	// 存放各个下载器
+	private Map<String, Downloader> downloaders = new HashMap<String, Downloader>();
+	// 存放与下载器对应的进度条
+	private Map<String, ProgressBar> ProgressBars = new HashMap<String, ProgressBar>();
 
 	public static ManagerFragment newInstance() {
 		ManagerFragment fragment = new ManagerFragment();
@@ -60,11 +77,14 @@ public class ManagerFragment extends Fragment {
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
 		mApp = (RuiApp) getActivity().getApplication();
+
+		rootFile = createDirIfNotExists(DIR_NAME);
+
 		View rootView = inflater.inflate(R.layout.fragment_manager, null);
 		mListView = (ListView) rootView.findViewById(R.id.list_view);
 		mListAdapter = new ListAdapter();
 		mListView.setAdapter(mListAdapter);
-		
+
 		mListView.setOnItemClickListener(new OnItemClickListener() {
 
 			@Override
@@ -74,19 +94,20 @@ public class ManagerFragment extends Fragment {
 				if (app.getId() == 0) {
 					return;
 				}
-				Intent intent = new Intent(getActivity(), AppDetailActivity.class);
+				Intent intent = new Intent(getActivity(),
+						AppDetailActivity.class);
 				intent.putExtra("ID", app.getId());
 				getActivity().startActivity(intent);
 			}
 		});
-		
-		loadInstalledApps();
+
 		return rootView;
 	}
 
 	@Override
 	public void onResume() {
 		super.onResume();
+		loadInstalledApps();
 	}
 
 	private class ListAdapter extends BaseAdapter {
@@ -128,6 +149,7 @@ public class ManagerFragment extends Fragment {
 			public TextView titleView;
 			public Button openBtn;
 			public Button updateBtn;
+			public ProgressBar downloadProgress;
 
 			public ViewHolder(Context context) {
 				super(context);
@@ -136,33 +158,36 @@ public class ManagerFragment extends Fragment {
 				titleView = (TextView) findViewById(R.id.title);
 				openBtn = (Button) findViewById(R.id.open_btn);
 				updateBtn = (Button) findViewById(R.id.update_btn);
+				downloadProgress = (ProgressBar) findViewById(R.id.download_progress);
 
 				openBtn.setOnClickListener(new OpenAppClick());
+				updateBtn.setOnClickListener(new OnUpdateClickListener());
 			}
 
 			public void setViewContent(int position, AppInfo item) {
 				iconView.setImageDrawable(item.getIcon());
 				titleView.setText(item.getMainTitle());
+				updateBtn.setTag(position);
 				if (item.isNeedUpdate()) {
 					updateBtn.setVisibility(View.VISIBLE);
 				} else {
 					updateBtn.setVisibility(View.GONE);
 				}
+				openBtn.setTag(position);
 				if (item.isInstalled()) {
 					openBtn.setVisibility(View.VISIBLE);
 				} else {
 					openBtn.setVisibility(View.GONE);
 				}
-
-				openBtn.setTag(position);
+				downloadProgress.setMax(item.getFileSize());
 			}
 
 			private class OpenAppClick implements View.OnClickListener {
 
 				@Override
 				public void onClick(View v) {
-					AppInfo appInfo = mListAdapter.getItem(Integer
-							.parseInt(v.getTag().toString()));
+					AppInfo appInfo = mListAdapter.getItem(Integer.parseInt(v
+							.getTag().toString()));
 					PackageManager pm = getActivity().getPackageManager();
 					Intent appStartIntent = pm
 							.getLaunchIntentForPackage(appInfo.getPackageName());
@@ -225,18 +250,20 @@ public class ManagerFragment extends Fragment {
 				JSONObject jsonObject = jsonArray.getJSONObject(i);
 				String packageName = JsonUtil.getString(jsonObject,
 						"packageName", null);
-				if (!mInstalledAppInfosIndex.containsKey(packageName)) {
+				if (!mInstalledAppInfosIndex.contains(packageName)) {
 					return;
 				}
-				AppInfo appInfoFromServer = AppInfoParser.getInstance().parse(jsonObject);
+				AppInfo appInfoFromServer = AppInfoParser.getInstance().parse(
+						jsonObject);
 				if (appInfoFromServer == null) {
 					return;
 				}
-				long versionCode = Long.parseLong(appInfoFromServer.getVersionValue());
-				String downUrl = appInfoFromServer.getDownUrl();
-				int index = mInstalledAppInfosIndex.get(packageName);
+				int index = mInstalledAppInfosIndex.indexOf(packageName);
 				AppInfo appInfo = mAppInfos.get(index);
-				if (Integer.parseInt(appInfo.getVersionValue()) < versionCode) {
+				appInfo.setVersionValue(appInfoFromServer.getVersionValue());
+				long newVersionCode = Long.parseLong(appInfo.getVersionValue());
+				String downUrl = appInfoFromServer.getDownUrl();
+				if (appInfo.getLocalVersionCode() < newVersionCode) {
 					appInfo.setNeedUpdate(true);
 				}
 				appInfo.setDownUrl(downUrl);
@@ -257,7 +284,7 @@ public class ManagerFragment extends Fragment {
 
 	private ArrayList<AppInfo> getInstalledApps(boolean includeSysApps) {
 		PackageManager packageManager = getActivity().getPackageManager();
-		mInstalledAppInfosIndex = new HashMap<String, Integer>();
+		mInstalledAppInfosIndex = new ArrayList<String>();
 		ArrayList<AppInfo> res = new ArrayList<AppInfo>();
 		List<PackageInfo> packs = packageManager.getInstalledPackages(0);
 		for (int i = 0; i < packs.size(); i++) {
@@ -274,19 +301,130 @@ public class ManagerFragment extends Fragment {
 			}
 
 			AppInfo appInfo = new AppInfo();
-			appInfo.setMainTitle(pkInfo.applicationInfo.loadLabel(packageManager)
-					.toString());
+			appInfo.setMainTitle(pkInfo.applicationInfo.loadLabel(
+					packageManager).toString());
 			appInfo.setPackageName(packageName);
 			appInfo.setVersionName(pkInfo.versionName);
-			appInfo.setVersionValue(pkInfo.versionCode + "");
+			appInfo.setLocalVersionCode(pkInfo.versionCode);
 			appInfo.setIcon(pkInfo.applicationInfo.loadIcon(packageManager));
 			appInfo.setInstalled(true);
-			
-			mInstalledAppInfosIndex.put(packageName, i);
+
+			mInstalledAppInfosIndex.add(packageName);
 
 			res.add(appInfo);
 		}
 		return res;
+	}
+
+	/**
+	 * 31 * 利用消息处理机制适时更新进度条 32
+	 */
+	private Handler mHandler = new Handler() {
+		public void handleMessage(Message msg) {
+			if (msg.what == 1) {
+				String url = (String) msg.obj;
+				int length = msg.arg1;
+				ProgressBar bar = ProgressBars.get(url);
+				if (bar != null) {
+					// 设置进度条按读取的length长度更新
+					bar.incrementProgressBy(length);
+					if (bar.getProgress() == bar.getMax()) {
+						Toast.makeText(getActivity(), "下载完成！", 0).show();
+						// 下载完成后清除进度条并将map中的数据清空
+						LinearLayout layout = (LinearLayout) bar.getParent();
+						layout.removeView(bar);
+						ProgressBars.remove(url);
+						downloaders.get(url).delete(url);
+						downloaders.get(url).reset();
+						downloaders.remove(url);
+
+					}
+				}
+			}
+		}
+	};
+
+	/**
+	 * 显示进度条
+	 */
+	private void showProgress(LoadInfo loadInfo, String url) {
+		ProgressBar bar = ProgressBars.get(url);
+		if (bar == null) {
+			return;
+		}
+		bar.setMax(loadInfo.getFileSize());
+		bar.setProgress(loadInfo.getComplete());
+	}
+
+	/**
+	 * 响应暂停下载按钮的点击事件
+	 */
+	public void pauseDownload(View v) {
+		// LinearLayout layout = (LinearLayout) v.getParent();
+		// String musicName = ((TextView) layout
+		// .findViewById(R.id.tv_resouce_name)).getText().toString();
+		// String urlstr = URL + musicName;
+		// TODO
+		String urlstr = "";
+		downloaders.get(urlstr).pause();
+	}
+
+	private class OnUpdateClickListener implements View.OnClickListener {
+
+		@Override
+		public void onClick(View v) {
+			startDownload(v);
+		}
+
+	}
+
+	/**
+	 * 83 * 响应开始下载按钮的点击事件 84
+	 */
+	private void startDownload(View v) {
+		int position = Integer.parseInt(v.getTag().toString());
+		AppInfo appInfo = mListAdapter.getItem(position);
+		String urlstr = appInfo.getDownUrl();
+		String localfile = rootFile.getPath() + File.pathSeparator
+				+ appInfo.getPackageName();
+		// 设置下载线程数为4，这里是我为了方便随便固定的
+		int threadcount = mListAdapter.getCount();
+		// 初始化一个downloader下载器
+		Downloader downloader = downloaders.get(urlstr);
+		if (downloader == null) {
+			downloader = new Downloader(urlstr, localfile, threadcount,
+					getActivity(), mHandler);
+			downloaders.put(urlstr, downloader);
+		}
+		if (downloader.isdownloading())
+			return;
+		// 得到下载信息类的个数组成集合
+		LoadInfo loadInfo = downloader.getDownloaderInfors();
+		// 显示进度条
+		// TODO
+		if (ProgressBars.get(urlstr) == null) {
+			ProgressBar bar = (ProgressBar) ((View) v.getParent())
+					.findViewById(R.id.download_progress);
+			ProgressBars.put(urlstr, bar);
+		}
+		showProgress(loadInfo, urlstr);
+		// 调用方法开始下载
+		downloader.download();
+	}
+
+	private File createDirIfNotExists(String path) {
+		boolean success = true;
+
+		File file = new File(Environment.getExternalStorageDirectory(), path);
+		if (!file.exists()) {
+			if (!file.mkdirs()) {
+				success = false;
+			}
+		}
+		if (success) {
+			return file;
+		}
+		return null;
 	}
 
 }

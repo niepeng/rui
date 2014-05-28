@@ -79,6 +79,7 @@ public class AppInfo extends BaseModel {
 	private boolean isInstalled;
 	private boolean isNeedUpdate;
 	private Drawable icon;
+	private int localVersionCode;
 	
 	public long getId() {
 		return id;
@@ -278,6 +279,14 @@ public class AppInfo extends BaseModel {
 	
 	public void setIcon(Drawable icon) {
 		this.icon = icon;
+	}
+	
+	public int getLocalVersionCode() {
+		return localVersionCode;
+	}
+	
+	public void setLocalVersionCode(int localVersionCode) {
+		this.localVersionCode = localVersionCode;
 	}
 
 }
