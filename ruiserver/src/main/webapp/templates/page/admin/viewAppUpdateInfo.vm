@@ -75,9 +75,9 @@
                                 <p class="ng-binding">$dateUtil.format($!appInfoDO.uploadDate, 'yyyy-MM-dd')</p>
                             </td>
                         </tr>
-                        <tr class="sign-row">
-                            <td class="title">签名</td>
-                            <td class="sign">
+                        <tr class="title">
+                            <td class="title"></td>
+                            <td class="date">
                                 <p>#errorMessage($!resultmessage.message)</p>
                             </td>
                         </tr>
@@ -184,7 +184,7 @@
                         				#foreach($cat in $catList)
                         					<option value="$cat.id">$cat.name</option>
                         				#end	
-								   </select>
+								   </select>#errorMessage($!form.firstCatId.message)
                                     <div class="pmt-form-help-inline">准确的分类将大大提高您的应用排名与下载量</div>
                                 </div>
                             </div>
@@ -193,7 +193,7 @@
                                 <div class="pmt-form-controls">
                                     <select class="ng-pristine ng-invalid ng-invalid-required" name="$form.secondCatId.name">
 										<option value="0">请选择二级类目</option>
-									</select>
+									</select>#errorMessage($!form.secondCatId.message)
 								</div>
                             </div>
                         </fieldset>
