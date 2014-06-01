@@ -24,12 +24,16 @@ public class GameFragment extends Fragment {
 		View rootView = inflater.inflate(R.layout.layout_app_listview, null);
 		mListView = new IndexListView(getActivity(),
 				(ListView) rootView.findViewById(R.id.list_view));
-		
+		return rootView;
+	}
+
+	@Override
+	public void onResume() {
+		super.onResume();
 		String url = Config.getConfig().getProperty(Config.Names.GAME_LIST);
 		HashMap<String, Object> params = new HashMap<String, Object>();
 		params.put("type", 1);
 		mListView.loadApps(url, params);
-		return rootView;
 	}
 
 }

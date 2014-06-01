@@ -6,7 +6,7 @@ import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
-import android.support.v4.app.FragmentPagerAdapter;
+import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -31,7 +31,7 @@ public class IndexFragment extends Fragment {
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
-		View rootView = inflater.inflate(R.layout.fragment_index, null);
+		View rootView = inflater.inflate(R.layout.fragment_index, container, false);
 
 		mTabHost = (TabHost) rootView.findViewById(android.R.id.tabhost);
 
@@ -47,6 +47,8 @@ public class IndexFragment extends Fragment {
 					mTabHost.newTabSpec(tabName[i]).setIndicator(getTabView(tabName[i])),
 					tabFragments[i], null);
 		}
+		
+		mTabHost.setCurrentTab(0);
 
 		return rootView;
 	}
@@ -69,7 +71,7 @@ public class IndexFragment extends Fragment {
 	 * switch to the correct paged in the ViewPager whenever the selected tab
 	 * changes.
 	 */
-	public static class TabsAdapter extends FragmentPagerAdapter implements
+	public static class TabsAdapter extends FragmentStatePagerAdapter implements
 			TabHost.OnTabChangeListener, ViewPager.OnPageChangeListener {
 		private final Context mContext;
 		private final TabHost mTabHost;
@@ -164,6 +166,11 @@ public class IndexFragment extends Fragment {
 
 		@Override
 		public void onPageScrollStateChanged(int state) {
+		}
+		
+		@Override
+		public int getItemPosition(Object object) {
+			return POSITION_NONE;
 		}
 	}
 }

@@ -1,7 +1,9 @@
 package com.rui.android_client.activity;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Locale;
 import java.util.Set;
 import java.util.TimeZone;
@@ -9,10 +11,12 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.Future;
 
 import net.tsz.afinal.FinalBitmap;
+import android.R.mipmap;
 import android.app.Activity;
 import android.app.Application;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.PackageManager.NameNotFoundException;
@@ -26,6 +30,8 @@ import android.view.Display;
 import android.view.WindowManager;
 
 import com.rui.android_client.db.Persist;
+import com.rui.android_client.model.AppInfo;
+import com.rui.android_client.utils.CollectionUtil;
 import com.rui.android_client.utils.DateUtils;
 import com.rui.android_client.utils.PreferenceUtil;
 import com.rui.android_client.utils.StringUtil;
@@ -56,6 +62,9 @@ public class RuiApp extends Application {
 	private AsynchronizedInvoke asynchronizedInvoke;
 	
 	private TelephonyManager telephonyManager;
+	
+	private static ArrayList<String> mInstalledAppPackageNames = new ArrayList<String>();
+	private static ArrayList<AppInfo> mInstalledApps = new ArrayList<AppInfo>();
 	
 	@Override
 	public void onCreate() {
@@ -89,6 +98,38 @@ public class RuiApp extends Application {
 		mPref = getSharedPreferences(PreferenceUtil.SP_NAME, MODE_PRIVATE);
 		
 		needInit = false;
+	}
+	
+	public boolean isAppInstalled(String packageName) {
+		if(CollectionUtil.isEmpty(mInstalledAppPackageNames)) {
+			mInstalledAppPackageNames = new ArrayList<String>();
+			for (AppInfo item : getInstalledAppInfos()) {
+				mInstalledAppPackageNames.add(item.getPackageName());
+			}
+		}
+		return mInstalledAppPackageNames.contains(packageName);
+	}
+	
+	public AppInfo getInstalledAppInfo(String packageName) {
+		if (isAppInstalled(packageName)) {
+			int index = mInstalledAppPackageNames.indexOf(packageName);
+			if (index >= 0 && index < mInstalledApps.size()) {
+				return mInstalledApps.get(index);
+			}
+		}
+		return null;
+	}
+	
+	public void setInstalledApps(ArrayList<AppInfo> installedApps) {
+		mInstalledApps = installedApps;
+		mInstalledAppPackageNames = null;
+	}
+	
+	public ArrayList<AppInfo> getInstalledAppInfos() {
+		if (CollectionUtil.isEmpty(mInstalledApps)) {
+			initInstalledApps(false);
+		}
+		return mInstalledApps;
 	}
 	
 	public static void getScreenSize() {
@@ -265,6 +306,39 @@ public class RuiApp extends Application {
 	
 	private void addDevice(String deviceId) {
 		PreferenceUtil.addDeviceId(deviceId);
+	}
+	
+	private void initInstalledApps(boolean includeSysApps) {
+		ArrayList<AppInfo> installedApps = new ArrayList<AppInfo>();
+		PackageManager packageManager = getPackageManager();
+		List<PackageInfo> packs = packageManager.getInstalledPackages(0);
+		ArrayList<String> installedPackages = new ArrayList<String>();
+		for (int i = 0; i < packs.size(); i++) {
+			PackageInfo pkInfo = packs.get(i);
+
+			if ((!includeSysApps)
+					&& ((pkInfo.applicationInfo.flags & ApplicationInfo.FLAG_SYSTEM) == 1)) {
+				continue;
+			}
+			String packageName = pkInfo.packageName;
+
+			if (packageManager.getLaunchIntentForPackage(packageName) == null) {
+				continue;
+			}
+
+			installedPackages.add(packageName);
+
+			AppInfo appInfo = new AppInfo();
+			appInfo.setMainTitle(pkInfo.applicationInfo.loadLabel(packageManager)
+					.toString());
+			appInfo.setPackageName(packageName);
+			appInfo.setVersionName(pkInfo.versionName);
+			appInfo.setLocalVersionCode(pkInfo.versionCode);
+			appInfo.setIcon(pkInfo.applicationInfo.loadIcon(packageManager));
+			
+			installedApps.add(appInfo);
+		}
+		setInstalledApps(installedApps);
 	}
 
 }

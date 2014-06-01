@@ -2,12 +2,12 @@ package com.rui.android_client.parse;
 
 import org.json.JSONObject;
 
+import com.rui.android_client.activity.RuiApp;
 import com.rui.android_client.model.AppInfo;
 import com.rui.android_client.utils.JsonUtil;
 
-
 public class AppInfoParser {
-	
+
 	private static AppInfoParser mParser;
 
 	public static AppInfoParser getInstance() {
@@ -16,7 +16,7 @@ public class AppInfoParser {
 		}
 		return mParser;
 	}
-	
+
 	public AppInfo parse(JSONObject json) {
 		AppInfo app = new AppInfo();
 		app.setId(JsonUtil.getLong(json, "id", 0));
@@ -30,6 +30,18 @@ public class AppInfoParser {
 		app.setFileSize(JsonUtil.getInt(json, "fileSize", 0));
 		app.setFirstCatId(JsonUtil.getLong(json, "firstCatId", 0));
 		app.setUpdateInfo(JsonUtil.getString(json, "updateInfo", null));
+
+		RuiApp ruiApp  = (RuiApp) RuiApp.context.getApplicationContext();
+		if (ruiApp.isAppInstalled(app.getPackageName())) {
+			app.setInstalled(true);
+			AppInfo installedApp = ruiApp.getInstalledAppInfo(app
+					.getPackageName());
+			if (installedApp.getLocalVersionCode() < Long.parseLong(app
+					.getVersionValue())) {
+				app.setNeedUpdate(true);
+			}
+		}
+
 		return app;
 	}
 

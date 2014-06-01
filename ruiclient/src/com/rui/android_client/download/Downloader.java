@@ -28,9 +28,10 @@ public class Downloader {
 	private static final int PAUSE = 3;
 	private int state = INIT;
 
-	public Downloader(String urlstr, String localfile, int threadcount,
+	public Downloader(String urlstr, int fileSize, String localfile, int threadcount,
 			Context context, Handler mHandler) {
 		this.urlstr = urlstr;
+		this.fileSize = fileSize;
 		this.localfile = localfile;
 		this.threadcount = threadcount;
 		this.mHandler = mHandler;
@@ -39,17 +40,20 @@ public class Downloader {
 	/**
 	 * 判断是否正在下载
 	 */
-	public boolean isdownloading() {
+	public boolean isDownloading() {
 		return state == DOWNLOADING;
 	}
-
+	
+	public boolean isPause () {
+		return state == PAUSE;
+	}
 	/**
 	 * 得到downloader里的信息 首先进行判断是否是第一次下载，如果是第一次就要进行初始化，并将下载器的信息保存到数据库中
 	 * 如果不是第一次下载，那就要从数据库中读出之前下载的信息（起始位置，结束为止，文件大小等），并将下载信息返回给下载器
 	 */
 	public LoadInfo getDownloaderInfors() {
 		if (isFirst(urlstr)) {
-			init();
+//			init();
 			int range = fileSize / threadcount;
 			infos = new ArrayList<DownloadInfo>();
 			for (int i = 0; i < threadcount - 1; i++) {

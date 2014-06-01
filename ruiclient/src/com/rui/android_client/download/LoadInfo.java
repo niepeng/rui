@@ -2,9 +2,9 @@ package com.rui.android_client.download;
 
 public class LoadInfo {
 
-	public int fileSize;// �ļ���С
-	private int complete;// ��ɶ�
-	private String urlstring;// ��������ʶ
+	public int fileSize;// 文件大小
+	private int complete;// 完成度
+	private String urlstring;// 下载器标识
 	public LoadInfo() {
 		super();
 		// TODO Auto-generated constructor stub

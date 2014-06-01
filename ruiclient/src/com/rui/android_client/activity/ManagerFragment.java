@@ -3,7 +3,6 @@ package com.rui.android_client.activity;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import org.json.JSONArray;
@@ -12,8 +11,6 @@ import org.json.JSONObject;
 
 import android.content.Context;
 import android.content.Intent;
-import android.content.pm.ApplicationInfo;
-import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -54,7 +51,6 @@ public class ManagerFragment extends Fragment {
 	private File rootFile;
 
 	private ArrayList<AppInfo> mAppInfos;
-	private ArrayList<String> mInstalledAppInfosIndex;
 
 	private ListView mListView;
 	private ListAdapter mListAdapter;
@@ -168,18 +164,21 @@ public class ManagerFragment extends Fragment {
 				iconView.setImageDrawable(item.getIcon());
 				titleView.setText(item.getMainTitle());
 				updateBtn.setTag(position);
+				openBtn.setTag(position);
 				if (item.isNeedUpdate()) {
 					updateBtn.setVisibility(View.VISIBLE);
+					openBtn.setVisibility(View.GONE);
 				} else {
 					updateBtn.setVisibility(View.GONE);
-				}
-				openBtn.setTag(position);
-				if (item.isInstalled()) {
 					openBtn.setVisibility(View.VISIBLE);
-				} else {
-					openBtn.setVisibility(View.GONE);
 				}
-				downloadProgress.setMax(item.getFileSize());
+				Downloader downloader = downloaders.get(item.getDownUrl());
+				if (downloader != null && (downloader.isDownloading()|| downloader.isPause())) {
+					downloadProgress.setVisibility(View.VISIBLE);
+					downloadProgress.setMax(item.getFileSize());
+				} else {
+					downloadProgress.setVisibility(View.GONE);
+				}
 			}
 
 			private class OpenAppClick implements View.OnClickListener {
@@ -219,7 +218,7 @@ public class ManagerFragment extends Fragment {
 
 		@Override
 		protected Void doInBackground(Void... params) {
-			mAppInfos = getInstalledApps(false);
+			mAppInfos = mApp.getInstalledAppInfos();
 			String url = Config.getConfig().getProperty(
 					Config.Names.INSTALLED_APPS_PACKAGE);
 			ArrayList<String> packageNames = new ArrayList<String>();
@@ -250,16 +249,12 @@ public class ManagerFragment extends Fragment {
 				JSONObject jsonObject = jsonArray.getJSONObject(i);
 				String packageName = JsonUtil.getString(jsonObject,
 						"packageName", null);
-				if (!mInstalledAppInfosIndex.contains(packageName)) {
-					return;
-				}
 				AppInfo appInfoFromServer = AppInfoParser.getInstance().parse(
 						jsonObject);
 				if (appInfoFromServer == null) {
 					return;
 				}
-				int index = mInstalledAppInfosIndex.indexOf(packageName);
-				AppInfo appInfo = mAppInfos.get(index);
+				AppInfo appInfo = mApp.getInstalledAppInfo(packageName);
 				appInfo.setVersionValue(appInfoFromServer.getVersionValue());
 				long newVersionCode = Long.parseLong(appInfo.getVersionValue());
 				String downUrl = appInfoFromServer.getDownUrl();
@@ -268,6 +263,7 @@ public class ManagerFragment extends Fragment {
 				}
 				appInfo.setDownUrl(downUrl);
 				appInfo.setId(appInfoFromServer.getId());
+				appInfo.setFileSize(appInfoFromServer.getFileSize());
 			} catch (JSONException e) {
 				e.printStackTrace();
 			}
@@ -280,40 +276,6 @@ public class ManagerFragment extends Fragment {
 			mLoadInstalledAppsTask = null;
 		}
 
-	}
-
-	private ArrayList<AppInfo> getInstalledApps(boolean includeSysApps) {
-		PackageManager packageManager = getActivity().getPackageManager();
-		mInstalledAppInfosIndex = new ArrayList<String>();
-		ArrayList<AppInfo> res = new ArrayList<AppInfo>();
-		List<PackageInfo> packs = packageManager.getInstalledPackages(0);
-		for (int i = 0; i < packs.size(); i++) {
-			PackageInfo pkInfo = packs.get(i);
-
-			if ((!includeSysApps)
-					&& ((pkInfo.applicationInfo.flags & ApplicationInfo.FLAG_SYSTEM) == 1)) {
-				continue;
-			}
-			String packageName = pkInfo.packageName;
-
-			if (packageManager.getLaunchIntentForPackage(packageName) == null) {
-				continue;
-			}
-
-			AppInfo appInfo = new AppInfo();
-			appInfo.setMainTitle(pkInfo.applicationInfo.loadLabel(
-					packageManager).toString());
-			appInfo.setPackageName(packageName);
-			appInfo.setVersionName(pkInfo.versionName);
-			appInfo.setLocalVersionCode(pkInfo.versionCode);
-			appInfo.setIcon(pkInfo.applicationInfo.loadIcon(packageManager));
-			appInfo.setInstalled(true);
-
-			mInstalledAppInfosIndex.add(packageName);
-
-			res.add(appInfo);
-		}
-		return res;
 	}
 
 	/**
@@ -337,7 +299,6 @@ public class ManagerFragment extends Fragment {
 						downloaders.get(url).delete(url);
 						downloaders.get(url).reset();
 						downloaders.remove(url);
-
 					}
 				}
 			}
@@ -352,6 +313,7 @@ public class ManagerFragment extends Fragment {
 		if (bar == null) {
 			return;
 		}
+		bar.setVisibility(View.VISIBLE);
 		bar.setMax(loadInfo.getFileSize());
 		bar.setProgress(loadInfo.getComplete());
 	}
@@ -387,23 +349,22 @@ public class ManagerFragment extends Fragment {
 		String urlstr = appInfo.getDownUrl();
 		String localfile = rootFile.getPath() + File.pathSeparator
 				+ appInfo.getPackageName();
-		// 设置下载线程数为4，这里是我为了方便随便固定的
 		int threadcount = mListAdapter.getCount();
 		// 初始化一个downloader下载器
 		Downloader downloader = downloaders.get(urlstr);
 		if (downloader == null) {
-			downloader = new Downloader(urlstr, localfile, threadcount,
-					getActivity(), mHandler);
+			downloader = new Downloader(urlstr, appInfo.getFileSize(),
+					localfile, threadcount, getActivity(), mHandler);
 			downloaders.put(urlstr, downloader);
 		}
-		if (downloader.isdownloading())
+		if (downloader.isDownloading())
 			return;
 		// 得到下载信息类的个数组成集合
 		LoadInfo loadInfo = downloader.getDownloaderInfors();
 		// 显示进度条
 		// TODO
 		if (ProgressBars.get(urlstr) == null) {
-			ProgressBar bar = (ProgressBar) ((View) v.getParent())
+			ProgressBar bar = (ProgressBar) ((View) v.getParent().getParent())
 					.findViewById(R.id.download_progress);
 			ProgressBars.put(urlstr, bar);
 		}

@@ -10,6 +10,7 @@ import org.json.JSONObject;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,9 +19,11 @@ import android.widget.AbsListView.OnScrollListener;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.BaseAdapter;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.rui.android_client.R;
@@ -64,7 +67,7 @@ public class AppListView {
 		footerView = View.inflate(activity, R.layout.listview_foot, null);
 		mListView.addFooterView(footerView);
 		footerView.setVisibility(View.GONE);
-		
+
 		initAdapter();
 
 		mListView.setOnScrollListener(mOnScrollListener);
@@ -76,7 +79,7 @@ public class AppListView {
 		mParams = params;
 		loadMore();
 	}
-	
+
 	protected void initAdapter() {
 		mAdapter = new ListAdapter();
 		mListView.setAdapter(mAdapter);
@@ -111,41 +114,77 @@ public class AppListView {
 				holder = (AppInfoViewHolder) convertView;
 			}
 			AppInfo app = getItem(position);
-			holder.setViewContent(app);
+			holder.setViewContent(position, app);
 			return holder;
 		}
 
 	}
-	
+
 	protected class ViewHolder extends LinearLayout {
 
 		public ViewHolder(Context context) {
 			super(context);
 		}
 
-		public void setViewContent(BaseModel item) {
+		public void setViewContent(int position, BaseModel item) {
 		}
 
 	}
-	
+
 	protected class AppInfoViewHolder extends ViewHolder {
 
 		public ImageView iconView;
 		public TextView titleView;
+		public Button openBtn;
+		public Button updateBtn;
+		public ProgressBar downloadProgress;
 
 		public AppInfoViewHolder(Context context) {
 			super(context);
 			View.inflate(context, R.layout.layout_app_listview_item, this);
 			iconView = (ImageView) findViewById(R.id.icon);
 			titleView = (TextView) findViewById(R.id.title);
+			openBtn = (Button) findViewById(R.id.open_btn);
+			updateBtn = (Button) findViewById(R.id.update_btn);
+			downloadProgress = (ProgressBar) findViewById(R.id.download_progress);
+
+			openBtn.setOnClickListener(new OpenAppClick());
+			// updateBtn.setOnClickListener(new OnUpdateClickListener());
+
 		}
 
 		@Override
-		public void setViewContent(BaseModel item) {
+		public void setViewContent(int position, BaseModel item) {
 			AppInfo app = (AppInfo) item;
 			// 异步加载图片
 			RuiApp.fb.display(iconView, app.getIconUrl());
 			titleView.setText(app.getMainTitle());
+
+			updateBtn.setTag(position);
+			openBtn.setTag(position);
+			if (app.isNeedUpdate()) {
+				updateBtn.setVisibility(View.VISIBLE);
+				openBtn.setVisibility(View.GONE);
+			} else {
+				updateBtn.setVisibility(View.GONE);
+				openBtn.setVisibility(View.VISIBLE);
+			}
+		}
+
+		private class OpenAppClick implements View.OnClickListener {
+
+			@Override
+			public void onClick(View v) {
+				AppInfo appInfo = mAdapter.getItem(Integer.parseInt(v.getTag()
+						.toString()));
+				PackageManager pm = mActivity.getPackageManager();
+				Intent appStartIntent = pm.getLaunchIntentForPackage(appInfo
+						.getPackageName());
+				if (null != appStartIntent) {
+					mActivity.startActivity(appStartIntent);
+				}
+			}
+
 		}
 
 	}
@@ -176,7 +215,7 @@ public class AppListView {
 		if (StringUtil.isBlank(mDownloadUrl)) {
 			new Thread(" app listview url is blank!");
 		}
- 		if (isLoading) {
+		if (isLoading) {
 			return;
 		}
 		isLoading = true;
@@ -185,7 +224,7 @@ public class AppListView {
 		RemoteManager remoteManager = RemoteManager.getPostOnceRemoteManager();
 		Request request = remoteManager.createPostRequest(mDownloadUrl);
 		if (mParams != null) {
-			for(String keyword : mParams.keySet()) {
+			for (String keyword : mParams.keySet()) {
 				request.addParameter(keyword, mParams.get(keyword));
 			}
 		}
@@ -221,7 +260,7 @@ public class AppListView {
 		}
 
 	}
-	
+
 	protected void parseCallbackBody(final Response response) {
 		JSONObject json = JsonUtil.getJsonObject(response.getModel());
 		JSONArray jsonArray = JsonUtil.getJsonArray(json, "data");
@@ -229,7 +268,9 @@ public class AppListView {
 			for (int i = 0, size = jsonArray.length(); i < size; i++) {
 				try {
 					JSONObject jsonObject = jsonArray.getJSONObject(i);
-					mAppInfos.add(AppInfoParser.getInstance().parse(jsonObject));
+					AppInfo appInfo = AppInfoParser.getInstance().parse(
+							jsonObject);
+					mAppInfos.add(appInfo);
 				} catch (JSONException e) {
 					e.printStackTrace();
 				}
