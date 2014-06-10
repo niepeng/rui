@@ -40,6 +40,8 @@
         <activity android:name="com.rui.android_client.activity.UpdateClientActivity" />
         <activity android:name="com.rui.android_client.activity.AboutUsActivity" />
         <activity android:name="com.rui.android_client.activity.FeedbackActivity" />
+        
+        <service android:name="com.rui.android_client.service.DownloadService" android:enabled="true" />
     </application>
 
 </manifest>

@@ -83,7 +83,7 @@ public class Config {
 		String FEEDBACK_URL = "feedback.url";
 		String SEARCH_URL = "search.url";
 		String APP_DETAIL_URL = "app.detail.url";
-		String GAME_LIST = "applist.game.url";
+		String INDEX_APP_LIST = "index.applist.url";
 		String CAT_LIST_URL = "cat.list.url";
 		String APP_LIST = "applist.url";
 		String INSTALLED_APPS_PACKAGE = "installed.apps.package";

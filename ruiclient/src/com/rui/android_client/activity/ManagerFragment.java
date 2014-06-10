@@ -57,8 +57,8 @@ public class ManagerFragment extends Fragment {
 
 	private LoadInstalledAppsTask mLoadInstalledAppsTask;
 
-	// 存放各个下载器
-	private Map<String, Downloader> downloaders = new HashMap<String, Downloader>();
+//	// 存放各个下载器
+//	private Map<String, Downloader> downloaders = new HashMap<String, Downloader>();
 	// 存放与下载器对应的进度条
 	private Map<String, ProgressBar> ProgressBars = new HashMap<String, ProgressBar>();
 
@@ -172,13 +172,14 @@ public class ManagerFragment extends Fragment {
 					updateBtn.setVisibility(View.GONE);
 					openBtn.setVisibility(View.VISIBLE);
 				}
-				Downloader downloader = downloaders.get(item.getDownUrl());
-				if (downloader != null && (downloader.isDownloading()|| downloader.isPause())) {
-					downloadProgress.setVisibility(View.VISIBLE);
-					downloadProgress.setMax(item.getFileSize());
-				} else {
-					downloadProgress.setVisibility(View.GONE);
-				}
+//				Downloader downloader = downloaders.get(item.getDownUrl());
+//				if (downloader != null
+//						&& (downloader.isDownloading() || downloader.isPause())) {
+//					downloadProgress.setVisibility(View.VISIBLE);
+//					downloadProgress.setMax(item.getFileSize());
+//				} else {
+//					downloadProgress.setVisibility(View.GONE);
+//				}
 			}
 
 			private class OpenAppClick implements View.OnClickListener {
@@ -284,23 +285,23 @@ public class ManagerFragment extends Fragment {
 	private Handler mHandler = new Handler() {
 		public void handleMessage(Message msg) {
 			if (msg.what == 1) {
-				String url = (String) msg.obj;
-				int length = msg.arg1;
-				ProgressBar bar = ProgressBars.get(url);
-				if (bar != null) {
-					// 设置进度条按读取的length长度更新
-					bar.incrementProgressBy(length);
-					if (bar.getProgress() == bar.getMax()) {
-						Toast.makeText(getActivity(), "下载完成！", 0).show();
-						// 下载完成后清除进度条并将map中的数据清空
-						LinearLayout layout = (LinearLayout) bar.getParent();
-						layout.removeView(bar);
-						ProgressBars.remove(url);
-						downloaders.get(url).delete(url);
-						downloaders.get(url).reset();
-						downloaders.remove(url);
-					}
-				}
+//				String url = (String) msg.obj;
+//				int length = msg.arg1;
+//				ProgressBar bar = ProgressBars.get(url);
+//				if (bar != null) {
+//					// 设置进度条按读取的length长度更新
+//					bar.incrementProgressBy(length);
+//					if (bar.getProgress() == bar.getMax()) {
+//						Toast.makeText(getActivity(), "下载完成！", 0).show();
+//						// 下载完成后清除进度条并将map中的数据清空
+//						LinearLayout layout = (LinearLayout) bar.getParent();
+//						layout.removeView(bar);
+//						ProgressBars.remove(url);
+//						downloaders.get(url).delete(url);
+//						downloaders.get(url).reset();
+//						downloaders.remove(url);
+//					}
+//				}
 			}
 		}
 	};
@@ -327,8 +328,8 @@ public class ManagerFragment extends Fragment {
 		// .findViewById(R.id.tv_resouce_name)).getText().toString();
 		// String urlstr = URL + musicName;
 		// TODO
-		String urlstr = "";
-		downloaders.get(urlstr).pause();
+//		String urlstr = "";
+//		downloaders.get(urlstr).pause();
 	}
 
 	private class OnUpdateClickListener implements View.OnClickListener {
@@ -348,29 +349,37 @@ public class ManagerFragment extends Fragment {
 		AppInfo appInfo = mListAdapter.getItem(position);
 		String urlstr = appInfo.getDownUrl();
 		String localfile = rootFile.getPath() + File.pathSeparator
-				+ appInfo.getPackageName();
-		int threadcount = mListAdapter.getCount();
-		// 初始化一个downloader下载器
-		Downloader downloader = downloaders.get(urlstr);
-		if (downloader == null) {
-			downloader = new Downloader(urlstr, appInfo.getFileSize(),
-					localfile, threadcount, getActivity(), mHandler);
-			downloaders.put(urlstr, downloader);
-		}
-		if (downloader.isDownloading())
-			return;
-		// 得到下载信息类的个数组成集合
-		LoadInfo loadInfo = downloader.getDownloaderInfors();
-		// 显示进度条
-		// TODO
-		if (ProgressBars.get(urlstr) == null) {
-			ProgressBar bar = (ProgressBar) ((View) v.getParent().getParent())
-					.findViewById(R.id.download_progress);
-			ProgressBars.put(urlstr, bar);
-		}
-		showProgress(loadInfo, urlstr);
-		// 调用方法开始下载
-		downloader.download();
+				+ appInfo.getPackageName() + ".apk";
+		
+		Intent intent = new Intent();
+		intent.setClass(getActivity(), com.rui.android_client.service.DownloadService.class);
+		intent.putExtra("fileName", localfile);
+		intent.putExtra("downloadUrl", urlstr);
+		intent.putExtra("flag","setState");//标志着数据从localdownactivity传送
+		getActivity().startService(intent);//这里启动service
+		
+//		int threadcount = 4;
+//		// 初始化一个downloader下载器
+//		Downloader downloader = downloaders.get(urlstr);
+//		if (downloader == null) {
+//			downloader = new Downloader(urlstr, localfile, threadcount,
+//					getActivity(), mHandler);
+//			downloaders.put(urlstr, downloader);
+//		}
+//		if (downloader.isDownloading())
+//			return;
+//		// 得到下载信息类的个数组成集合
+//		LoadInfo loadInfo = downloader.getDownloaderInfors();
+//		// 显示进度条
+//		// TODO
+//		if (ProgressBars.get(urlstr) == null) {
+//			ProgressBar bar = (ProgressBar) ((View) v.getParent().getParent())
+//					.findViewById(R.id.download_progress);
+//			ProgressBars.put(urlstr, bar);
+//		}
+//		showProgress(loadInfo, urlstr);
+//		// 调用方法开始下载
+//		downloader.download();
 	}
 
 	private File createDirIfNotExists(String path) {

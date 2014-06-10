@@ -1,10 +1,13 @@
 package com.rui.android_client.download;
 
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.io.RandomAccessFile;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -15,10 +18,14 @@ import android.util.Log;
 
 import com.rui.android_client.activity.RuiApp;
 import com.rui.android_client.model.DownloadInfo;
+import com.rui.android_client.utils.IoUtil;
 
 public class Downloader {
+	
+	private static final int LEN = 1024;
+	
 	private String urlstr;// 下载的地址
-	private String localfile;// 保存路径
+	private String savePath;// 保存路径
 	private int threadcount;// 线程数
 	private Handler mHandler;// 消息处理器
 	private int fileSize;// 所要下载的文件的大小
@@ -28,11 +35,10 @@ public class Downloader {
 	private static final int PAUSE = 3;
 	private int state = INIT;
 
-	public Downloader(String urlstr, int fileSize, String localfile, int threadcount,
+	public Downloader(String urlstr, String savePath, int threadcount,
 			Context context, Handler mHandler) {
 		this.urlstr = urlstr;
-		this.fileSize = fileSize;
-		this.localfile = localfile;
+		this.savePath = savePath;
 		this.threadcount = threadcount;
 		this.mHandler = mHandler;
 	}
@@ -53,7 +59,7 @@ public class Downloader {
 	 */
 	public LoadInfo getDownloaderInfors() {
 		if (isFirst(urlstr)) {
-//			init();
+			init();
 			int range = fileSize / threadcount;
 			infos = new ArrayList<DownloadInfo>();
 			for (int i = 0; i < threadcount - 1; i++) {
@@ -62,7 +68,7 @@ public class Downloader {
 				infos.add(info);
 			}
 			DownloadInfo info = new DownloadInfo(threadcount - 1,
-					(threadcount - 1) * range, fileSize - 1, 0, urlstr);
+					(threadcount - 1) * range, fileSize, 0, urlstr);
 			infos.add(info);
 			// 保存infos中的数据到数据库
 			RuiApp.mPersist.downloadInfoDao.saveInfos(infos);
@@ -93,7 +99,7 @@ public class Downloader {
 			connection.setConnectTimeout(5000);
 			connection.setRequestMethod("GET");
 			fileSize = connection.getContentLength();
-			File file = new File(localfile);
+			File file = new File(savePath);
 			if (!file.exists()) {
 				file.createNewFile();
 			}
@@ -160,10 +166,11 @@ public class Downloader {
 				connection.setRequestProperty("Range", "bytes="
 						+ (startPos + compeleteSize) + "-" + endPos);
 
-				randomAccessFile = new RandomAccessFile(localfile, "rwd");
+				randomAccessFile = new RandomAccessFile(savePath, "rwd");
 				randomAccessFile.seek(startPos + compeleteSize);
 				// 将要下载的文件写到保存在保存路径下的文件中
 				is = connection.getInputStream();
+				
 				byte[] buffer = new byte[4096];
 				int length = -1;
 				while ((length = is.read(buffer)) != -1) {

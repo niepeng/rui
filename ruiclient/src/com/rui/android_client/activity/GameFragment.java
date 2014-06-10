@@ -30,7 +30,7 @@ public class GameFragment extends Fragment {
 	@Override
 	public void onResume() {
 		super.onResume();
-		String url = Config.getConfig().getProperty(Config.Names.GAME_LIST);
+		String url = Config.getConfig().getProperty(Config.Names.INDEX_APP_LIST);
 		HashMap<String, Object> params = new HashMap<String, Object>();
 		params.put("type", 1);
 		mListView.loadApps(url, params);

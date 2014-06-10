@@ -25,7 +25,7 @@ public class FineRecommendedFragment extends Fragment {
 		mListView = new IndexListView(getActivity(),
 				(ListView) rootView.findViewById(R.id.list_view));
 		
-		String url = Config.getConfig().getProperty(Config.Names.GAME_LIST);
+		String url = Config.getConfig().getProperty(Config.Names.INDEX_APP_LIST);
 		HashMap<String, Object> params = new HashMap<String, Object>();
 		params.put("type", 2);
 		mListView.loadApps(url, params);
