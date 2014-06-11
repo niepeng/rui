@@ -1,6 +1,7 @@
 package com.rui.android_client.model;
 
 import java.util.Calendar;
+import java.util.List;
 
 import android.graphics.drawable.Drawable;
 
@@ -80,6 +81,7 @@ public class AppInfo extends BaseModel {
 	private boolean isNeedUpdate;
 	private Drawable icon;
 	private int localVersionCode;
+	private List<DownloadInfo> downloadInfos;
 	
 	public long getId() {
 		return id;
@@ -287,6 +289,14 @@ public class AppInfo extends BaseModel {
 	
 	public void setLocalVersionCode(int localVersionCode) {
 		this.localVersionCode = localVersionCode;
+	}
+	
+	public List<DownloadInfo> getDownloadInfos() {
+		return downloadInfos;
+	}
+	
+	public void setDownloadInfos(List<DownloadInfo> downloadInfos) {
+		this.downloadInfos = downloadInfos;
 	}
 
 }

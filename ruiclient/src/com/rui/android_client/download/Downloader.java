@@ -1,13 +1,10 @@
 package com.rui.android_client.download;
 
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.InputStream;
-import java.io.OutputStream;
 import java.io.RandomAccessFile;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -18,7 +15,6 @@ import android.util.Log;
 
 import com.rui.android_client.activity.RuiApp;
 import com.rui.android_client.model.DownloadInfo;
-import com.rui.android_client.utils.IoUtil;
 
 public class Downloader {
 	
@@ -183,7 +179,8 @@ public class Downloader {
 					Message message = Message.obtain();
 					message.what = 1;
 					message.obj = urlstr;
-					message.arg1 = length;
+					message.arg1 = fileSize;
+					message.arg2 = compeleteSize;
 					mHandler.sendMessage(message);
 					if (state == PAUSE) {
 						return;

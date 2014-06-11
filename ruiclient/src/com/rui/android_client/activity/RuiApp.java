@@ -31,6 +31,7 @@ import android.view.WindowManager;
 
 import com.rui.android_client.db.Persist;
 import com.rui.android_client.model.AppInfo;
+import com.rui.android_client.model.DownloadInfo;
 import com.rui.android_client.utils.CollectionUtil;
 import com.rui.android_client.utils.DateUtils;
 import com.rui.android_client.utils.PreferenceUtil;

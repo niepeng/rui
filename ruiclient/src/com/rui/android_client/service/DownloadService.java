@@ -14,6 +14,8 @@ import com.rui.android_client.download.Downloader;
 import com.rui.android_client.download.LoadInfo;
 
 public class DownloadService extends Service {
+	
+	public static final String ACTION_UPDATE_PROGRESS = "com.rui.android_client.service.DownloadService.UPDATE_PROGRESS";
 
 	// 存放各个下载器
 	private Map<String, Downloader> downloaders = new HashMap<String, Downloader>();
@@ -81,11 +83,20 @@ public class DownloadService extends Service {
 		public void handleMessage(Message msg) {
 			if (msg.what == 1) {
 				String url = (String) msg.obj;
-				int length = msg.arg1;
-
-				// TODO
-
+				int fileSize = msg.arg1;
+				int completedSize = msg.arg2;
+				
+				Downloader downloader = downloaders.get(url);
+				if (fileSize == completedSize) {
+					downloader.reset();
+				}
+				
 				// 发送广播更新
+				Intent intent = new Intent(ACTION_UPDATE_PROGRESS);
+				intent.putExtra("downloadUrl", url);
+				intent.putExtra("fileSize", fileSize);
+				intent.putExtra("completedSize", completedSize);
+				sendBroadcast(intent);
 			}
 		}
 	};

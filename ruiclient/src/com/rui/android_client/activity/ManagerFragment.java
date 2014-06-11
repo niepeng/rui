@@ -3,20 +3,21 @@ package com.rui.android_client.activity;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
-import android.os.Handler;
-import android.os.Message;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -30,14 +31,15 @@ import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.rui.android_client.R;
-import com.rui.android_client.download.Downloader;
-import com.rui.android_client.download.LoadInfo;
 import com.rui.android_client.model.AppInfo;
+import com.rui.android_client.model.DownloadInfo;
 import com.rui.android_client.parse.AppInfoParser;
+import com.rui.android_client.service.DownloadService;
+import com.rui.android_client.utils.CollectionUtil;
 import com.rui.android_client.utils.JsonUtil;
+import com.rui.android_client.utils.StringUtil;
 import com.rui.http.Config;
 import com.rui.http.RemoteManager;
 import com.rui.http.Request;
@@ -49,6 +51,8 @@ public class ManagerFragment extends Fragment {
 
 	private String DIR_NAME = "rui";
 	private File rootFile;
+	
+	private UpdateProgressReceiver mUpdateProgressReceiver;
 
 	private ArrayList<AppInfo> mAppInfos;
 
@@ -72,6 +76,10 @@ public class ManagerFragment extends Fragment {
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
+		
+		mUpdateProgressReceiver = new UpdateProgressReceiver();
+		getActivity().registerReceiver(mUpdateProgressReceiver, new IntentFilter(DownloadService.ACTION_UPDATE_PROGRESS));
+		
 		mApp = (RuiApp) getActivity().getApplication();
 
 		rootFile = createDirIfNotExists(DIR_NAME);
@@ -104,6 +112,14 @@ public class ManagerFragment extends Fragment {
 	public void onResume() {
 		super.onResume();
 		loadInstalledApps();
+	}
+	
+	@Override
+	public void onDestroyView() {
+		if (mUpdateProgressReceiver != null) {
+			getActivity().unregisterReceiver(mUpdateProgressReceiver);
+		}
+		super.onDestroyView();
 	}
 
 	private class ListAdapter extends BaseAdapter {
@@ -172,14 +188,17 @@ public class ManagerFragment extends Fragment {
 					updateBtn.setVisibility(View.GONE);
 					openBtn.setVisibility(View.VISIBLE);
 				}
-//				Downloader downloader = downloaders.get(item.getDownUrl());
-//				if (downloader != null
-//						&& (downloader.isDownloading() || downloader.isPause())) {
-//					downloadProgress.setVisibility(View.VISIBLE);
-//					downloadProgress.setMax(item.getFileSize());
-//				} else {
-//					downloadProgress.setVisibility(View.GONE);
-//				}
+				if (CollectionUtil.isEmpty(item.getDownloadInfos())) {
+					downloadProgress.setVisibility(View.GONE);
+				} else {
+					int completedSize = 0;
+					for (DownloadInfo info : item.getDownloadInfos()) {
+						completedSize += info.getCompeleteSize();
+					}
+					downloadProgress.setVisibility(View.VISIBLE);
+					downloadProgress.setMax(item.getFileSize()); // TODO
+					downloadProgress.setProgress(completedSize);
+				}
 			}
 
 			private class OpenAppClick implements View.OnClickListener {
@@ -224,6 +243,10 @@ public class ManagerFragment extends Fragment {
 					Config.Names.INSTALLED_APPS_PACKAGE);
 			ArrayList<String> packageNames = new ArrayList<String>();
 			for (AppInfo item : mAppInfos) {
+				if (StringUtil.isNotBlank(item.getDownUrl())) {
+					List<DownloadInfo> downloadInfos = RuiApp.mPersist.downloadInfoDao.getInfos(item.getDownUrl());
+					item.setDownloadInfos(downloadInfos);
+				}
 				packageNames.add(item.getPackageName());
 			}
 			RemoteManager remoteManager = RemoteManager
@@ -279,59 +302,6 @@ public class ManagerFragment extends Fragment {
 
 	}
 
-	/**
-	 * 31 * 利用消息处理机制适时更新进度条 32
-	 */
-	private Handler mHandler = new Handler() {
-		public void handleMessage(Message msg) {
-			if (msg.what == 1) {
-//				String url = (String) msg.obj;
-//				int length = msg.arg1;
-//				ProgressBar bar = ProgressBars.get(url);
-//				if (bar != null) {
-//					// 设置进度条按读取的length长度更新
-//					bar.incrementProgressBy(length);
-//					if (bar.getProgress() == bar.getMax()) {
-//						Toast.makeText(getActivity(), "下载完成！", 0).show();
-//						// 下载完成后清除进度条并将map中的数据清空
-//						LinearLayout layout = (LinearLayout) bar.getParent();
-//						layout.removeView(bar);
-//						ProgressBars.remove(url);
-//						downloaders.get(url).delete(url);
-//						downloaders.get(url).reset();
-//						downloaders.remove(url);
-//					}
-//				}
-			}
-		}
-	};
-
-	/**
-	 * 显示进度条
-	 */
-	private void showProgress(LoadInfo loadInfo, String url) {
-		ProgressBar bar = ProgressBars.get(url);
-		if (bar == null) {
-			return;
-		}
-		bar.setVisibility(View.VISIBLE);
-		bar.setMax(loadInfo.getFileSize());
-		bar.setProgress(loadInfo.getComplete());
-	}
-
-	/**
-	 * 响应暂停下载按钮的点击事件
-	 */
-	public void pauseDownload(View v) {
-		// LinearLayout layout = (LinearLayout) v.getParent();
-		// String musicName = ((TextView) layout
-		// .findViewById(R.id.tv_resouce_name)).getText().toString();
-		// String urlstr = URL + musicName;
-		// TODO
-//		String urlstr = "";
-//		downloaders.get(urlstr).pause();
-	}
-
 	private class OnUpdateClickListener implements View.OnClickListener {
 
 		@Override
@@ -348,8 +318,7 @@ public class ManagerFragment extends Fragment {
 		int position = Integer.parseInt(v.getTag().toString());
 		AppInfo appInfo = mListAdapter.getItem(position);
 		String urlstr = appInfo.getDownUrl();
-		String localfile = rootFile.getPath() + File.pathSeparator
-				+ appInfo.getPackageName() + ".apk";
+		String localfile = rootFile.getPath() + File.pathSeparator + appInfo.getPackageName() + ".apk";
 		
 		Intent intent = new Intent();
 		intent.setClass(getActivity(), com.rui.android_client.service.DownloadService.class);
@@ -358,28 +327,17 @@ public class ManagerFragment extends Fragment {
 		intent.putExtra("flag","setState");//标志着数据从localdownactivity传送
 		getActivity().startService(intent);//这里启动service
 		
-//		int threadcount = 4;
-//		// 初始化一个downloader下载器
-//		Downloader downloader = downloaders.get(urlstr);
-//		if (downloader == null) {
-//			downloader = new Downloader(urlstr, localfile, threadcount,
-//					getActivity(), mHandler);
-//			downloaders.put(urlstr, downloader);
-//		}
-//		if (downloader.isDownloading())
-//			return;
-//		// 得到下载信息类的个数组成集合
-//		LoadInfo loadInfo = downloader.getDownloaderInfors();
-//		// 显示进度条
-//		// TODO
-//		if (ProgressBars.get(urlstr) == null) {
-//			ProgressBar bar = (ProgressBar) ((View) v.getParent().getParent())
-//					.findViewById(R.id.download_progress);
-//			ProgressBars.put(urlstr, bar);
-//		}
-//		showProgress(loadInfo, urlstr);
-//		// 调用方法开始下载
-//		downloader.download();
+		showProgressBar(v, urlstr);
+	}
+
+	private void showProgressBar(View v, String urlstr) {
+		ProgressBar bar = ProgressBars.get(urlstr);
+		if (bar == null) {
+			bar = (ProgressBar) ((View) v.getParent().getParent())
+					.findViewById(R.id.download_progress);
+			ProgressBars.put(urlstr, bar);
+		}
+		bar.setVisibility(View.VISIBLE);
 	}
 
 	private File createDirIfNotExists(String path) {
@@ -395,6 +353,23 @@ public class ManagerFragment extends Fragment {
 			return file;
 		}
 		return null;
+	}
+	
+	private class UpdateProgressReceiver extends BroadcastReceiver {
+
+		@Override
+		public void onReceive(Context context, Intent intent) {
+			String url = intent.getStringExtra("downloadUrl");
+			int fileSize = intent.getIntExtra("fileSize", 0);
+			int completedSize = intent.getIntExtra("completedSize", 0);
+			ProgressBar bar = ProgressBars.get(url);
+			if (bar == null) {
+				return;
+			}
+			bar.setMax(fileSize);
+			bar.setProgress(completedSize);
+		}
+
 	}
 
 }
