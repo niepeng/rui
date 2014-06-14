@@ -68,6 +68,7 @@ public class Downloader {
 			}
 			DownloadInfo info = new DownloadInfo(threadcount - 1,
 					(threadcount - 1) * range, fileSize, 0, urlstr);
+			info.setPackageName(packageName);
 			infos.add(info);
 			// 保存infos中的数据到数据库
 			RuiApp.mPersist.downloadInfoDao.saveInfos(infos);
