@@ -33,11 +33,11 @@ public class DownloadService extends Service {
 			String downloadUrl = intent.getStringExtra("downloadUrl");
 			Downloader downloader = RuiApp.downloaders.get(downloadUrl);
 			if (downloader != null) {
+				downloader.pause();
 				downloader.delete(downloadUrl);
 				RuiApp.downloaders.remove(downloader);
 			}
 		}
-
 		return super.onStartCommand(intent, flags, startId);
 	}
 

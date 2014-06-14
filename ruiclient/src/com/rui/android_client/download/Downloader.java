@@ -136,6 +136,7 @@ public class Downloader {
 				new MyThread(info.getThreadId(), info.getStartPos(),
 						info.getEndPos(), info.getCompeleteSize(),
 						info.getUrl()).start();
+				
 			}
 		}
 	}
