@@ -7,6 +7,7 @@ public class DownloadInfo extends BaseModel {
 	private int endPos;// 结束点
 	private int compeleteSize;// 完成度
 	private String url;// 下载器网络标识
+	private String packageName;
 	
 	public DownloadInfo() {
 		
@@ -62,11 +63,12 @@ public class DownloadInfo extends BaseModel {
 		this.url = url;
 	}
 
-	@Override
-	public String toString() {
-		return "DownloadInfo [threadId=" + threadId + ", startPos=" + startPos
-				+ ", endPos=" + endPos + ", compeleteSize=" + compeleteSize
-				+ "]";
+	public String getPackageName() {
+		return packageName;
 	}
-
+	
+	public void setPackageName(String packageName) {
+		this.packageName = packageName;
+	}
+	
 }

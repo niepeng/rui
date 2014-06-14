@@ -1,8 +1,5 @@
 package com.rui.android_client.service;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import android.app.Service;
 import android.content.Intent;
 import android.os.AsyncTask;
@@ -10,15 +7,12 @@ import android.os.Handler;
 import android.os.IBinder;
 import android.os.Message;
 
+import com.rui.android_client.activity.RuiApp;
 import com.rui.android_client.download.Downloader;
-import com.rui.android_client.download.LoadInfo;
 
 public class DownloadService extends Service {
 	
 	public static final String ACTION_UPDATE_PROGRESS = "com.rui.android_client.service.DownloadService.UPDATE_PROGRESS";
-
-	// 存放各个下载器
-	private Map<String, Downloader> downloaders = new HashMap<String, Downloader>();
 
 	@Override
 	public IBinder onBind(Intent intent) {
@@ -32,42 +26,47 @@ public class DownloadService extends Service {
 
 	@Override
 	public int onStartCommand(Intent intent, int flags, int startId) {
-		// TODO Auto-generated method stub
-
 		String flag = intent.getStringExtra("flag");
-		if ("setState".equals(flag)) {
+		if ("start_download".equals(flag)) {
 			startDownload(intent);
-		} else {
-			
+		} else if ("cancel".equals(flag)) {
+			String downloadUrl = intent.getStringExtra("downloadUrl");
+			Downloader downloader = RuiApp.downloaders.get(downloadUrl);
+			if (downloader != null) {
+				downloader.delete(downloadUrl);
+				RuiApp.downloaders.remove(downloader);
+			}
 		}
 
 		return super.onStartCommand(intent, flags, startId);
 	}
 
 	private void startDownload(Intent intent) {
+		final String packageName = intent.getStringExtra("packageName");
 		final String downloadUrl = intent.getStringExtra("downloadUrl");
 		final String fileName = intent.getStringExtra("fileName");
 		
-		new StartDownload().execute(downloadUrl, fileName);
+		new StartDownload().execute(packageName, downloadUrl, fileName);
 	}
 	
 	private class StartDownload extends AsyncTask<String, Void, Void> {
 
 		@Override
 		protected Void doInBackground(String... params) {
-			String downloadUrl = params[0];
-			String fileName = params[1];
+			String packageName = params[0];
+			String downloadUrl = params[1];
+			String fileName = params[2];
 			int threadcount = 1;
 			// 初始化一个downloader下载器
-			Downloader downloader = downloaders.get(downloadUrl);
+			Downloader downloader = RuiApp.downloaders.get(downloadUrl);
 			if (downloader == null) {
-				downloader = new Downloader(downloadUrl, fileName, threadcount,
+				downloader = new Downloader(packageName, downloadUrl, fileName, threadcount,
 						DownloadService.this, mHandler);
-				downloaders.put(downloadUrl, downloader);
+				RuiApp.downloaders.put(downloadUrl, downloader);
 			}
 			if (downloader.isDownloading())
 				return null;
-			LoadInfo loadInfo = downloader.getDownloaderInfors();
+			downloader.getDownloaderInfors();
 			// 调用方法开始下载
 			downloader.download();
 			return null;
@@ -78,7 +77,7 @@ public class DownloadService extends Service {
 		}
 
 	}
-
+	
 	private Handler mHandler = new Handler() {
 		public void handleMessage(Message msg) {
 			if (msg.what == 1) {
@@ -86,9 +85,10 @@ public class DownloadService extends Service {
 				int fileSize = msg.arg1;
 				int completedSize = msg.arg2;
 				
-				Downloader downloader = downloaders.get(url);
+				Downloader downloader = RuiApp.downloaders.get(url);
 				if (fileSize == completedSize) {
 					downloader.reset();
+					RuiApp.downloaders.remove(downloader);
 				}
 				
 				// 发送广播更新

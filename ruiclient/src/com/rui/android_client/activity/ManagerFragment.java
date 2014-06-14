@@ -2,9 +2,7 @@ package com.rui.android_client.activity;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -15,6 +13,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
@@ -38,6 +37,7 @@ import com.rui.android_client.model.DownloadInfo;
 import com.rui.android_client.parse.AppInfoParser;
 import com.rui.android_client.service.DownloadService;
 import com.rui.android_client.utils.CollectionUtil;
+import com.rui.android_client.utils.DownloadUtils;
 import com.rui.android_client.utils.JsonUtil;
 import com.rui.android_client.utils.StringUtil;
 import com.rui.http.Config;
@@ -47,11 +47,13 @@ import com.rui.http.Response;
 
 public class ManagerFragment extends Fragment {
 
+	private static final int REQUEST_INSTALL_APK_CODE = 1;
+
 	private RuiApp mApp;
 
 	private String DIR_NAME = "rui";
 	private File rootFile;
-	
+
 	private UpdateProgressReceiver mUpdateProgressReceiver;
 
 	private ArrayList<AppInfo> mAppInfos;
@@ -61,11 +63,6 @@ public class ManagerFragment extends Fragment {
 
 	private LoadInstalledAppsTask mLoadInstalledAppsTask;
 
-//	// 存放各个下载器
-//	private Map<String, Downloader> downloaders = new HashMap<String, Downloader>();
-	// 存放与下载器对应的进度条
-	private Map<String, ProgressBar> ProgressBars = new HashMap<String, ProgressBar>();
-
 	public static ManagerFragment newInstance() {
 		ManagerFragment fragment = new ManagerFragment();
 		Bundle args = new Bundle();
@@ -74,15 +71,24 @@ public class ManagerFragment extends Fragment {
 	}
 
 	@Override
+	public void onActivityResult(int requestCode, int resultCode, Intent data) {
+		if (requestCode == REQUEST_INSTALL_APK_CODE) {
+
+		}
+		super.onActivityResult(requestCode, resultCode, data);
+	}
+
+	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
-		
+
 		mUpdateProgressReceiver = new UpdateProgressReceiver();
-		getActivity().registerReceiver(mUpdateProgressReceiver, new IntentFilter(DownloadService.ACTION_UPDATE_PROGRESS));
-		
+		getActivity().registerReceiver(mUpdateProgressReceiver,
+				new IntentFilter(DownloadService.ACTION_UPDATE_PROGRESS));
+
 		mApp = (RuiApp) getActivity().getApplication();
 
-		rootFile = createDirIfNotExists(DIR_NAME);
+		rootFile = DownloadUtils.createDirIfNotExists();
 
 		View rootView = inflater.inflate(R.layout.fragment_manager, null);
 		mListView = (ListView) rootView.findViewById(R.id.list_view);
@@ -113,7 +119,7 @@ public class ManagerFragment extends Fragment {
 		super.onResume();
 		loadInstalledApps();
 	}
-	
+
 	@Override
 	public void onDestroyView() {
 		if (mUpdateProgressReceiver != null) {
@@ -161,6 +167,8 @@ public class ManagerFragment extends Fragment {
 			public TextView titleView;
 			public Button openBtn;
 			public Button updateBtn;
+			public Button cancelBtn;
+			public Button installBtn;
 			public ProgressBar downloadProgress;
 
 			public ViewHolder(Context context) {
@@ -170,34 +178,61 @@ public class ManagerFragment extends Fragment {
 				titleView = (TextView) findViewById(R.id.title);
 				openBtn = (Button) findViewById(R.id.open_btn);
 				updateBtn = (Button) findViewById(R.id.update_btn);
+				cancelBtn = (Button) findViewById(R.id.cancel_btn);
+				installBtn = (Button) findViewById(R.id.install_btn);
 				downloadProgress = (ProgressBar) findViewById(R.id.download_progress);
 
 				openBtn.setOnClickListener(new OpenAppClick());
 				updateBtn.setOnClickListener(new OnUpdateClickListener());
+				cancelBtn.setOnClickListener(new OnCancelClickListener());
+				installBtn.setOnClickListener(new OnInstallApkClickListener());
 			}
 
 			public void setViewContent(int position, AppInfo item) {
 				iconView.setImageDrawable(item.getIcon());
 				titleView.setText(item.getMainTitle());
-				updateBtn.setTag(position);
+
+				openBtn.setVisibility(View.GONE);
+				updateBtn.setVisibility(View.GONE);
+				cancelBtn.setVisibility(View.GONE);
+				installBtn.setVisibility(View.GONE);
+
 				openBtn.setTag(position);
-				if (item.isNeedUpdate()) {
-					updateBtn.setVisibility(View.VISIBLE);
-					openBtn.setVisibility(View.GONE);
-				} else {
-					updateBtn.setVisibility(View.GONE);
-					openBtn.setVisibility(View.VISIBLE);
-				}
+				updateBtn.setTag(position);
+				cancelBtn.setTag(position);
+				installBtn.setTag(position);
+
 				if (CollectionUtil.isEmpty(item.getDownloadInfos())) {
+					if (item.isNeedUpdate()) {
+						updateBtn.setVisibility(View.VISIBLE);
+					} else {
+						openBtn.setVisibility(View.VISIBLE);
+					}
 					downloadProgress.setVisibility(View.GONE);
 				} else {
+					int fileSize = 0;
 					int completedSize = 0;
 					for (DownloadInfo info : item.getDownloadInfos()) {
 						completedSize += info.getCompeleteSize();
+						fileSize += info.getEndPos() - info.getStartPos();
 					}
 					downloadProgress.setVisibility(View.VISIBLE);
-					downloadProgress.setMax(item.getFileSize()); // TODO
+					downloadProgress.setMax(fileSize);
 					downloadProgress.setProgress(completedSize);
+					if (DownloadUtils.isReadyInstalled(item.getPackageName(),
+							fileSize, completedSize)) {
+						installBtn.setVisibility(View.VISIBLE);
+					} else if (RuiApp.downloaders.get(item.getDownUrl()) != null
+							&& DownloadUtils.isDownloading(fileSize,
+									completedSize)) {
+						cancelBtn.setVisibility(View.VISIBLE);
+					} else {
+						if (item.isNeedUpdate()) {
+							updateBtn.setVisibility(View.VISIBLE);
+						} else {
+							openBtn.setVisibility(View.VISIBLE);
+						}
+					}
 				}
 			}
 
@@ -243,10 +278,6 @@ public class ManagerFragment extends Fragment {
 					Config.Names.INSTALLED_APPS_PACKAGE);
 			ArrayList<String> packageNames = new ArrayList<String>();
 			for (AppInfo item : mAppInfos) {
-				if (StringUtil.isNotBlank(item.getDownUrl())) {
-					List<DownloadInfo> downloadInfos = RuiApp.mPersist.downloadInfoDao.getInfos(item.getDownUrl());
-					item.setDownloadInfos(downloadInfos);
-				}
 				packageNames.add(item.getPackageName());
 			}
 			RemoteManager remoteManager = RemoteManager
@@ -288,6 +319,12 @@ public class ManagerFragment extends Fragment {
 				appInfo.setDownUrl(downUrl);
 				appInfo.setId(appInfoFromServer.getId());
 				appInfo.setFileSize(appInfoFromServer.getFileSize());
+
+				if (StringUtil.isNotBlank(appInfo.getDownUrl())) {
+					List<DownloadInfo> downloadInfos = RuiApp.mPersist.downloadInfoDao
+							.getInfos(appInfo.getDownUrl());
+					appInfo.setDownloadInfos(downloadInfos);
+				}
 			} catch (JSONException e) {
 				e.printStackTrace();
 			}
@@ -317,57 +354,95 @@ public class ManagerFragment extends Fragment {
 	private void startDownload(View v) {
 		int position = Integer.parseInt(v.getTag().toString());
 		AppInfo appInfo = mListAdapter.getItem(position);
-		String urlstr = appInfo.getDownUrl();
-		String localfile = rootFile.getPath() + File.pathSeparator + appInfo.getPackageName() + ".apk";
-		
+		String downloadUrl = appInfo.getDownUrl();
+		String fileName = rootFile.getAbsolutePath() + File.separator
+				+ appInfo.getPackageName() + ".apk";
+
 		Intent intent = new Intent();
-		intent.setClass(getActivity(), com.rui.android_client.service.DownloadService.class);
-		intent.putExtra("fileName", localfile);
-		intent.putExtra("downloadUrl", urlstr);
-		intent.putExtra("flag","setState");//标志着数据从localdownactivity传送
-		getActivity().startService(intent);//这里启动service
-		
-		showProgressBar(v, urlstr);
+		intent.setClass(getActivity(),
+				com.rui.android_client.service.DownloadService.class);
+		intent.putExtra("packageName", appInfo.getPackageName());
+		intent.putExtra("fileName", fileName);
+		intent.putExtra("downloadUrl", downloadUrl);
+		intent.putExtra("flag", "start_download");// 标志着数据从localdownactivi
+		getActivity().startService(intent);// 这里启动service
+
+		showProgressBar(v, downloadUrl);
 	}
 
-	private void showProgressBar(View v, String urlstr) {
-		ProgressBar bar = ProgressBars.get(urlstr);
-		if (bar == null) {
-			bar = (ProgressBar) ((View) v.getParent().getParent())
-					.findViewById(R.id.download_progress);
-			ProgressBars.put(urlstr, bar);
-		}
+	private void showProgressBar(View v, String downloadUrl) {
+		View root = (View) v.getParent().getParent();
+		ProgressBar bar = (ProgressBar) root
+				.findViewById(R.id.download_progress);
+		v.setVisibility(View.GONE);
+		Button cancelBtn = (Button) root.findViewById(R.id.cancel_btn);
+		cancelBtn.setVisibility(View.VISIBLE);
 		bar.setVisibility(View.VISIBLE);
 	}
 
-	private File createDirIfNotExists(String path) {
-		boolean success = true;
+	private class OnCancelClickListener implements View.OnClickListener {
+		@Override
+		public void onClick(View v) {
+			int position = Integer.parseInt(v.getTag().toString());
+			AppInfo appInfo = mListAdapter.getItem(position);
 
-		File file = new File(Environment.getExternalStorageDirectory(), path);
-		if (!file.exists()) {
-			if (!file.mkdirs()) {
-				success = false;
-			}
+			Intent intent = new Intent();
+			intent.setClass(getActivity(),
+					com.rui.android_client.service.DownloadService.class);
+			intent.putExtra("downloadUrl", appInfo.getDownUrl());
+			intent.putExtra("flag", "cancel");// 标志着数据从localdownactivi
+			getActivity().startService(intent);// 这里启动service
 		}
-		if (success) {
-			return file;
-		}
-		return null;
 	}
-	
+
+	private class OnInstallApkClickListener implements View.OnClickListener {
+		@Override
+		public void onClick(View v) {
+			int position = Integer.parseInt(v.getTag().toString());
+			AppInfo appInfo = mListAdapter.getItem(position);
+
+			File file = new File(Environment.getExternalStorageDirectory(),
+					DIR_NAME);
+			if (!file.exists()) {
+				return;
+			}
+			String path = file.getAbsolutePath() + File.separator
+					+ appInfo.getPackageName() + ".apk";
+			File installFile = new File(path);
+			if (!installFile.exists()) {
+				return;
+			}
+
+			String type = "application/vnd.android.package-archive";
+			Intent intent = new Intent();
+			intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+			intent.setAction(android.content.Intent.ACTION_VIEW);
+			intent.setDataAndType(Uri.fromFile(installFile), type);
+			startActivityForResult(intent, REQUEST_INSTALL_APK_CODE);
+		}
+	}
+
 	private class UpdateProgressReceiver extends BroadcastReceiver {
 
 		@Override
 		public void onReceive(Context context, Intent intent) {
 			String url = intent.getStringExtra("downloadUrl");
-			int fileSize = intent.getIntExtra("fileSize", 0);
-			int completedSize = intent.getIntExtra("completedSize", 0);
-			ProgressBar bar = ProgressBars.get(url);
-			if (bar == null) {
-				return;
+			String packageName = intent.getStringExtra("packageName");
+			for (AppInfo item : mAppInfos) {
+				if (StringUtil.isNotBlank(url) && url.equals(item.getDownUrl())) {
+					item.setDownloadInfos(RuiApp.mPersist.downloadInfoDao
+							.getInfos(url));
+					mListAdapter.notifyDataSetChanged();
+					break;
+				}
+				if (StringUtil.isNotBlank(packageName)
+						&& packageName.equals(item.getPackageName())) {
+					item.setDownloadInfos(RuiApp.mPersist.downloadInfoDao
+							.getInfosByPackage(packageName));
+					mListAdapter.notifyDataSetChanged();
+					break;
+				}
 			}
-			bar.setMax(fileSize);
-			bar.setProgress(completedSize);
 		}
 
 	}

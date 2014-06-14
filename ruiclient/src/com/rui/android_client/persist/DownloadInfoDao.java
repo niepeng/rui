@@ -3,7 +3,7 @@ package com.rui.android_client.persist;
 import static android.provider.BaseColumns._ID;
 import static com.rui.android_client.db.metadata.DBaseColumns.CREATED;
 import static com.rui.android_client.db.metadata.DBaseColumns.UPDATED;
-import static com.rui.android_client.db.metadata.DownloadInfoTable.Columns.COMPLETE_SIZE;
+import static com.rui.android_client.db.metadata.DownloadInfoTable.Columns.*;
 import static com.rui.android_client.db.metadata.DownloadInfoTable.Columns.END_POS;
 import static com.rui.android_client.db.metadata.DownloadInfoTable.Columns.START_POS;
 import static com.rui.android_client.db.metadata.DownloadInfoTable.Columns.THREAD_ID;
@@ -51,6 +51,11 @@ public class DownloadInfoDao extends BaseDao<DownloadInfo> {
 		String whereClause = URL + "=?";
 		db.delete(tableName, whereClause, new String[] { url });
 	}
+	
+	public void deleteByPackageName(String packageName) {
+		String whereClause = PACKAGE_NAME + "=?";
+		db.delete(tableName, whereClause, new String[] { packageName });
+	}
 
 	/**
 	 * 查看数据库中是否有数据
@@ -68,6 +73,11 @@ public class DownloadInfoDao extends BaseDao<DownloadInfo> {
 		String clause = URL + "=?";
 		return findList(clause, new String[] { url });
 	}
+	
+	public List<DownloadInfo> getInfosByPackage(String packageName) {
+		String clause = PACKAGE_NAME + "=?";
+		return findList(clause, new String[] { packageName });
+	}
 
 	@Override
 	protected DownloadInfo cursorToObject(Cursor c) {
@@ -80,6 +90,7 @@ public class DownloadInfoDao extends BaseDao<DownloadInfo> {
 		item.setStartPos(c.getInt(c.getColumnIndex(START_POS)));
 		item.setEndPos(c.getInt(c.getColumnIndex(END_POS)));
 		item.setCompeleteSize(c.getInt(c.getColumnIndex(COMPLETE_SIZE)));
+		item.setPackageName(c.getString(c.getColumnIndex(PACKAGE_NAME)));
 		return item;
 	}
 
@@ -94,13 +105,14 @@ public class DownloadInfoDao extends BaseDao<DownloadInfo> {
 		values.put(START_POS, t.getStartPos());
 		values.put(END_POS, t.getEndPos());
 		values.put(COMPLETE_SIZE, t.getCompeleteSize());
+		values.put(PACKAGE_NAME, t.getPackageName());
 		return values;
 	}
 
 	@Override
 	protected String[] colunms() {
 		return new String[] { _ID, CREATED, UPDATED, URL, THREAD_ID, START_POS,
-				END_POS, COMPLETE_SIZE };
+				END_POS, COMPLETE_SIZE, PACKAGE_NAME };
 	}
 
 	@Override

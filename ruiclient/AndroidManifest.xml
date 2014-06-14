@@ -40,8 +40,42 @@
         <activity android:name="com.rui.android_client.activity.UpdateClientActivity" />
         <activity android:name="com.rui.android_client.activity.AboutUsActivity" />
         <activity android:name="com.rui.android_client.activity.FeedbackActivity" />
-        
-        <service android:name="com.rui.android_client.service.DownloadService" android:enabled="true" />
+
+        <service
+            android:name="com.rui.android_client.service.DownloadService"
+            android:enabled="true" />
+
+        <receiver
+            android:name="com.rui.android_client.service.BootService"
+            android:enabled="true"
+            android:exported="true"
+            android:label="BootService" >
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+
+                <data android:scheme="package" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.PACKAGE_ADDED" />
+
+                <data android:scheme="package" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.PACKAGE_INSTALL" />
+
+                <data android:scheme="package" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.PACKAGE_CHANGED" />
+
+                <data android:scheme="package" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.PACKAGE_REPLACED" />
+
+                <data android:scheme="package" />
+            </intent-filter>
+        </receiver>
     </application>
 
 </manifest>

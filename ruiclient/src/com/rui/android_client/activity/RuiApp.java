@@ -2,9 +2,11 @@ package com.rui.android_client.activity;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Set;
 import java.util.TimeZone;
 import java.util.concurrent.Callable;
@@ -30,6 +32,7 @@ import android.view.Display;
 import android.view.WindowManager;
 
 import com.rui.android_client.db.Persist;
+import com.rui.android_client.download.Downloader;
 import com.rui.android_client.model.AppInfo;
 import com.rui.android_client.model.DownloadInfo;
 import com.rui.android_client.utils.CollectionUtil;
@@ -50,6 +53,9 @@ public class RuiApp extends Application {
 	public static SharedPreferences mPref;
 	
 	public static Persist mPersist;
+	
+	// 存放各个下载器
+	public static Map<String, Downloader> downloaders = new HashMap<String, Downloader>();
 	
 	private boolean needInit = true;
 	

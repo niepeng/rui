@@ -20,6 +20,7 @@ public class Downloader {
 	
 	private static final int LEN = 1024;
 	
+	private String packageName;
 	private String urlstr;// 下载的地址
 	private String savePath;// 保存路径
 	private int threadcount;// 线程数
@@ -31,8 +32,9 @@ public class Downloader {
 	private static final int PAUSE = 3;
 	private int state = INIT;
 
-	public Downloader(String urlstr, String savePath, int threadcount,
+	public Downloader(String packageName, String urlstr, String savePath, int threadcount,
 			Context context, Handler mHandler) {
+		this.packageName = packageName;
 		this.urlstr = urlstr;
 		this.savePath = savePath;
 		this.threadcount = threadcount;
@@ -61,6 +63,7 @@ public class Downloader {
 			for (int i = 0; i < threadcount - 1; i++) {
 				DownloadInfo info = new DownloadInfo(i, i * range, (i + 1)
 						* range - 1, 0, urlstr);
+				info.setPackageName(packageName);
 				infos.add(info);
 			}
 			DownloadInfo info = new DownloadInfo(threadcount - 1,
@@ -83,6 +86,10 @@ public class Downloader {
 			}
 			return new LoadInfo(size, compeleteSize, urlstr);
 		}
+	}
+	
+	public List<DownloadInfo> getInfos() {
+		return infos;
 	}
 
 	/**
