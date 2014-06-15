@@ -5,7 +5,6 @@ import java.util.ArrayList;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.view.LayoutInflater;
@@ -19,10 +18,10 @@ import com.rui.android_client.R;
 
 public class IndexFragment extends Fragment {
 
-	private static String[] tabName = new String[] { "游戏精品", "精品推荐", "下载排行"};
+	private static String[] tabName = new String[] { "游戏精品", "精品推荐", "下载排行" };
 	@SuppressWarnings("rawtypes")
 	private static Class[] tabFragments = new Class[] { GameFragment.class,
-			FineRecommendedFragment.class, DownloadTopFragment.class};
+			FineRecommendedFragment.class, DownloadTopFragment.class };
 
 	TabHost mTabHost;
 	ViewPager mViewPager;
@@ -31,7 +30,8 @@ public class IndexFragment extends Fragment {
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
-		View rootView = inflater.inflate(R.layout.fragment_index, container, false);
+		View rootView = inflater.inflate(R.layout.fragment_index, container,
+				false);
 
 		mTabHost = (TabHost) rootView.findViewById(android.R.id.tabhost);
 
@@ -40,21 +40,22 @@ public class IndexFragment extends Fragment {
 
 		mViewPager = (ViewPager) rootView.findViewById(R.id.pager);
 
-		mTabsAdapter = new TabsAdapter(getActivity(), mTabHost, mViewPager);
+		mTabsAdapter = new TabsAdapter(this, mTabHost, mViewPager);
 
 		for (int i = 0; i < tabName.length; i++) {
 			mTabsAdapter.addTab(
-					mTabHost.newTabSpec(tabName[i]).setIndicator(getTabView(tabName[i])),
-					tabFragments[i], null);
+					mTabHost.newTabSpec(tabName[i]).setIndicator(
+							getTabView(tabName[i])), tabFragments[i], null);
 		}
-		
+
 		mTabHost.setCurrentTab(0);
 
 		return rootView;
 	}
-	
+
 	private View getTabView(String tabName) {
-		View view = View.inflate(getActivity(), R.layout.layout_topbar_tab, null);
+		View view = View.inflate(getActivity(), R.layout.layout_topbar_tab,
+				null);
 		TextView text = (TextView) view.findViewById(R.id.topbar_tab_name);
 		text.setText(tabName);
 		return view;
@@ -106,10 +107,9 @@ public class IndexFragment extends Fragment {
 			}
 		}
 
-		public TabsAdapter(FragmentActivity activity, TabHost tabHost,
-				ViewPager pager) {
-			super(activity.getSupportFragmentManager());
-			mContext = activity;
+		public TabsAdapter(Fragment activity, TabHost tabHost, ViewPager pager) {
+			super(activity.getChildFragmentManager());
+			mContext = activity.getActivity();
 			mTabHost = tabHost;
 			mViewPager = pager;
 			mTabHost.setOnTabChangedListener(this);
@@ -152,11 +152,6 @@ public class IndexFragment extends Fragment {
 
 		@Override
 		public void onPageSelected(int position) {
-			// Unfortunately when TabHost changes the current tab, it kindly
-			// also takes care of putting focus on it when not in touch mode.
-			// The jerk.
-			// This hack tries to prevent this from pulling focus out of our
-			// ViewPager.
 			TabWidget widget = mTabHost.getTabWidget();
 			int oldFocusability = widget.getDescendantFocusability();
 			widget.setDescendantFocusability(ViewGroup.FOCUS_BLOCK_DESCENDANTS);
@@ -167,7 +162,7 @@ public class IndexFragment extends Fragment {
 		@Override
 		public void onPageScrollStateChanged(int state) {
 		}
-		
+
 		@Override
 		public int getItemPosition(Object object) {
 			return POSITION_NONE;
