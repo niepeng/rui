@@ -33,5 +33,14 @@
         <!-- View background -->
         <attr name="android:background" />
     </declare-styleable>
+    
+    <declare-styleable name="TextViewWithLabel">
+        <attr name="label" format="string" />
+        <attr name="label_color" format="color" />
+        <attr name="label_text_size" format="dimension" />
+        <attr name="content" format="string" />
+        <attr name="content_color" format="color" />
+        <attr name="content_text_size" format="dimension" />
+    </declare-styleable>
 
 </resources>

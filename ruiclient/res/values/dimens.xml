@@ -6,5 +6,7 @@
     
     <dimen name="padding_view">14dp</dimen>
     <dimen name="padding_text">10dp</dimen>
+    
+    <dimen name="detail_label_text_size">12sp</dimen>
 
 </resources>

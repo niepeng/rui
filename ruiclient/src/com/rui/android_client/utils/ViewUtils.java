@@ -1,58 +1,97 @@
 package com.rui.android_client.utils;
 
+
+import java.util.Formatter;
+
+import com.rui.android_client.activity.RuiApp;
+
 import android.content.Context;
-import android.graphics.Bitmap;
-import android.graphics.Bitmap.Config;
-import android.graphics.Canvas;
-import android.graphics.Color;
-import android.graphics.Paint;
-import android.graphics.PorterDuff;
-import android.graphics.PorterDuffXfermode;
-import android.graphics.Rect;
-import android.graphics.RectF;
+import android.content.res.ColorStateList;
+import android.content.res.XmlResourceParser;
+import android.graphics.drawable.Drawable;
+import android.view.inputmethod.InputMethodManager;
+import android.widget.EditText;
 
 public class ViewUtils {
 
-	public static Bitmap getRoundedCornerBitmap(Context context, Bitmap input,
-			float pixels, int w, int h, boolean squareTL, boolean squareTR,
-			boolean squareBL, boolean squareBR) {
+	@SuppressWarnings("resource")
+	public static String format(String message, Object... arg) {
+		return new Formatter().format(message, arg).toString();
+	}
+	
+	@SuppressWarnings("resource")
+	public static String format(int message, Object... arg) {
+		return new Formatter().format(getText(message), arg).toString();
+	}
 
-		Bitmap output = Bitmap.createBitmap(w, h, Config.ARGB_8888);
-		Canvas canvas = new Canvas(output);
-		final float densityMultiplier = context.getResources()
-				.getDisplayMetrics().density;
+	public static String getText(int id) {
+		return RuiApp.context.getResources().getString(id);
+	}
 
-		final int color = Color.WHITE;
-		final Paint paint = new Paint();
-		final Rect rect = new Rect(0, 0, w, h);
-		final RectF rectF = new RectF(rect);
+	public static int getColor(int id) {
+		return RuiApp.context.getResources().getColor(id);
+	}
 
-		// make sure that our rounded corner is scaled appropriately
-		final float roundPx = pixels * densityMultiplier;
-
-		paint.setAntiAlias(true);
-		canvas.drawARGB(0, 0, 0, 0);
-		paint.setColor(color);
-		canvas.drawRoundRect(rectF, roundPx, roundPx, paint);
-
-		// draw rectangles over the corners we want to be square
-		if (squareTL) {
-			canvas.drawRect(0, 0, w / 2, h / 2, paint);
+	public static ColorStateList getColors(int id) {
+		try {
+			XmlResourceParser parser = RuiApp.context.getResources()
+					.getXml(id);
+			ColorStateList colors = ColorStateList.createFromXml(
+					RuiApp.context.getResources(), parser);
+			return colors;
+		} catch (Exception e) {
+			e.printStackTrace();
 		}
-		if (squareTR) {
-			canvas.drawRect(w / 2, 0, w, h / 2, paint);
-		}
-		if (squareBL) {
-			canvas.drawRect(0, h / 2, w / 2, h, paint);
-		}
-		if (squareBR) {
-			canvas.drawRect(w / 2, h / 2, w, h, paint);
+		return null;
+	}
+
+	public static Drawable getDrawable(int id) {
+		return RuiApp.context.getResources().getDrawable(id);
+	}
+
+	public static int getId(String variableName, String type) {
+		int resourceId = RuiApp.context.getResources().getIdentifier(
+				variableName, type, RuiApp.context.getPackageName());
+		if (resourceId == 0) {
+			return -1;
+		} else {
+			return resourceId;
 		}
 
-		paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC_IN));
-		canvas.drawBitmap(input, 0, 0, paint);
+	}
 
-		return output;
+	public static int getInteger(int id) {
+		return RuiApp.context.getResources().getInteger(id);
+	}
+
+	public static float getDimens(int id) {
+		return RuiApp.context.getResources().getDimension(id);
+	}
+
+	public static void hideSoftKeyboard(Context context, EditText editText) {
+		if (editText == null) {
+			return;
+		}
+		InputMethodManager mInputMethodManager = (InputMethodManager) context
+				.getSystemService(Context.INPUT_METHOD_SERVICE);
+		mInputMethodManager.hideSoftInputFromWindow(editText.getWindowToken(),
+				0);
+	}
+
+	public static void showSoftKeyboardDelayed(final Context context,
+			final EditText editText, long delayMillis) {
+		editText.postDelayed(new Runnable() {
+
+			@Override
+			public void run() {
+				editText.setSelection(editText.getText().toString().length());
+			}
+		}, delayMillis);
+	}
+	
+	public static int dip2px(Context context, float dpValue) {
+		final float scale = context.getResources().getDisplayMetrics().density;
+		return (int) (dpValue * scale + 0.5f);
 	}
 
 }

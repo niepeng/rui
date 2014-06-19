@@ -142,5 +142,39 @@
         <item name="android:textSize">12sp</item>
         <item name="android:textColor">@android:color/white</item>
     </style>
+    
+    <style name="detail_btn">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_alignParentBottom">true</item>
+        <item name="android:layout_centerHorizontal">true</item>
+        <item name="android:layout_marginTop">20dp</item>
+    </style>
+    
+    <style name="textview_with_label_wrap">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+    </style>
+
+    <style name="textview_with_textview_label">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:textSize">14sp</item>
+        <item name="android:singleLine">true</item>
+        <item name="android:ellipsize">end</item>
+        <item name="android:layout_centerVertical">true</item>
+    </style>
+
+    <style name="textview_with_textview_content">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:gravity">left|center_vertical</item>
+        <item name="android:textSize">14sp</item>
+        <item name="android:singleLine">true</item>
+        <item name="android:ellipsize">end</item>
+        <item name="android:drawablePadding">10dp</item>
+        <item name="android:paddingLeft">@dimen/padding_text</item>
+        <item name="android:layout_centerVertical">true</item>
+    </style>
 
 </resources>

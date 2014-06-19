@@ -31,7 +31,7 @@ public class AppInfoParser {
 		app.setFirstCatId(JsonUtil.getLong(json, "firstCatId", 0));
 		app.setUpdateInfo(JsonUtil.getString(json, "updateInfo", null));
 
-		RuiApp ruiApp  = (RuiApp) RuiApp.context.getApplicationContext();
+		RuiApp ruiApp = (RuiApp) RuiApp.context.getApplicationContext();
 		if (ruiApp.isAppInstalled(app.getPackageName())) {
 			app.setInstalled(true);
 			AppInfo installedApp = ruiApp.getInstalledAppInfo(app

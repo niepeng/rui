@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:rui="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:padding="@dimen/padding_view" >
@@ -40,7 +41,19 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_below="@+id/main_title"
+                    android:layout_marginLeft="@dimen/padding_view"
                     android:layout_toRightOf="@+id/icon" />
+
+                <com.rui.android_client.component.TextViewWithLabelLayout
+                    android:id="@+id/file_size"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/sub_title"
+                    android:layout_marginLeft="@dimen/padding_view"
+                    android:layout_toRightOf="@+id/icon"
+                    rui:content_color="@android:color/black"
+                    rui:label="大小"
+                    rui:label_color="@color/detail_label_text_color" />
             </RelativeLayout>
 
             <include layout="@layout/layout_banner" />
@@ -52,13 +65,36 @@
         </LinearLayout>
     </ScrollView>
 
+    <ProgressBar
+        android:id="@+id/download_progress"
+        style="?android:attr/progressBarStyleHorizontal"
+        android:layout_width="match_parent"
+        android:layout_height="10dp"
+        android:layout_marginTop="10dp"
+        android:max="100" />
+
     <Button
         android:id="@+id/download_btn"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="20dp"
-        android:text="@string/download" />
+        style="@style/detail_btn"
+        android:text="@string/download"
+        android:visibility="gone" />
+
+    <Button
+        android:id="@+id/update_btn"
+        style="@style/detail_btn"
+        android:text="更新"
+        android:visibility="gone" />
+
+    <Button
+        android:id="@+id/cancel_btn"
+        style="@style/detail_btn"
+        android:text="取消"
+        android:visibility="gone" />
+
+    <Button
+        android:id="@+id/install_btn"
+        style="@style/listview_item_btn"
+        android:text="安装"
+        android:visibility="gone" />
 
 </RelativeLayout>

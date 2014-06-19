@@ -1,16 +1,16 @@
 package com.rui.android_client.component;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import android.app.Activity;
-import android.content.Context;
 import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
@@ -19,19 +19,15 @@ import android.widget.AbsListView.OnScrollListener;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.BaseAdapter;
-import android.widget.Button;
-import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.ListView;
-import android.widget.ProgressBar;
-import android.widget.TextView;
 
 import com.rui.android_client.R;
 import com.rui.android_client.activity.AppDetailActivity;
 import com.rui.android_client.activity.RuiApp;
 import com.rui.android_client.model.AppInfo;
-import com.rui.android_client.model.BaseModel;
+import com.rui.android_client.model.DownloadInfo;
 import com.rui.android_client.parse.AppInfoParser;
+import com.rui.android_client.utils.DownloadUtils;
 import com.rui.android_client.utils.JsonUtil;
 import com.rui.android_client.utils.StringUtil;
 import com.rui.android_client.utils.ThreadAid;
@@ -59,6 +55,8 @@ public class AppListView {
 	protected boolean isLoading = false;
 
 	protected int mPage = 1;
+	
+	private File rootFile;
 
 	public AppListView(Activity activity, ListView listView) {
 		mActivity = activity;
@@ -67,6 +65,8 @@ public class AppListView {
 		footerView = View.inflate(activity, R.layout.listview_foot, null);
 		mListView.addFooterView(footerView);
 		footerView.setVisibility(View.GONE);
+		
+		rootFile = DownloadUtils.createDirIfNotExists();
 
 		initAdapter();
 
@@ -116,75 +116,6 @@ public class AppListView {
 			AppInfo app = getItem(position);
 			holder.setViewContent(position, app);
 			return holder;
-		}
-
-	}
-
-	protected class ViewHolder extends LinearLayout {
-
-		public ViewHolder(Context context) {
-			super(context);
-		}
-
-		public void setViewContent(int position, BaseModel item) {
-		}
-
-	}
-
-	protected class AppInfoViewHolder extends ViewHolder {
-
-		public ImageView iconView;
-		public TextView titleView;
-		public Button openBtn;
-		public Button updateBtn;
-		public ProgressBar downloadProgress;
-
-		public AppInfoViewHolder(Context context) {
-			super(context);
-			View.inflate(context, R.layout.layout_app_listview_item, this);
-			iconView = (ImageView) findViewById(R.id.icon);
-			titleView = (TextView) findViewById(R.id.title);
-			openBtn = (Button) findViewById(R.id.open_btn);
-			updateBtn = (Button) findViewById(R.id.update_btn);
-			downloadProgress = (ProgressBar) findViewById(R.id.download_progress);
-
-			openBtn.setOnClickListener(new OpenAppClick());
-			// updateBtn.setOnClickListener(new OnUpdateClickListener());
-
-		}
-
-		@Override
-		public void setViewContent(int position, BaseModel item) {
-			AppInfo app = (AppInfo) item;
-			// 异步加载图片
-			RuiApp.fb.display(iconView, app.getIconUrl());
-			titleView.setText(app.getMainTitle());
-
-			updateBtn.setTag(position);
-			openBtn.setTag(position);
-			if (app.isNeedUpdate()) {
-				updateBtn.setVisibility(View.VISIBLE);
-				openBtn.setVisibility(View.GONE);
-			} else {
-				updateBtn.setVisibility(View.GONE);
-				openBtn.setVisibility(View.VISIBLE);
-			}
-		}
-
-		private class OpenAppClick implements View.OnClickListener {
-
-			@Override
-			public void onClick(View v) {
-				AppInfo appInfo = mAdapter.getItem(Integer.parseInt(v.getTag()
-						.toString()));
-				PackageManager pm = mActivity.getPackageManager();
-				Intent appStartIntent = pm.getLaunchIntentForPackage(appInfo
-						.getPackageName());
-				if (null != appStartIntent) {
-					mActivity.startActivity(appStartIntent);
-				}
-			}
-
 		}
 
 	}
@@ -262,6 +193,11 @@ public class AppListView {
 	}
 
 	protected void parseCallbackBody(final Response response) {
+		List<AppInfo> localApps = mApp.getInstalledAppInfos();
+		HashMap<String, Integer> localAppVersionCodes = new HashMap<String, Integer>();
+		for (AppInfo item : localApps) {
+			localAppVersionCodes.put(item.getPackageName(), Integer.parseInt(item.getVersionValue()));
+		}
 		JSONObject json = JsonUtil.getJsonObject(response.getModel());
 		JSONArray jsonArray = JsonUtil.getJsonArray(json, "data");
 		if (jsonArray != null) {
@@ -270,6 +206,18 @@ public class AppListView {
 					JSONObject jsonObject = jsonArray.getJSONObject(i);
 					AppInfo appInfo = AppInfoParser.getInstance().parse(
 							jsonObject);
+					
+					if (localAppVersionCodes.containsKey(appInfo.getPackageName())) {
+						if (Integer.parseInt(appInfo.getVersionValue()) > localAppVersionCodes.get(appInfo.getPackageName())) {
+							appInfo.setNeedUpdate(true);
+						}
+					}
+					if (StringUtil.isNotBlank(appInfo.getDownUrl())) {
+						List<DownloadInfo> downloadInfos = RuiApp.mPersist.downloadInfoDao
+								.getInfos(appInfo.getDownUrl());
+						appInfo.setDownloadInfos(downloadInfos);
+					}
+					
 					mAppInfos.add(appInfo);
 				} catch (JSONException e) {
 					e.printStackTrace();
@@ -289,5 +237,5 @@ public class AppListView {
 			mActivity.startActivity(intent);
 		}
 	};
-
+	
 }
