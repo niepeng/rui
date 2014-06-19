@@ -196,18 +196,21 @@ public class ManagerFragment extends Fragment {
 				JSONObject jsonObject = jsonArray.getJSONObject(i);
 				String packageName = JsonUtil.getString(jsonObject,
 						"packageName", null);
-				AppInfo appInfo = AppInfoParser.getInstance().parse(
+				AppInfo appInfoFromServer = AppInfoParser.getInstance().parse(
 						jsonObject);
-				if (appInfo == null) {
+				if (appInfoFromServer == null) {
 					return;
 				}
-				AppInfo installedAppInfo = mApp.getInstalledAppInfo(packageName);
-				
-				appInfo.setIcon(installedAppInfo.getIcon());
-				appInfo.setVersionValue(installedAppInfo.getVersionValue());
-				appInfo.setLocalVersionCode(installedAppInfo.getLocalVersionCode());
-				
-				if (StringUtil.isNotBlank(installedAppInfo.getDownUrl())) {
+				AppInfo appInfo = mApp.getInstalledAppInfo(packageName);
+				appInfo.setVersionValue(appInfoFromServer.getVersionValue());
+				String downUrl = appInfoFromServer.getDownUrl();
+				appInfo.setInstalled(appInfo.isInstalled());
+				appInfo.setNeedUpdate(appInfoFromServer.isNeedUpdate());
+				appInfo.setDownUrl(downUrl);
+				appInfo.setId(appInfoFromServer.getId());
+				appInfo.setFileSize(appInfoFromServer.getFileSize());
+
+				if (StringUtil.isNotBlank(appInfo.getDownUrl())) {
 					List<DownloadInfo> downloadInfos = RuiApp.mPersist.downloadInfoDao
 							.getInfos(appInfo.getDownUrl());
 					appInfo.setDownloadInfos(downloadInfos);

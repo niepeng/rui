@@ -46,6 +46,8 @@ public class DownloadService extends Service {
 		final String downloadUrl = intent.getStringExtra("downloadUrl");
 		final String fileName = intent.getStringExtra("fileName");
 		
+		RuiApp.mPersist.downloadInfoDao.deleteByPackageName(packageName);
+		
 		new StartDownload().execute(packageName, downloadUrl, fileName);
 	}
 	
