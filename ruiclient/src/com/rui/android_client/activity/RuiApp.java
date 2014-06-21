@@ -342,6 +342,7 @@ public class RuiApp extends Application {
 			appInfo.setVersionName(pkInfo.versionName);
 			appInfo.setLocalVersionCode(pkInfo.versionCode);
 			appInfo.setIcon(pkInfo.applicationInfo.loadIcon(packageManager));
+			appInfo.setInstalled(true);
 			
 			installedApps.add(appInfo);
 		}

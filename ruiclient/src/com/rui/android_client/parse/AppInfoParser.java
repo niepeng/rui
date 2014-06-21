@@ -5,6 +5,7 @@ import org.json.JSONObject;
 import com.rui.android_client.activity.RuiApp;
 import com.rui.android_client.model.AppInfo;
 import com.rui.android_client.utils.JsonUtil;
+import com.rui.android_client.utils.StringUtil;
 
 public class AppInfoParser {
 
@@ -21,6 +22,7 @@ public class AppInfoParser {
 		AppInfo app = new AppInfo();
 		app.setId(JsonUtil.getLong(json, "id", 0));
 		app.setMainTitle(JsonUtil.getString(json, "mainTitle", null));
+		app.setSubTitle(JsonUtil.getString(json, "subTitle", null));
 		app.setIconUrl(JsonUtil.getString(json, "iconUrl", null));
 		app.setDownUrl(JsonUtil.getString(json, "downUrl", null));
 		app.setVersionValue(JsonUtil.getString(json, "versionValue", null));
@@ -30,6 +32,11 @@ public class AppInfoParser {
 		app.setFileSize(JsonUtil.getInt(json, "fileSize", 0));
 		app.setFirstCatId(JsonUtil.getLong(json, "firstCatId", 0));
 		app.setUpdateInfo(JsonUtil.getString(json, "updateInfo", null));
+
+		String screenshots = JsonUtil.getString(json, "screenshots", null);
+		if (StringUtil.isNotBlank(screenshots)) {
+			app.setScreenshots(screenshots.split(","));
+		}
 
 		RuiApp ruiApp = (RuiApp) RuiApp.context.getApplicationContext();
 		if (ruiApp.isAppInstalled(app.getPackageName())) {

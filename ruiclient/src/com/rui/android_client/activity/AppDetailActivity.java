@@ -141,6 +141,7 @@ public class AppDetailActivity extends BaseActivity {
 		}
 		RuiApp.fb.display(iconView, mAppInfo.getIconUrl());
 		mainTitleView.setText(mAppInfo.getMainTitle());
+		subTitleView.setText(mAppInfo.getSubTitle());
 
 		fileSizeView
 				.setContentText(NumberUtils.setScale(mAppInfo.getFileSize() / 1024f)

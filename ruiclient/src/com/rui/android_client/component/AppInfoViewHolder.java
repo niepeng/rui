@@ -9,7 +9,6 @@ import android.net.Uri;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
-import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.rui.android_client.R;
@@ -28,10 +27,8 @@ public class AppInfoViewHolder extends ViewHolder {
 	public ImageView iconView;
 	public TextView titleView;
 	public Button openBtn;
-	public Button updateBtn;
-	public Button cancelBtn;
+	public ButtonProgress downloadBtn;
 	public Button installBtn;
-	public ProgressBar downloadProgress;
 
 	private OnAppInfoDetailClickListener mOnAppInfoDetailClickListener;
 	private OnUpdateAppInfoClickListener mOnUpdateAppInfoClickListener;
@@ -78,14 +75,11 @@ public class AppInfoViewHolder extends ViewHolder {
 		iconView = (ImageView) findViewById(R.id.icon);
 		titleView = (TextView) findViewById(R.id.title);
 		openBtn = (Button) findViewById(R.id.open_btn);
-		updateBtn = (Button) findViewById(R.id.update_btn);
-		cancelBtn = (Button) findViewById(R.id.cancel_btn);
+		downloadBtn = (ButtonProgress) findViewById(R.id.download_btn);
 		installBtn = (Button) findViewById(R.id.install_btn);
-		downloadProgress = (ProgressBar) findViewById(R.id.download_progress);
 
 		openBtn.setOnClickListener(onOpenClick);
-		updateBtn.setOnClickListener(onUpdateClick);
-		cancelBtn.setOnClickListener(onCancelClick);
+		downloadBtn.setOnButtonClickListener(onUpdateClick);
 		installBtn.setOnClickListener(onInstallClick);
 	}
 
@@ -101,22 +95,15 @@ public class AppInfoViewHolder extends ViewHolder {
 		titleView.setText(appInfo.getMainTitle());
 
 		openBtn.setTag(appInfo);
-		updateBtn.setTag(appInfo);
-		cancelBtn.setTag(appInfo);
+		downloadBtn.setTag(appInfo);
 		installBtn.setTag(appInfo);
 
 		openBtn.setVisibility(View.GONE);
-		updateBtn.setVisibility(View.GONE);
-		cancelBtn.setVisibility(View.GONE);
+		downloadBtn.setVisibility(View.GONE);
 		installBtn.setVisibility(View.GONE);
 
 		if (CollectionUtil.isEmpty(appInfo.getDownloadInfos())) {
-			if (appInfo.isNeedUpdate()) {
-				updateBtn.setVisibility(View.VISIBLE);
-			} else {
-				openBtn.setVisibility(View.VISIBLE);
-			}
-			downloadProgress.setVisibility(View.GONE);
+			setButtonDefaultStatus(appInfo);
 		} else {
 			int fileSize = 0;
 			int completedSize = 0;
@@ -129,19 +116,27 @@ public class AppInfoViewHolder extends ViewHolder {
 				installBtn.setVisibility(View.VISIBLE);
 			} else if (RuiApp.downloaders.get(appInfo.getDownUrl()) != null
 					&& DownloadUtils.isDownloading(fileSize, completedSize)) {
-				cancelBtn.setVisibility(View.VISIBLE);
+				downloadBtn.setText("取消");
+				downloadBtn.setVisibility(View.VISIBLE);
 			} else {
 				fileSize = 0;
 				completedSize = 0;
-				if (appInfo.isNeedUpdate()) {
-					updateBtn.setVisibility(View.VISIBLE);
-				} else {
-					openBtn.setVisibility(View.VISIBLE);
-				}
+				setButtonDefaultStatus(appInfo);
 			}
-			downloadProgress.setVisibility(View.VISIBLE);
-			downloadProgress.setMax(fileSize);
-			downloadProgress.setProgress(completedSize);
+			downloadBtn.setProgressMax(fileSize);
+			downloadBtn.updateProgress(completedSize);
+		}
+	}
+
+	private void setButtonDefaultStatus(AppInfo appInfo) {
+		if (appInfo.isNeedUpdate()) {
+			downloadBtn.setText("更新");
+			downloadBtn.setVisibility(View.VISIBLE);
+		} else if (!appInfo.isInstalled()) {
+			downloadBtn.setText("下载");
+			downloadBtn.setVisibility(View.VISIBLE);
+		} else {
+			openBtn.setVisibility(View.VISIBLE);
 		}
 	}
 
@@ -163,16 +158,19 @@ public class AppInfoViewHolder extends ViewHolder {
 		}
 	};
 
-	private View.OnClickListener onUpdateClick = new View.OnClickListener() {
+	private ButtonProgress.OnButtonClickListener onUpdateClick = new ButtonProgress.OnButtonClickListener() {
 
-		@Override
-		public void onClick(View v) {
+		public void onStart(View v) {
 			if (mOnUpdateAppInfoClickListener != null) {
 				mOnUpdateAppInfoClickListener.onClick(v);
 				return;
 			}
 			startDownload(v);
-		}
+		};
+
+		public void onStop(View v) {
+			cancelDownload(v);
+		};
 
 	};
 
@@ -193,36 +191,21 @@ public class AppInfoViewHolder extends ViewHolder {
 		intent.putExtra("downloadUrl", downloadUrl);
 		intent.putExtra("flag", "start_download");// 标志着数据从localdownactivi
 		mContext.startService(intent);// 这里启动service
-
-		showProgressBar(v, downloadUrl);
 	}
 
-	private void showProgressBar(View v, String downloadUrl) {
-		View root = (View) v.getParent().getParent();
-		ProgressBar bar = (ProgressBar) root
-				.findViewById(R.id.download_progress);
-		v.setVisibility(View.GONE);
-		Button cancelBtn = (Button) root.findViewById(R.id.cancel_btn);
-		cancelBtn.setVisibility(View.VISIBLE);
-		bar.setVisibility(View.VISIBLE);
-	}
-
-	private View.OnClickListener onCancelClick = new View.OnClickListener() {
-		@Override
-		public void onClick(View v) {
-			if (mOnCancelUpdateClickListener != null) {
-				mOnCancelUpdateClickListener.onClick(v);
-				return;
-			}
-			AppInfo appInfo = (AppInfo) v.getTag();
-			Intent intent = new Intent();
-			intent.setClass(mContext,
-					com.rui.android_client.service.DownloadService.class);
-			intent.putExtra("downloadUrl", appInfo.getDownUrl());
-			intent.putExtra("flag", "cancel");// 标志着数据从localdownactivi
-			mContext.startService(intent);// 这里启动service
+	private void cancelDownload(View v) {
+		if (mOnCancelUpdateClickListener != null) {
+			mOnCancelUpdateClickListener.onClick(v);
+			return;
 		}
-	};
+		AppInfo appInfo = (AppInfo) v.getTag();
+		Intent intent = new Intent();
+		intent.setClass(mContext,
+				com.rui.android_client.service.DownloadService.class);
+		intent.putExtra("downloadUrl", appInfo.getDownUrl());
+		intent.putExtra("flag", "cancel");// 标志着数据从localdownactivi
+		mContext.startService(intent);// 这里启动service
+	}
 
 	private View.OnClickListener onInstallClick = new View.OnClickListener() {
 

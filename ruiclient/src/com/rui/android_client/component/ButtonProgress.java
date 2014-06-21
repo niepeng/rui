@@ -125,7 +125,6 @@ public class ButtonProgress extends RelativeLayout {
 
 	private void initListener() {
 		setClickable(true);
-		setFocusable(true);
 		setOnClickListener(new OnClickListener() {
 
 			@Override

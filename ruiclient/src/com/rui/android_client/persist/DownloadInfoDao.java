@@ -9,6 +9,7 @@ import static com.rui.android_client.db.metadata.DownloadInfoTable.Columns.START
 import static com.rui.android_client.db.metadata.DownloadInfoTable.Columns.THREAD_ID;
 import static com.rui.android_client.db.metadata.DownloadInfoTable.Columns.URL;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import android.content.ContentValues;
@@ -17,6 +18,7 @@ import android.database.sqlite.SQLiteDatabase;
 
 import com.rui.android_client.db.metadata.DownloadInfoTable;
 import com.rui.android_client.model.DownloadInfo;
+import com.rui.android_client.utils.StringUtil;
 
 public class DownloadInfoDao extends BaseDao<DownloadInfo> {
 
@@ -70,6 +72,9 @@ public class DownloadInfoDao extends BaseDao<DownloadInfo> {
 	 * 得到下载具体信息
 	 */
 	public List<DownloadInfo> getInfos(String url) {
+		if (StringUtil.isBlank(url)) {
+			return new ArrayList<DownloadInfo>();
+		}
 		String clause = URL + "=?";
 		return findList(clause, new String[] { url });
 	}
