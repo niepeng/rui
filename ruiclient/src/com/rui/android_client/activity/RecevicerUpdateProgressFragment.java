@@ -30,7 +30,7 @@ public abstract class RecevicerUpdateProgressFragment extends Fragment {
 				new IntentFilter(DownloadService.ACTION_UPDATE_PROGRESS));
 		return super.onCreateView(inflater, container, savedInstanceState);
 	}
-	
+
 	@Override
 	public void onDestroyView() {
 		if (mUpdateProgressReceiver != null) {
@@ -59,16 +59,13 @@ public abstract class RecevicerUpdateProgressFragment extends Fragment {
 					&& downloadUrl.equals(item.getDownUrl())) {
 				item.setDownloadInfos(RuiApp.mPersist.downloadInfoDao
 						.getInfos(downloadUrl));
-				mListAdapter.notifyDataSetChanged();
-				break;
 			}
 			if (StringUtil.isNotBlank(packageName)
 					&& packageName.equals(item.getPackageName())) {
 				item.setDownloadInfos(RuiApp.mPersist.downloadInfoDao
 						.getInfosByPackage(packageName));
-				mListAdapter.notifyDataSetChanged();
-				break;
 			}
 		}
+		mListAdapter.notifyDataSetChanged();
 	}
 }
