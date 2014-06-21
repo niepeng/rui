@@ -65,35 +65,20 @@
         </LinearLayout>
     </ScrollView>
 
-    <ProgressBar
-        android:id="@+id/download_progress"
-        style="?android:attr/progressBarStyleHorizontal"
-        android:layout_width="match_parent"
-        android:layout_height="10dp"
-        android:layout_marginTop="10dp"
-        android:max="100" />
-
-    <Button
+    <com.rui.android_client.component.ButtonProgress
         android:id="@+id/download_btn"
         style="@style/detail_btn"
-        android:text="@string/download"
-        android:visibility="gone" />
-
-    <Button
-        android:id="@+id/update_btn"
-        style="@style/detail_btn"
-        android:text="更新"
-        android:visibility="gone" />
-
-    <Button
-        android:id="@+id/cancel_btn"
-        style="@style/detail_btn"
-        android:text="取消"
-        android:visibility="gone" />
+        rui:button_color="@android:color/transparent"
+        rui:button_text="下载"
+        rui:button_text_color="@color/detail_btn_text_color"
+        rui:button_text_size="@dimen/detail_btn_text_size"
+        rui:progress_bar_drawable="@drawable/progress_bar"
+        rui:progress_max="100" />
 
     <Button
         android:id="@+id/install_btn"
-        style="@style/listview_item_btn"
+        style="@style/detail_btn"
+        android:background="@color/btn_background_color"
         android:text="安装"
         android:visibility="gone" />
 

@@ -42,5 +42,14 @@
         <attr name="content_color" format="color" />
         <attr name="content_text_size" format="dimension" />
     </declare-styleable>
+    
+    <declare-styleable name="ButtonProgress">
+        <attr name="button_color" format="color"/>
+        <attr name="button_text_size" format="dimension" />
+        <attr name="button_text_color" format="color" />
+        <attr name="button_text" format="string" />
+        <attr name="progress_bar_drawable" format="reference" />
+        <attr name="progress_max" format="integer" />
+    </declare-styleable>
 
 </resources>

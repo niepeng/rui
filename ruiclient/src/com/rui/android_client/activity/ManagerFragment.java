@@ -7,13 +7,9 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import android.content.BroadcastReceiver;
-import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -27,7 +23,6 @@ import com.rui.android_client.component.AppInfoViewHolder;
 import com.rui.android_client.model.AppInfo;
 import com.rui.android_client.model.DownloadInfo;
 import com.rui.android_client.parse.AppInfoParser;
-import com.rui.android_client.service.DownloadService;
 import com.rui.android_client.utils.JsonUtil;
 import com.rui.android_client.utils.StringUtil;
 import com.rui.http.Config;
@@ -35,13 +30,11 @@ import com.rui.http.RemoteManager;
 import com.rui.http.Request;
 import com.rui.http.Response;
 
-public class ManagerFragment extends Fragment {
+public class ManagerFragment extends RecevicerUpdateProgressFragment {
 
 	private static final int REQUEST_INSTALL_APK_CODE = 1;
 
 	private RuiApp mApp;
-
-	private UpdateProgressReceiver mUpdateProgressReceiver;
 
 	private ArrayList<AppInfo> mAppInfos;
 
@@ -68,11 +61,7 @@ public class ManagerFragment extends Fragment {
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
-
-		mUpdateProgressReceiver = new UpdateProgressReceiver();
-		getActivity().registerReceiver(mUpdateProgressReceiver,
-				new IntentFilter(DownloadService.ACTION_UPDATE_PROGRESS));
-
+		super.onCreateView(inflater, container, savedInstanceState);
 		mApp = (RuiApp) getActivity().getApplication();
 
 		View rootView = inflater.inflate(R.layout.fragment_manager, null);
@@ -103,14 +92,6 @@ public class ManagerFragment extends Fragment {
 	public void onResume() {
 		super.onResume();
 		loadInstalledApps();
-	}
-
-	@Override
-	public void onDestroyView() {
-		if (mUpdateProgressReceiver != null) {
-			getActivity().unregisterReceiver(mUpdateProgressReceiver);
-		}
-		super.onDestroyView();
 	}
 
 	private class ListAdapter extends BaseAdapter {
@@ -229,29 +210,9 @@ public class ManagerFragment extends Fragment {
 
 	}
 
-	private class UpdateProgressReceiver extends BroadcastReceiver {
-
-		@Override
-		public void onReceive(Context context, Intent intent) {
-			String url = intent.getStringExtra("downloadUrl");
-			String packageName = intent.getStringExtra("packageName");
-			for (AppInfo item : mAppInfos) {
-				if (StringUtil.isNotBlank(url) && url.equals(item.getDownUrl())) {
-					item.setDownloadInfos(RuiApp.mPersist.downloadInfoDao
-							.getInfos(url));
-					mListAdapter.notifyDataSetChanged();
-					break;
-				}
-				if (StringUtil.isNotBlank(packageName)
-						&& packageName.equals(item.getPackageName())) {
-					item.setDownloadInfos(RuiApp.mPersist.downloadInfoDao
-							.getInfosByPackage(packageName));
-					mListAdapter.notifyDataSetChanged();
-					break;
-				}
-			}
-		}
-
+	@Override
+	protected void updateProgress(String downloadUrl, String packageName) {
+		super.updateProgress(mAppInfos, mListAdapter, downloadUrl, packageName);
 	}
 
 }

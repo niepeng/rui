@@ -7,7 +7,10 @@ import java.util.List;
 import org.json.JSONObject;
 
 import android.app.ActionBar;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.view.PagerAdapter;
@@ -19,15 +22,17 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ImageView.ScaleType;
 import android.widget.LinearLayout.LayoutParams;
-import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.rui.android_client.R;
+import com.rui.android_client.component.ButtonProgress;
+import com.rui.android_client.component.ButtonProgress.OnButtonClickListener;
 import com.rui.android_client.component.LinePageIndicator;
 import com.rui.android_client.component.TextViewWithLabelLayout;
 import com.rui.android_client.model.AppInfo;
 import com.rui.android_client.model.DownloadInfo;
 import com.rui.android_client.parse.AppInfoParser;
+import com.rui.android_client.service.DownloadService;
 import com.rui.android_client.utils.CollectionUtil;
 import com.rui.android_client.utils.DownloadUtils;
 import com.rui.android_client.utils.JsonUtil;
@@ -52,16 +57,15 @@ public class AppDetailActivity extends BaseActivity {
 	private TextView mainTitleView, subTitleView, detailInfoView;
 	private TextViewWithLabelLayout fileSizeView;
 
-	private Button downloadBtn;
-	private Button updateBtn;
-	private Button cancelBtn;
+	private ButtonProgress downloadBtn;
 	private Button installBtn;
-	private ProgressBar downloadProgress;
 
 	private ArrayList<View> bannerImageViewList = new ArrayList<View>();
 	private BannerPagerAdapter mBannerPageAdapter;
 	private ViewPager mBannerViewPager;
 	private LinePageIndicator mBannerViewIndicator;
+
+	private UpdateProgressReceiver mUpdateProgressReceiver;
 
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
@@ -81,6 +85,14 @@ public class AppDetailActivity extends BaseActivity {
 		init();
 	}
 
+	@Override
+	protected void onDestroy() {
+		if (mUpdateProgressReceiver != null) {
+			unregisterReceiver(mUpdateProgressReceiver);
+		}
+		super.onDestroy();
+	}
+
 	private void init() {
 		initView();
 		initData();
@@ -94,11 +106,8 @@ public class AppDetailActivity extends BaseActivity {
 		subTitleView = (TextView) findViewById(R.id.sub_title);
 		fileSizeView = (TextViewWithLabelLayout) findViewById(R.id.file_size);
 		detailInfoView = (TextView) findViewById(R.id.detail_info);
-		downloadBtn = (Button) findViewById(R.id.download_btn);
-		updateBtn = (Button) findViewById(R.id.update_btn);
-		cancelBtn = (Button) findViewById(R.id.cancel_btn);
+		downloadBtn = (ButtonProgress) findViewById(R.id.download_btn);
 		installBtn = (Button) findViewById(R.id.install_btn);
-		downloadProgress = (ProgressBar) findViewById(R.id.download_progress);
 
 		mBannerPageAdapter = new BannerPagerAdapter();
 		mBannerViewPager = (ViewPager) findViewById(R.id.banner_viewpage);
@@ -139,21 +148,21 @@ public class AppDetailActivity extends BaseActivity {
 
 		setBannerViewContent();
 
-		updateBtn.setTag(mAppInfo);
-		cancelBtn.setTag(mAppInfo);
+		downloadBtn.setTag(mAppInfo);
 		installBtn.setTag(mAppInfo);
 
-		updateBtn.setVisibility(View.GONE);
-		cancelBtn.setVisibility(View.GONE);
-		installBtn.setVisibility(View.GONE);
+		setButtonsViewContent();
+	}
 
+	private void setButtonsViewContent() {
+		installBtn.setVisibility(View.GONE);
 		if (CollectionUtil.isEmpty(mAppInfo.getDownloadInfos())) {
+			downloadBtn.setVisibility(View.VISIBLE);
 			if (mAppInfo.isNeedUpdate()) {
-				updateBtn.setVisibility(View.VISIBLE);
+				downloadBtn.setText("更新");
 			} else {
-				downloadBtn.setVisibility(View.VISIBLE);
+				downloadBtn.setText("下载");
 			}
-			downloadProgress.setVisibility(View.GONE);
 		} else {
 			int fileSize = 0;
 			int completedSize = 0;
@@ -166,19 +175,20 @@ public class AppDetailActivity extends BaseActivity {
 				installBtn.setVisibility(View.VISIBLE);
 			} else if (RuiApp.downloaders.get(mAppInfo.getDownUrl()) != null
 					&& DownloadUtils.isDownloading(fileSize, completedSize)) {
-				cancelBtn.setVisibility(View.VISIBLE);
+				downloadBtn.setVisibility(View.VISIBLE);
+				downloadBtn.setText("取消");
 			} else {
 				fileSize = 0;
 				completedSize = 0;
+				downloadBtn.setVisibility(View.VISIBLE);
 				if (mAppInfo.isNeedUpdate()) {
-					updateBtn.setVisibility(View.VISIBLE);
+					downloadBtn.setText("更新");
 				} else {
-					downloadBtn.setVisibility(View.VISIBLE);
+					downloadBtn.setText("下载");
 				}
 			}
-			downloadProgress.setVisibility(View.VISIBLE);
-			downloadProgress.setMax(fileSize);
-			downloadProgress.setProgress(completedSize);
+			downloadBtn.setProgressMax(fileSize);
+			downloadBtn.updateProgress(completedSize);
 		}
 	}
 
@@ -209,7 +219,8 @@ public class AppDetailActivity extends BaseActivity {
 						JsonUtil.getJSONObject(jsonRoot, "data"), "appDetail");
 				if (jsonAppDetail != null) {
 					mAppInfo = AppInfoParser.getInstance().parse(jsonAppDetail);
-					if (mAppInfo != null && StringUtil.isNotBlank(mAppInfo.getDownUrl())) {
+					if (mAppInfo != null
+							&& StringUtil.isNotBlank(mAppInfo.getDownUrl())) {
 						List<DownloadInfo> downloadInfos = RuiApp.mPersist.downloadInfoDao
 								.getInfos(mAppInfo.getDownUrl());
 						mAppInfo.setDownloadInfos(downloadInfos);
@@ -265,19 +276,24 @@ public class AppDetailActivity extends BaseActivity {
 	}
 
 	private void initListener() {
-		updateBtn.setOnClickListener(onUpdateClick);
-		cancelBtn.setOnClickListener(onCancelClick);
+		mUpdateProgressReceiver = new UpdateProgressReceiver();
+		registerReceiver(mUpdateProgressReceiver, new IntentFilter(
+				DownloadService.ACTION_UPDATE_PROGRESS));
+
+		downloadBtn.setOnButtonClickListener(new OnButtonClickListener() {
+
+			@Override
+			public void onStop(View v) {
+				cancelDownload(v);
+			}
+
+			@Override
+			public void onStart(View v) {
+				startDownload(v);
+			}
+		});
 		installBtn.setOnClickListener(onInstallClick);
 	}
-
-	private View.OnClickListener onUpdateClick = new View.OnClickListener() {
-
-		@Override
-		public void onClick(View v) {
-			startDownload(v);
-		}
-
-	};
 
 	/**
 	 * 83 * 响应开始下载按钮的点击事件 84
@@ -296,32 +312,17 @@ public class AppDetailActivity extends BaseActivity {
 		intent.putExtra("downloadUrl", downloadUrl);
 		intent.putExtra("flag", "start_download");// 标志着数据从localdownactivi
 		startService(intent);// 这里启动service
-
-		showProgressBar(v, downloadUrl);
 	}
 
-	private void showProgressBar(View v, String downloadUrl) {
-		View root = (View) v.getParent().getParent();
-		ProgressBar bar = (ProgressBar) root
-				.findViewById(R.id.download_progress);
-		v.setVisibility(View.GONE);
-		Button cancelBtn = (Button) root.findViewById(R.id.cancel_btn);
-		cancelBtn.setVisibility(View.VISIBLE);
-		bar.setVisibility(View.VISIBLE);
+	private void cancelDownload(View v) {
+		AppInfo appInfo = (AppInfo) v.getTag();
+		Intent intent = new Intent();
+		intent.setClass(AppDetailActivity.this,
+				com.rui.android_client.service.DownloadService.class);
+		intent.putExtra("downloadUrl", appInfo.getDownUrl());
+		intent.putExtra("flag", "cancel");// 标志着数据从localdownactivi
+		startService(intent);// 这里启动service
 	}
-
-	private View.OnClickListener onCancelClick = new View.OnClickListener() {
-		@Override
-		public void onClick(View v) {
-			AppInfo appInfo = (AppInfo) v.getTag();
-			Intent intent = new Intent();
-			intent.setClass(AppDetailActivity.this,
-					com.rui.android_client.service.DownloadService.class);
-			intent.putExtra("downloadUrl", appInfo.getDownUrl());
-			intent.putExtra("flag", "cancel");// 标志着数据从localdownactivi
-			startService(intent);// 这里启动service
-		}
-	};
 
 	private View.OnClickListener onInstallClick = new View.OnClickListener() {
 
@@ -342,5 +343,17 @@ public class AppDetailActivity extends BaseActivity {
 			startActivity(intent);
 		}
 	};
+
+	private class UpdateProgressReceiver extends BroadcastReceiver {
+
+		@Override
+		public void onReceive(Context context, Intent intent) {
+			String url = intent.getStringExtra("downloadUrl");
+			mAppInfo.setDownloadInfos(RuiApp.mPersist.downloadInfoDao
+					.getInfos(url));
+			setButtonsViewContent();
+		}
+
+	}
 
 }

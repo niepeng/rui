@@ -22,5 +22,11 @@
     <bool name="default_line_indicator_centered">true</bool>
     
     <color name="detail_label_text_color">#333333</color>
+    <color name="detail_btn_background">#333333</color>
+    <color name="detail_btn_text_color">#ffffff</color>
+    <color name="detail_progress_color">#ff0000</color>
+    
+    <color name="btn_background_color">#3baa24</color>
+    <color name="progress_bar_progress_color">#333333</color>
 
 </resources>

@@ -57,6 +57,14 @@ public class AppListView {
 	protected int mPage = 1;
 	
 	private File rootFile;
+	
+	public BaseAdapter getAdapter() {
+		return mAdapter;
+	}
+	
+	public ArrayList<AppInfo> getAppInfos() {
+		return mAppInfos;
+	}
 
 	public AppListView(Activity activity, ListView listView) {
 		mActivity = activity;
