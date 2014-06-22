@@ -54,7 +54,7 @@ public class AppDetailActivity extends BaseActivity {
 	private AppInfo mAppInfo;
 
 	private ImageView iconView;
-	private TextView mainTitleView, subTitleView, detailInfoView;
+	private TextView mainTitleView, subTitleView, detailInfoView, updateInfoView;
 	private TextViewWithLabelLayout fileSizeView;
 
 	private ButtonProgress downloadBtn;
@@ -106,6 +106,7 @@ public class AppDetailActivity extends BaseActivity {
 		subTitleView = (TextView) findViewById(R.id.sub_title);
 		fileSizeView = (TextViewWithLabelLayout) findViewById(R.id.file_size);
 		detailInfoView = (TextView) findViewById(R.id.detail_info);
+		updateInfoView = (TextView) findViewById(R.id.update_info);
 		downloadBtn = (ButtonProgress) findViewById(R.id.download_btn);
 		installBtn = (Button) findViewById(R.id.install_btn);
 
@@ -142,6 +143,9 @@ public class AppDetailActivity extends BaseActivity {
 		RuiApp.fb.display(iconView, mAppInfo.getIconUrl());
 		mainTitleView.setText(mAppInfo.getMainTitle());
 		subTitleView.setText(mAppInfo.getSubTitle());
+		detailInfoView.setText(mAppInfo.getInfo());
+		updateInfoView.setText(mAppInfo.getUpdateInfo());
+		
 
 		fileSizeView
 				.setContentText(NumberUtils.setScale(mAppInfo.getFileSize() / 1024f)

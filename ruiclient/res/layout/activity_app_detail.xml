@@ -69,7 +69,8 @@
                 <android.support.v4.view.ViewPager
                     android:id="@+id/banner_viewpage"
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent" />
+                    android:layout_height="match_parent"
+                    android:clipChildren="false" />
 
                 <com.rui.android_client.component.LinePageIndicator
                     android:id="@+id/indicator"
@@ -79,9 +80,20 @@
             </RelativeLayout>
 
             <TextView
+                style="@style/detail_desc_label"
+                android:text="应用描述" />
+
+            <TextView
                 android:id="@+id/detail_info"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content" />
+                style="@style/detail_desc" />
+
+            <TextView
+                style="@style/detail_desc_label"
+                android:text="本次更新" />
+
+            <TextView
+                android:id="@+id/update_info"
+                style="@style/detail_desc" />
         </LinearLayout>
     </ScrollView>
 

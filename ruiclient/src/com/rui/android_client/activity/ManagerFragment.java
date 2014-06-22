@@ -183,6 +183,8 @@ public class ManagerFragment extends RecevicerUpdateProgressFragment {
 					return;
 				}
 				AppInfo appInfo = mApp.getInstalledAppInfo(packageName);
+				appInfo.setInfo(appInfoFromServer.getInfo());
+				appInfo.setUpdateInfo(appInfoFromServer.getUpdateInfo());
 				appInfo.setVersionValue(appInfoFromServer.getVersionValue());
 				String downUrl = appInfoFromServer.getDownUrl();
 				appInfo.setNeedUpdate(appInfoFromServer.isNeedUpdate());

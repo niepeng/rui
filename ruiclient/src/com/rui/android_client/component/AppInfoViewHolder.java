@@ -25,7 +25,7 @@ public class AppInfoViewHolder extends ViewHolder {
 	private File mRootFile;
 
 	public ImageView iconView;
-	public TextView titleView;
+	public TextView titleView, subTitleView, infoView;
 	public Button openBtn;
 	public ButtonProgress downloadBtn;
 	public Button installBtn;
@@ -74,6 +74,8 @@ public class AppInfoViewHolder extends ViewHolder {
 		View.inflate(context, R.layout.layout_app_listview_item, this);
 		iconView = (ImageView) findViewById(R.id.icon);
 		titleView = (TextView) findViewById(R.id.title);
+		subTitleView = (TextView ) findViewById(R.id.sub_title);
+		infoView = (TextView) findViewById(R.id.app_info);
 		openBtn = (Button) findViewById(R.id.open_btn);
 		downloadBtn = (ButtonProgress) findViewById(R.id.download_btn);
 		installBtn = (Button) findViewById(R.id.install_btn);
@@ -93,6 +95,8 @@ public class AppInfoViewHolder extends ViewHolder {
 			RuiApp.fb.display(iconView, appInfo.getIconUrl());
 		}
 		titleView.setText(appInfo.getMainTitle());
+		subTitleView.setText(appInfo.getSubTitle());
+		infoView.setText(appInfo.getInfo());
 
 		openBtn.setTag(appInfo);
 		downloadBtn.setTag(appInfo);

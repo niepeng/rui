@@ -27,6 +27,7 @@ import com.rui.android_client.activity.RuiApp;
 import com.rui.android_client.model.AppInfo;
 import com.rui.android_client.model.DownloadInfo;
 import com.rui.android_client.parse.AppInfoParser;
+import com.rui.android_client.utils.CollectionUtil;
 import com.rui.android_client.utils.DownloadUtils;
 import com.rui.android_client.utils.JsonUtil;
 import com.rui.android_client.utils.StringUtil;
@@ -105,6 +106,9 @@ public class AppListView {
 
 		@Override
 		public AppInfo getItem(int position) {
+			if (CollectionUtil.isEmpty(mAppInfos)) {
+				return null;
+			}
 			return mAppInfos.get(position);
 		}
 
@@ -240,6 +244,9 @@ public class AppListView {
 		public void onItemClick(AdapterView<?> parent, View view, int position,
 				long id) {
 			AppInfo app = mAdapter.getItem(position);
+			if (app == null) {
+				return;
+			}
 			Intent intent = new Intent(mActivity, AppDetailActivity.class);
 			intent.putExtra("ID", app.getId());
 			mActivity.startActivity(intent);
