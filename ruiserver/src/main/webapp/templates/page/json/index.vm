@@ -3,5 +3,5 @@
 	#if($bannerList)
 			"bannerList" : $jsonUtil.mfields('id,name,imageUrl',$bannerList) ,
 	#end
-	"appList" : $jsonUtil.mfields('id,mainTitle,subTitle,downUrl,fileSize,iconUrl,packageName,info,updateInfo',$appList) 
+	"appList" : $jsonUtil.mfields('id,mainTitle,subTitle,downUrl,fileSize,iconUrl,packageName,info,updateInfo,versionName,versionValue',$appList) 
 }}
