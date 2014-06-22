@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:rui="http://schemas.android.com/apk/res-auto"
-    style="@style/listview_item" >
+    style="@style/listview_item"
+    android:orientation="vertical" >
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -30,13 +31,6 @@
                 style="@style/listview_item_title"
                 android:textSize="14sp" />
         </LinearLayout>
-
-        <TextView
-            android:id="@+id/app_info"
-            style="@style/listview_item_title"
-            android:lines="2"
-            android:singleLine="false"
-            android:textSize="14sp" />
 
         <LinearLayout
             android:layout_width="wrap_content"
@@ -73,13 +67,18 @@
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:gravity="center_vertical"
         android:orientation="vertical" >
 
         <TextView
-            android:id="@+id/update_info"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
+            android:id="@+id/app_info"
+            style="@style/listview_item_title"
+            android:lineSpacingExtra="3dp"
+            android:lines="2"
+            android:singleLine="false"
+            android:textSize="14sp" />
     </LinearLayout>
 
 </LinearLayout>
