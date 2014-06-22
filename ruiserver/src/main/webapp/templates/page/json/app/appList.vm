@@ -1,1 +1,1 @@
-{"code":0, "data":$jsonUtil.mfields('id,mainTitle,downUrl,fileSize,iconUrl,subTitle,info',$appList) }
+{"code":0, "data":$jsonUtil.mfields('id,mainTitle,subTitle,downUrl,fileSize,iconUrl,packageName,info,updateInfo,versionName,versionValue',$appList) }
