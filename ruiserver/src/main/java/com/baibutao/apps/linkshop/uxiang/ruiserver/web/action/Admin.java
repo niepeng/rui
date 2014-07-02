@@ -1,6 +1,7 @@
 package com.baibutao.apps.linkshop.uxiang.ruiserver.web.action;
 
 import wint.help.biz.result.Result;
+import wint.help.biz.result.ResultSupport;
 import wint.mvc.flow.FlowData;
 import wint.mvc.form.Form;
 import wint.mvc.module.annotations.Action;
@@ -51,9 +52,12 @@ public class Admin extends BaseAction {
 		if (!checkSessionNeedRedrect(flowData, context)) {
 			return;
 		}
+		Result result = new ResultSupport(true);
+		addLoginInfo(result, flowData);
 		long fatherAppId = flowData.getParameters().getLong("fatherAppId");
 		context.put("title", "上传安装包");
 		context.put("fatherAppId", fatherAppId);
+		handleResult(result, flowData, context);
 		flowData.setLayout("/admin/addApp");
 	}
 	

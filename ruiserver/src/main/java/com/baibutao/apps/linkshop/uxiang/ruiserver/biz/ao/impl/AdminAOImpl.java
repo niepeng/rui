@@ -190,6 +190,10 @@ public class AdminAOImpl extends BaseAO implements AdminAO {
 					appQuery.setUserId(loginUserId);
 				}
 			}
+			
+			if(appQuery.getUserId() == 0 && isAdmin(flowData)) {
+				appQuery.setUserId(getLoginUserId(flowData));
+			}
 
 			// 获取当前用户提交的所有app列表
 			List<AppInfoDO> appInfoList = appInfoDAO.query(appQuery);
@@ -527,6 +531,14 @@ public class AdminAOImpl extends BaseAO implements AdminAO {
 			AppInfoDO appInfoDO = appInfoDAO.queryById(appId);
 			if(appInfoDO == null || appInfoDO.isOnLine() || appInfoDO.isTimeOut()) {
 				result.setResultCode(new StringResultCode("当前app不存在或已经上线了"));
+				return result;
+			}
+			
+			// app第一次提交审核通过处理
+			if(appInfoDO.getReferMainAppId() == 0) {
+				appInfoDO.setStatus(APPStsutsEnum.ONLINE.getValue());
+				appInfoDAO.update(appInfoDO);
+				result.setSuccess(true);
 				return result;
 			}
 			

@@ -1,5 +1,5 @@
  
- $widget.setTemplate("userHeader").addToContext("tab",'0')
+ $widget.setTemplate("userHeader").addToContext("tab",'0').addToContext('loginUserDO', $!loginUserDO)
 
      <div class="pmt-main-section pmt-container ng-scope" ng-view="">
 		<div class="pmt-step-progress-bar ng-scope ng-isolate-scope step-1 step-2" step-bar="" steps="['上传安装包', '填写应用信息','提交审核', '应用上架']" stepnum="$root.stepnum" ng-show="$root.vm.isShowStepBar">
