@@ -1,7 +1,13 @@
 package com.rui.android_client.model;
 
-public class BaseModel {
+import java.io.Serializable;
 
+public class BaseModel implements Serializable {
+
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 2089347400398454795L;
 	private long id;
 	private long created;
 	private long updated;

@@ -6,8 +6,17 @@
         android:id="@+id/icon"
         style="@style/listview_item_icon" />
 
-    <TextView
-        android:id="@+id/title"
-        style="@style/listview_item_title" />
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:orientation="vertical"
+        android:paddingLeft="10dp"
+        android:paddingRight="10dp" >
+
+        <TextView
+            android:id="@+id/title"
+            style="@style/listview_item_title" />
+    </LinearLayout>
 
 </LinearLayout>

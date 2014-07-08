@@ -180,18 +180,21 @@ public class AppListView {
 		@Override
 		public void onPostExecute(final Response response) {
 			final boolean isSuccess = response != null && response.isSuccess();
+			ArrayList<AppInfo> tempAppInfos = null;
 			if (isSuccess) {
 				// 解析数据
-				parseCallbackBody(response);
+				tempAppInfos = parseCallbackBody(response);
 				mPage++;
 			} else {
 				// TODO load failed
 			}
+			final ArrayList<AppInfo> appInfos = tempAppInfos;
 			mActivity.runOnUiThread(new Runnable() {
 
 				@Override
 				public void run() {
 					if (isSuccess) {
+						mAppInfos.addAll(appInfos);
 						mAdapter.notifyDataSetChanged(); // 数据集变化后,通知adapter
 						mListView.setSelection(mVisibleLastIndex
 								- mVisibleItemCount + 1); // 设置选中项
@@ -204,12 +207,13 @@ public class AppListView {
 
 	}
 
-	protected void parseCallbackBody(final Response response) {
+	protected ArrayList<AppInfo> parseCallbackBody(final Response response) {
 		List<AppInfo> localApps = mApp.getInstalledAppInfos();
 		HashMap<String, Integer> localAppVersionCodes = new HashMap<String, Integer>();
 		for (AppInfo item : localApps) {
-			localAppVersionCodes.put(item.getPackageName(), Integer.parseInt(item.getVersionValue()));
+			localAppVersionCodes.put(item.getPackageName(), item.getLocalVersionCode());
 		}
+		ArrayList<AppInfo> appinfos = new ArrayList<AppInfo>();
 		JSONObject json = JsonUtil.getJsonObject(response.getModel());
 		JSONArray jsonArray = JsonUtil.getJsonArray(json, "data");
 		if (jsonArray != null) {
@@ -230,12 +234,13 @@ public class AppListView {
 						appInfo.setDownloadInfos(downloadInfos);
 					}
 					
-					mAppInfos.add(appInfo);
+					appinfos.add(appInfo);
 				} catch (JSONException e) {
 					e.printStackTrace();
 				}
 			}
 		}
+		return appinfos;
 	}
 
 	private OnItemClickListener mOnItemClickListener = new OnItemClickListener() {

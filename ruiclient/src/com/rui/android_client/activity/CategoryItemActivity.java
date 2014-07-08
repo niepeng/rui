@@ -37,7 +37,7 @@ public class CategoryItemActivity extends BaseActivity {
 		setContentView(R.layout.layout_app_listview);
 		init();
 	}
-	
+
 	@Override
 	protected void onNewIntent(Intent intent) {
 		super.onNewIntent(intent);
@@ -60,7 +60,7 @@ public class CategoryItemActivity extends BaseActivity {
 	private void initActionBar() {
 		ActionBar actionBar = getActionBar();
 		// TODO
-		// actionBar.setTitle(R.string.detail);
+		actionBar.setTitle(R.string.detail);
 		actionBar.setDisplayHomeAsUpEnabled(true);
 		actionBar.setHomeButtonEnabled(true);
 		actionBar.setDisplayShowTitleEnabled(true);

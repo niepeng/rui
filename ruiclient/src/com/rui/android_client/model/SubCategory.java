@@ -1,9 +1,14 @@
 package com.rui.android_client.model;
 
-import java.util.ArrayList;
+import java.io.Serializable;
 
-public class AppCategory extends BaseModel {
+public class SubCategory extends BaseModel implements Serializable {
 	
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -9017735919784303895L;
+
 	private long id;
 
 	private String name;
@@ -15,8 +20,6 @@ public class AppCategory extends BaseModel {
 	private int sortValue;
 
 	private String iconUrl;
-	
-	private ArrayList<SubCategory> subCategories;
 	
 	public long getId() {
 		return id;
@@ -64,14 +67,6 @@ public class AppCategory extends BaseModel {
 
 	public void setIconUrl(String iconUrl) {
 		this.iconUrl = iconUrl;
-	}
-	
-	public ArrayList<SubCategory> getSubCategories() {
-		return subCategories;
-	}
-	
-	public void setSubCategories(ArrayList<SubCategory> subCategories) {
-		this.subCategories = subCategories;
 	}
 
 }

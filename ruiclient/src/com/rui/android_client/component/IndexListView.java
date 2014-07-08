@@ -35,7 +35,7 @@ public class IndexListView extends AppListView {
 	}
 
 	@Override
-	protected void parseCallbackBody(Response response) {
+	protected ArrayList<AppInfo> parseCallbackBody(Response response) {
 		JSONObject json = JsonUtil.getJsonObject(response.getModel());
 		JSONObject jsonData = JsonUtil.getJSONObject(json, "data");
 		JSONArray bannerList = JsonUtil.getJsonArray(jsonData, "bannerList");
@@ -50,18 +50,19 @@ public class IndexListView extends AppListView {
 				}
 			}
 		}
+		ArrayList<AppInfo> appInfos = new ArrayList<AppInfo>();
 		JSONArray appList = JsonUtil.getJsonArray(jsonData, "appList");
 		if (appList != null) {
 			for (int i = 0, size = appList.length(); i < size; i++) {
 				try {
 					JSONObject jsonObject = appList.getJSONObject(i);
-					mAppInfos
-							.add(AppInfoParser.getInstance().parse(jsonObject));
+					appInfos.add(AppInfoParser.getInstance().parse(jsonObject));
 				} catch (JSONException e) {
 					e.printStackTrace();
 				}
 			}
 		}
+		return appInfos;
 	}
 
 	@Override
