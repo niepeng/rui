@@ -35,7 +35,7 @@
             <strong class="slogan">你的手机娱乐中心</strong>
             <p class="full">在$!applicationUtil.websiteName()，你可以轻松免费获取很多视频、小说、壁纸和安卓手机应用和游戏。</p>
             <div class="download-field">
-                <a rel="nofollow" id="download-windows" href="#" target="_self" class="download-button download-windows-client">
+                <a rel="nofollow" id="download-windows" href="http://img.uxiang.com/ruiserver/files/bairui.apk" target="_blank" class="download-button download-windows-client">
                     下载$!applicationUtil.websiteName()
                 </a>
                 <span id="download-beta" data-track="home/download/beta">Beta 测试版</span>
@@ -134,7 +134,7 @@
         <!--apps-->
 <!--download-wrapper-->
 <div class="download-wrapper">
-    <a rel="nofollow" href="#"  target="_self" class="download-button download-windows-client">下载$!applicationUtil.websiteName()</a>
+    <a rel="nofollow" href="http://img.uxiang.com/ruiserver/files/bairui.apk"  target="_blank" class="download-button download-windows-client">下载$!applicationUtil.websiteName()</a>
     <!-- <a href="" class="android-popup-btn" data-track="home/popup/p4">在手机上安装$!applicationUtil.websiteName()</a>  -->
 </div>
 <!--download-wrapper-->
