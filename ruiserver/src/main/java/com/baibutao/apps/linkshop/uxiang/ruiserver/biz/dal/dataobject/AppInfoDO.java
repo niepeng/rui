@@ -2,6 +2,7 @@ package com.baibutao.apps.linkshop.uxiang.ruiserver.biz.dal.dataobject;
 
 import java.util.Date;
 
+import com.baibutao.apps.linkshop.uxiang.ruiserver.biz.bean.CatchDataBean;
 import com.baibutao.apps.linkshop.uxiang.ruiserver.biz.dal.dataobject.enums.APPStsutsEnum;
 
 /**
@@ -95,6 +96,11 @@ public class AppInfoDO extends BaseDO implements Cloneable {
 
 	// 当前是否为推荐app
 	private boolean recommendApp;
+	
+	// 抓取的detail页面链接
+	private String catchDetailUrl;
+	
+	private CatchDataBean catchDataBean;
 	
 	// -------------- normal moethod -------------------------
 	
@@ -322,6 +328,22 @@ public class AppInfoDO extends BaseDO implements Cloneable {
 
 	public void setNextAppId(long nextAppId) {
 		this.nextAppId = nextAppId;
+	}
+
+	public String getCatchDetailUrl() {
+		return catchDetailUrl;
+	}
+
+	public void setCatchDetailUrl(String catchDetailUrl) {
+		this.catchDetailUrl = catchDetailUrl;
+	}
+
+	public CatchDataBean getCatchDataBean() {
+		return catchDataBean;
+	}
+
+	public void setCatchDataBean(CatchDataBean catchDataBean) {
+		this.catchDataBean = catchDataBean;
 	}
 	
 }

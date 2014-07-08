@@ -54,6 +54,12 @@ public class TestCat extends BaseImageserver {
 		Assert.assertEquals(cat.getName(), fromDB.getName());
 	}
 	
+	public void testQueryByName() {
+		String name = "应用";
+		List<CatDO> list = catDAO.queryByName(name);
+		Assert.assertTrue(!CollectionUtil.isEmpty(list));
+	}
+	
 	public void testQueryFirstLevel() {
 		List<CatDO> catList = catDAO.queryFirstLevel();
 		Assert.assertTrue(!CollectionUtil.isEmpty(catList));

@@ -1,10 +1,12 @@
 package com.baibutao.apps.linkshop.uxiang.ruiserver.biz.ao.impl;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.zip.ZipException;
 
 import javax.servlet.http.HttpSession;
 
@@ -23,6 +25,7 @@ import com.baibutao.apps.linkshop.uxiang.ruiserver.biz.ao.BaseAO;
 import com.baibutao.apps.linkshop.uxiang.ruiserver.biz.bean.UserBean;
 import com.baibutao.apps.linkshop.uxiang.ruiserver.biz.bo.FileService;
 import com.baibutao.apps.linkshop.uxiang.ruiserver.biz.bo.impl.FileServiceImpl;
+import com.baibutao.apps.linkshop.uxiang.ruiserver.biz.common.CatchDataUtil;
 import com.baibutao.apps.linkshop.uxiang.ruiserver.biz.dal.daointerface.AdminDAO;
 import com.baibutao.apps.linkshop.uxiang.ruiserver.biz.dal.daointerface.AppInfoDAO;
 import com.baibutao.apps.linkshop.uxiang.ruiserver.biz.dal.daointerface.BannerDAO;
@@ -190,6 +193,10 @@ public class AdminAOImpl extends BaseAO implements AdminAO {
 					appQuery.setUserId(loginUserId);
 				}
 			}
+			
+			if(appQuery.getUserId() == 0 && isAdmin(flowData)) {
+				appQuery.setUserId(getLoginUserId(flowData));
+			}
 
 			// 获取当前用户提交的所有app列表
 			List<AppInfoDO> appInfoList = appInfoDAO.query(appQuery);
@@ -267,25 +274,9 @@ public class AdminAOImpl extends BaseAO implements AdminAO {
 			}
 			
 			// 1. 解析出包名以及版本 
-			String fileName = visitUrl.substring(visitUrl.lastIndexOf("/") + 1);
-			File apkFile = fileService.getFileByName(fileName);
-			if (!apkFile.exists()) {
-				result.setResultCode(new StringResultCode("上传apk文件分析文件信息失败"));
+			if(!parseAPKPackage(result, appInfoDO, visitUrl)) {
 				return result;
 			}
-			
-			AndroidApk apk = new AndroidApk(apkFile);
-			long fileSize = apkFile.length();
-			appInfoDO.setPackageName(apk.getPackageName());
-			appInfoDO.setVersionName(apk.getAppVersion());
-			appInfoDO.setVersionValue(apk.getAppVersionCode());
-			appInfoDO.setFileSize((int) (fileSize / 1024));
-			List<String> permissionList = apk.getUsesPermission();
-			String permissoinValues = CollectionUtil.join(permissionList, ",");
-			if (!StringUtil.isBlank(permissoinValues)) {
-				appInfoDO.setPermissionValue(permissoinValues);
-			}
-			appInfoDO.setDownUrl(visitUrl);
 			
 			// 2. 新增app:原有系统中不存在的app
 			// 	  更新app:原有系统中要有app，并把信息复制过去
@@ -328,6 +319,31 @@ public class AdminAOImpl extends BaseAO implements AdminAO {
 			log.error("addAppFirst error", e);
 		}
 		return result;
+	}
+
+	private boolean parseAPKPackage(Result result, AppInfoDO appInfoDO, String visitUrl) throws ZipException, IOException {
+		String fileName = visitUrl.substring(visitUrl.lastIndexOf("/") + 1);
+		File apkFile = fileService.getFileByName(fileName);
+		if (!apkFile.exists()) {
+			if(result != null) {
+				result.setResultCode(new StringResultCode("上传apk文件分析文件信息失败"));
+			}
+			return false;
+		}
+		
+		AndroidApk apk = new AndroidApk(apkFile);
+		long fileSize = apkFile.length();
+		appInfoDO.setPackageName(apk.getPackageName());
+		appInfoDO.setVersionName(apk.getAppVersion());
+		appInfoDO.setVersionValue(apk.getAppVersionCode());
+		appInfoDO.setFileSize((int) (fileSize / 1024));
+		List<String> permissionList = apk.getUsesPermission();
+		String permissoinValues = CollectionUtil.join(permissionList, ",");
+		if (!StringUtil.isBlank(permissoinValues)) {
+			appInfoDO.setPermissionValue(permissoinValues);
+		}
+		appInfoDO.setDownUrl(visitUrl);
+		return true;
 	}
 	
 	private void copyAppInfo(AppInfoDO appInfoDO, AppInfoDO fatherAppInfoDO) {
@@ -527,6 +543,14 @@ public class AdminAOImpl extends BaseAO implements AdminAO {
 			AppInfoDO appInfoDO = appInfoDAO.queryById(appId);
 			if(appInfoDO == null || appInfoDO.isOnLine() || appInfoDO.isTimeOut()) {
 				result.setResultCode(new StringResultCode("当前app不存在或已经上线了"));
+				return result;
+			}
+			
+			// app第一次提交审核通过处理
+			if(appInfoDO.getReferMainAppId() == 0) {
+				appInfoDO.setStatus(APPStsutsEnum.ONLINE.getValue());
+				appInfoDAO.update(appInfoDO);
+				result.setSuccess(true);
 				return result;
 			}
 			
@@ -1116,8 +1140,148 @@ public class AdminAOImpl extends BaseAO implements AdminAO {
 			log.error("updateRecommendApps error", e);
 		}
 		return result;
-
+	}
 	
+	
+	@Override
+	public Result catchCatsAndApps(FlowData flowData) {
+		Result result = new ResultSupport(false);
+		log.error("catchCatsAndApps->1");
+		try {
+			// 登陆和权限判断
+			if (!ensureUserLogin(result, flowData) || !isAdmin(flowData)) {
+				return result;
+			}
+			
+			log.error("catchCatsAndApps->2");
+			
+			// 应用
+			final String startAppUrl = "http://www.wandoujia.com/tag/app";
+			// 游戏
+			final String startGameUrl = "http://www.wandoujia.com/tag/game";
+			
+			final long userId = getLoginUserId(flowData);
+			
+			/* 1. 抓取类目数据
+			 * 2. 抓取app数据
+			*/
+			new Thread(new Runnable() {
+				@Override
+				public void run() {
+					List<CatDO> catList = catDAO.queryFirstLevel();
+					if(catList == null || catList.size() != 2) {
+						log.error("catchCatsAndApps-> firstCat num is not correct");
+						return;
+					}
+					
+					log.error("catchCatsAndApps->start");
+					CatDO appCat = catList.get(0);
+					CatDO gameCat = catList.get(1);
+					
+					List<CatDO> catchAppCatList = CatchDataUtil.catchCats(startAppUrl);
+					optCurrentCats(catchAppCatList, appCat);
+					List<CatDO> catchGameCatList = CatchDataUtil.catchCats(startGameUrl);
+					optCurrentCats(catchGameCatList, gameCat);
+					log.error("catchCatsAndApps->end");
+				}
+
+				private void optCurrentCats(List<CatDO> catchCatList, CatDO appCat) {
+					if (CollectionUtil.isEmpty(catchCatList)) {
+						return;
+					}
+					List<CatDO> list = null;
+					int num = 2;
+					for (CatDO cat : catchCatList) {
+						list = catDAO.queryByName(cat.getName());
+						if (!CollectionUtil.isEmpty(list)) {
+							continue;
+						}
+						// 数据库不存在的类目，需要处理，首先获取类目图片
+						String catchIconUrl = CatchDataUtil.catchCatImg(cat.getName());
+						String iconUrl = fileService.uploadFile(catchIconUrl, FileServiceImpl.PNG);
+						if (StringUtil.isBlank(iconUrl)) {
+							continue;
+						}
+						cat.setIconUrl(iconUrl);
+						cat.setLevel(2);
+						cat.setParentId(appCat.getId());
+						cat.setSortValue(num++);
+						long secondCatId = catDAO.create(cat);
+						cat.setId(secondCatId);
+						uploadApps(cat);
+					}
+
+				}
+
+				private void uploadApps(CatDO cat) {
+					List<AppInfoDO> appList = CatchDataUtil.catAppList("http://www.wandoujia.com/tag/"+ CatchDataUtil.encode(cat.getName()));
+					if (CollectionUtil.isEmpty(appList)) {
+						return;
+					}
+					for (AppInfoDO appInfoDO : appList) {
+						List<AppInfoDO> fromDBList = appInfoDAO.queryByPackageName(appInfoDO.getPackageName());
+						if (!CollectionUtil.isEmpty(fromDBList)) {
+							continue;
+						}
+						AppInfoDO prepareAppInfoDO = mergeAppInfo(appInfoDO, cat);
+						if (prepareAppInfoDO != null) {
+							prepareAppInfoDO.setUploadDate(new Date());
+							prepareAppInfoDO.setPublishDate(new Date());
+							appInfoDAO.create(prepareAppInfoDO);
+						}
+
+					}
+				}
+
+				private AppInfoDO mergeAppInfo(AppInfoDO appInfoDO, CatDO cat) {
+					try {
+						AppInfoDO fromCatchApp = CatchDataUtil.catAppDetail(appInfoDO.getCatchDetailUrl(), null);
+						String apkUrl = fileService.uploadFile(fromCatchApp.getCatchDataBean().downloadUrl, FileServiceImpl.APK);
+						fromCatchApp.setDownUrl(apkUrl);
+						String iconUrl = fileService.uploadFile(fromCatchApp.getCatchDataBean().iconUrl, FileServiceImpl.PNG);
+						fromCatchApp.setIconUrl(iconUrl);
+						String packageName = appInfoDO.getPackageName();
+						if (!parseAPKPackage(null, fromCatchApp, apkUrl)) {
+							return null;
+						}
+
+						if (!packageName.equals(fromCatchApp.getPackageName())) {
+							return null;
+						}
+						uploadScreenshots(fromCatchApp);
+						fromCatchApp.setFirstCatId(cat.getParentId());
+						fromCatchApp.setSecondCatId(cat.getId());
+						fromCatchApp.setUploadUserId(userId);
+						fromCatchApp.setStatus(APPStsutsEnum.ONLINE.getValue());
+						return fromCatchApp;
+					} catch (Exception e) {
+						log.error("mergeAppInfoError", e);
+					}
+					return null;
+				}
+
+				private void uploadScreenshots(AppInfoDO fromCatchApp) {
+					String[] screenshots = fromCatchApp.getScreenshots().split(",");
+					StringBuilder sb = new StringBuilder();
+					for (String s : screenshots) {
+						String screenshot = fileService.uploadFile(s, FileServiceImpl.PNG);
+						if (!StringUtil.isBlank(screenshot)) {
+							sb.append(screenshot);
+							sb.append(",");
+						}
+					}
+					String result = sb.toString();
+					if (!StringUtil.isBlank(result)) {
+						fromCatchApp.setScreenshots(result.substring(0, result.length() - 1));
+					}
+				}
+			}).start();
+			
+			result.setSuccess(true);
+		} catch (Exception e) {
+			log.error("catchCatsAndApps error", e);
+		}
+		return result;
 	}
 
 	private void setAppInfoListRecommend(List<AppInfoDO> appInfoList, int type) {

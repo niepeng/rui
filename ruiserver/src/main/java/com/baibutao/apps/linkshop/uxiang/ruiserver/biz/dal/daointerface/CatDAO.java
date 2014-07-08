@@ -24,5 +24,7 @@ public interface CatDAO {
     public List<CatDO> queryFirstLevel();
     
     public List<CatDO> queryByParentId(long id);
+    
+    public List<CatDO> queryByName(String name);
 
 }

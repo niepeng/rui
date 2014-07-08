@@ -46,6 +46,7 @@ values (now(), #linkUrl#, now(), #imageUrl#, #name#, #sortValue#, #relationAppId
 			rui_db_banner t
 		where
 			 t.deleted = 0 
+		order by sort_value asc
 	</select>
 	
 	<update id="delete" parameterClass="long">

@@ -15,6 +15,8 @@ public interface FileService {
 
 	public String uploadFile(UploadFile uploadFile, String suffix);
 	
+	public String uploadFile(String url, String suffix);
+	
 	public String uploadFile(UploadFile uploadFile);
 	
 	public File getFileByName(String fileName); 

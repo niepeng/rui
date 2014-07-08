@@ -24,6 +24,9 @@ public class CatDO extends BaseDO {
 	// -------------- extend attribute -----------------------
 	
 	private List<CatDO> childrenList;
+	
+	// 抓取数据的时候，类目app列表页面
+	private String catchUrl;
 
 	// -------------- normal moethod -------------------------
 
@@ -76,7 +79,14 @@ public class CatDO extends BaseDO {
 	public void setChildrenList(List<CatDO> childrenList) {
 		this.childrenList = childrenList;
 	}
-	
+
+	public String getCatchUrl() {
+		return catchUrl;
+	}
+
+	public void setCatchUrl(String catchUrl) {
+		this.catchUrl = catchUrl;
+	}
 	
 }
 

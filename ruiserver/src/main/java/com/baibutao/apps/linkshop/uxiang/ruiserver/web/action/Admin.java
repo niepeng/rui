@@ -1,6 +1,7 @@
 package com.baibutao.apps.linkshop.uxiang.ruiserver.web.action;
 
 import wint.help.biz.result.Result;
+import wint.help.biz.result.ResultSupport;
 import wint.mvc.flow.FlowData;
 import wint.mvc.form.Form;
 import wint.mvc.module.annotations.Action;
@@ -51,9 +52,12 @@ public class Admin extends BaseAction {
 		if (!checkSessionNeedRedrect(flowData, context)) {
 			return;
 		}
+		Result result = new ResultSupport(true);
+		addLoginInfo(result, flowData);
 		long fatherAppId = flowData.getParameters().getLong("fatherAppId");
 		context.put("title", "上传安装包");
 		context.put("fatherAppId", fatherAppId);
+		handleResult(result, flowData, context);
 		flowData.setLayout("/admin/addApp");
 	}
 	
@@ -178,6 +182,17 @@ public class Admin extends BaseAction {
 		handleResult(result, flowData, context);
 	}
 	
+	public void catchCatsAndApps(FlowData flowData, Context context) {
+		String flag = flowData.getParameters().getString("flag");
+		log.error("catchCatsAndApps0");
+		if ("start".equals(flag)) {
+			log.error("catchCatsAndApps1");
+			Result result = adminAO.catchCatsAndApps(flowData);
+			handleResult(result, flowData, context);
+			return;
+		}
+		log.error("catchCatsAndApps2");
+	}
 	
 	public void quit(FlowData flowData, Context context) {
 		adminAO.loginOut(flowData);
