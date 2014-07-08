@@ -63,8 +63,8 @@ public class CategoryFragment extends Fragment {
 			public void onItemClick(AdapterView<?> parent, View view,
 					int position, long id) {
 				AppCategory item = mListAdapter.getItem(position);
-				Intent intent = new Intent(getActivity(), CategoryItemActivity.class);
-				intent.putExtra("catId", item.getId());
+				Intent intent = new Intent(getActivity(), SubCategoryActivity.class);
+				intent.putExtra("sub_categories", item.getSubCategories());
 				getActivity().startActivity(intent);
 			}
 		});

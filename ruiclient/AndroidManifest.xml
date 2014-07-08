@@ -34,6 +34,7 @@
             </intent-filter>
         </activity>
         <activity android:name="com.rui.android_client.activity.AppDetailActivity" />
+        <activity android:name="com.rui.android_client.activity.SubCategoryActivity" />
         <activity
             android:name="com.rui.android_client.activity.CategoryItemActivity"
             android:launchMode="singleTask" />
