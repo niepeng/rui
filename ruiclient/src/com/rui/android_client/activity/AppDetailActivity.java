@@ -40,6 +40,7 @@ import com.rui.android_client.utils.NumberUtils;
 import com.rui.android_client.utils.StringUtil;
 import com.rui.android_client.utils.ThreadAid;
 import com.rui.android_client.utils.ThreadListener;
+import com.rui.android_client.utils.ViewUtils;
 import com.rui.http.Config;
 import com.rui.http.RemoteManager;
 import com.rui.http.Request;
@@ -54,7 +55,8 @@ public class AppDetailActivity extends BaseActivity {
 	private AppInfo mAppInfo;
 
 	private ImageView iconView;
-	private TextView mainTitleView, subTitleView, detailInfoView, updateInfoView;
+	private TextView mainTitleView, subTitleView, detailInfoView,
+			updateInfoView;
 	private TextViewWithLabelLayout fileSizeView;
 
 	private ButtonProgress downloadBtn;
@@ -124,6 +126,7 @@ public class AppDetailActivity extends BaseActivity {
 		actionBar.setHomeButtonEnabled(true);
 		actionBar.setDisplayShowTitleEnabled(true);
 		actionBar.setDisplayUseLogoEnabled(false);
+		actionBar.setDisplayShowHomeEnabled(false);
 	}
 
 	private void initData() {
@@ -141,11 +144,10 @@ public class AppDetailActivity extends BaseActivity {
 			return;
 		}
 		RuiApp.fb.display(iconView, mAppInfo.getIconUrl());
-		mainTitleView.setText(mAppInfo.getMainTitle());
-		subTitleView.setText(mAppInfo.getSubTitle());
-		detailInfoView.setText(mAppInfo.getInfo());
-		updateInfoView.setText(mAppInfo.getUpdateInfo());
-		
+		mainTitleView.setText(ViewUtils.fromHtml(mAppInfo.getMainTitle()));
+		subTitleView.setText(ViewUtils.fromHtml(mAppInfo.getSubTitle()));
+		detailInfoView.setText(ViewUtils.fromHtml(mAppInfo.getInfo()));
+		updateInfoView.setText(ViewUtils.fromHtml(mAppInfo.getUpdateInfo()));
 
 		fileSizeView
 				.setContentText(NumberUtils.setScale(mAppInfo.getFileSize() / 1024f)
@@ -204,7 +206,7 @@ public class AppDetailActivity extends BaseActivity {
 		bannerImageViewList.clear();
 		for (String item : mAppInfo.getScreenshots()) {
 			ImageView view = new ImageView(this);
-			view.setScaleType(ScaleType.FIT_XY);
+			view.setScaleType(ScaleType.CENTER);
 			view.setLayoutParams(new LayoutParams(LayoutParams.MATCH_PARENT,
 					LayoutParams.MATCH_PARENT));
 			RuiApp.fb.display(view, item);

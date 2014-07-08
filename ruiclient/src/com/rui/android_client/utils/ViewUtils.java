@@ -3,14 +3,16 @@ package com.rui.android_client.utils;
 
 import java.util.Formatter;
 
-import com.rui.android_client.activity.RuiApp;
-
 import android.content.Context;
 import android.content.res.ColorStateList;
 import android.content.res.XmlResourceParser;
 import android.graphics.drawable.Drawable;
+import android.text.Html;
+import android.text.Spanned;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
+
+import com.rui.android_client.activity.RuiApp;
 
 public class ViewUtils {
 
@@ -92,6 +94,13 @@ public class ViewUtils {
 	public static int dip2px(Context context, float dpValue) {
 		final float scale = context.getResources().getDisplayMetrics().density;
 		return (int) (dpValue * scale + 0.5f);
+	}
+	
+	public static Spanned fromHtml(String text) {
+		if (StringUtil.isEmpty(text)) {
+			return null;
+		}
+		return Html.fromHtml(text);
 	}
 
 }

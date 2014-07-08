@@ -64,6 +64,7 @@ public class CategoryFragment extends Fragment {
 					int position, long id) {
 				AppCategory item = mListAdapter.getItem(position);
 				Intent intent = new Intent(getActivity(), SubCategoryActivity.class);
+				intent.putExtra("category_name", item.getName());
 				intent.putExtra("sub_categories", item.getSubCategories());
 				getActivity().startActivity(intent);
 			}

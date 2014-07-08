@@ -16,6 +16,7 @@ public class CategoryItemActivity extends BaseActivity {
 
 	private AppListView mListView;
 
+	private String mCategoryName;
 	private long mCatId;
 	private String mUrl;
 	private HashMap<String, Object> mParams;
@@ -48,26 +49,27 @@ public class CategoryItemActivity extends BaseActivity {
 	private void init() {
 		initView();
 		initData();
+		initActionBar();
 		initViewContent();
 	}
 
 	private void initView() {
-		initActionBar();
 		mListView = new AppListView(this,
 				(ListView) findViewById(R.id.list_view));
 	}
 
 	private void initActionBar() {
 		ActionBar actionBar = getActionBar();
-		// TODO
-		actionBar.setTitle(R.string.detail);
+		actionBar.setTitle(mCategoryName);
 		actionBar.setDisplayHomeAsUpEnabled(true);
 		actionBar.setHomeButtonEnabled(true);
 		actionBar.setDisplayShowTitleEnabled(true);
 		actionBar.setDisplayUseLogoEnabled(false);
+		actionBar.setDisplayShowHomeEnabled(false);
 	}
 
 	private void initData() {
+		mCategoryName = getIntent().getStringExtra("category_name");
 		mCatId = getIntent().getLongExtra("catId", -1);
 		mUrl = Config.getConfig().getProperty(Config.Names.APP_LIST);
 		mParams = new HashMap<String, Object>();

@@ -88,6 +88,14 @@ public class AppListView {
 		mParams = params;
 		loadMore();
 	}
+	
+	public void clearApps() {
+		mPage = 1;
+		mVisibleLastIndex = 0;
+		mVisibleLastIndex = 0;
+		mAppInfos.clear();
+		mAdapter.notifyDataSetChanged();
+	}
 
 	protected void initAdapter() {
 		mAdapter = new ListAdapter();

@@ -18,6 +18,7 @@ import com.rui.android_client.model.BaseModel;
 import com.rui.android_client.model.DownloadInfo;
 import com.rui.android_client.utils.CollectionUtil;
 import com.rui.android_client.utils.DownloadUtils;
+import com.rui.android_client.utils.ViewUtils;
 
 public class AppInfoViewHolder extends ViewHolder {
 
@@ -94,9 +95,9 @@ public class AppInfoViewHolder extends ViewHolder {
 		} else {
 			RuiApp.fb.display(iconView, appInfo.getIconUrl());
 		}
-		titleView.setText(appInfo.getMainTitle());
-		subTitleView.setText(appInfo.getSubTitle());
-		infoView.setText(appInfo.getInfo());
+		titleView.setText(ViewUtils.fromHtml(appInfo.getMainTitle()));
+		subTitleView.setText(ViewUtils.fromHtml(appInfo.getSubTitle()));
+		infoView.setText(ViewUtils.fromHtml(appInfo.getInfo()));
 
 		openBtn.setTag(appInfo);
 		downloadBtn.setTag(appInfo);
