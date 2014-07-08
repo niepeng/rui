@@ -1146,11 +1146,14 @@ public class AdminAOImpl extends BaseAO implements AdminAO {
 	@Override
 	public Result catchCatsAndApps(FlowData flowData) {
 		Result result = new ResultSupport(false);
+		log.error("catchCatsAndApps->1");
 		try {
 			// 登陆和权限判断
 			if (!ensureUserLogin(result, flowData) || !isAdmin(flowData)) {
 				return result;
 			}
+			
+			log.error("catchCatsAndApps->2");
 			
 			// 应用
 			final String startAppUrl = "http://www.wandoujia.com/tag/app";
