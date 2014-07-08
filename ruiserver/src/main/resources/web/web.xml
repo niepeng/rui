@@ -33,6 +33,10 @@
 			<param-name>wint.session.cookie.key.file</param-name>
 			<param-value>keys/uxiang-session-key</param-value>
 		</init-param>
+		<init-param>
+			<param-name>wint.app.upload.max.size</param-name>
+			<param-value>52428800</param-value>
+		</init-param>
 	</servlet>
 	
 	<filter>

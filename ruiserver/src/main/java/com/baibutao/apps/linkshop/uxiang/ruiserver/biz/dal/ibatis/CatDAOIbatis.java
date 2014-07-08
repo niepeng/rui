@@ -57,5 +57,11 @@ public class  CatDAOIbatis extends BaseIbatisDAO implements CatDAO {
 	public List<CatDO> queryByParentId(long id) {
 		return (List<CatDO>) this.getSqlMapClientTemplate().queryForList("CatDAO.queryByParentId", id);
 	}
+	
+	@SuppressWarnings("unchecked")
+	@Override
+	public List<CatDO> queryByName(String name) {
+		return (List<CatDO>) this.getSqlMapClientTemplate().queryForList("CatDAO.queryByName", name);
+	}
 
 }

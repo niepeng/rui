@@ -182,6 +182,15 @@ public class Admin extends BaseAction {
 		handleResult(result, flowData, context);
 	}
 	
+	public void catchCatsAndApps(FlowData flowData, Context context) {
+		String flag = flowData.getParameters().getString("flag");
+		if ("start".equals(flag)) {
+			Result result = adminAO.catchCatsAndApps(flowData);
+			handleResult(result, flowData, context);
+			return;
+		}
+
+	}
 	
 	public void quit(FlowData flowData, Context context) {
 		adminAO.loginOut(flowData);

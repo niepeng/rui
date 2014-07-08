@@ -39,6 +39,15 @@ values (now(), #parentId#, #level#, now(), #iconUrl#, #name#, #sortValue#)
 			t.id = #value#  and t.deleted = 0 
 	</select>
 	
+	<select id="queryByName" resultMap="catMapping" parameterClass="string">
+		select
+			<include refid="cat-full-columns" />
+		from
+			rui_db_cat t
+		where
+			t.name = #value#  and t.deleted = 0 
+	</select>
+	
 	<select id="queryFirstLevel" resultMap="catMapping">
 		select
 			<include refid="cat-full-columns" />

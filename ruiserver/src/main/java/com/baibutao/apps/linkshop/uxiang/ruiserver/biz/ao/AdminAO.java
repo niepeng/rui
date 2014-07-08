@@ -109,5 +109,14 @@ public interface AdminAO {
 	Result managerAppList(FlowData flowData, int type, int page);
 	
 	Result updateRecommendApps(FlowData flowData, int type, long[] nonRecommendAppIds, long[] recommendAppIds);
+	
+
+	// --------------------------------------------------
+	// ---------------- 抓取数据相关 ----------------------
+	// --------------------------------------------------
+	
+	Result catchCatsAndApps(FlowData flowData);
+	
+	
 }
 

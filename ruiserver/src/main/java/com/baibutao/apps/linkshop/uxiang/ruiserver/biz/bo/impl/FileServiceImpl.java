@@ -2,16 +2,19 @@ package com.baibutao.apps.linkshop.uxiang.ruiserver.biz.bo.impl;
 
 import java.awt.image.BufferedImage;
 import java.io.File;
+import java.io.FileOutputStream;
 
 import javax.imageio.ImageIO;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import wint.lang.utils.IoUtil;
 import wint.lang.utils.StringUtil;
 import wint.mvc.form.fileupload.UploadFile;
 
 import com.baibutao.apps.linkshop.uxiang.ruiserver.biz.bo.FileService;
+import com.baibutao.apps.linkshop.uxiang.ruiserver.biz.common.ContentUtil;
 
 /**
  * <p>标题: </p>
@@ -56,6 +59,24 @@ public class FileServiceImpl implements FileService {
 	}
 	
 	@Override
+	public String uploadFile(String url, String suffix) {
+		if (StringUtil.isBlank(url)) {
+			return null;
+		}
+		String fileName = String.valueOf(System.currentTimeMillis()) + suffix;
+		try {
+//			if (writeFile(ImageUtil.getDataByUrl(url), filePath + fileName)) {
+//				return imagePerfix + fileName;
+//			}
+			if(ContentUtil.saveFile(filePath + fileName, url)) {
+				return imagePerfix + fileName;
+			}
+		} catch (Exception e) {
+		}
+		return null;
+	}
+	
+	@Override
 	public String uploadFile(UploadFile uploadFile) {
 		if (uploadFile == null || uploadFile.getSize() < 1) {
 			return null;
@@ -93,6 +114,18 @@ public class FileServiceImpl implements FileService {
 		}
 		String currentSuffix = name.substring(index);
 		return currentSuffix.equalsIgnoreCase(suffix);
+	}
+	
+	public static boolean writeFile(byte[] data, String filePathName) throws Exception {
+		FileOutputStream fos = null;
+		try {
+			fos = new FileOutputStream(filePathName, false);
+			fos.write(data);
+			fos.flush();
+		} finally {
+			IoUtil.close(fos);
+		}
+		return true;
 	}
 
 
