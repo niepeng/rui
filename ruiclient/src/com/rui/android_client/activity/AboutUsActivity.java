@@ -32,7 +32,7 @@ public class AboutUsActivity extends BaseActivity {
 		TextView currentVersionView = (TextView) findViewById(R.id.current_version);
 		currentVersionView.setText("当前版本：" + RuiApp.getVersionName());
 		TextView contactMeView = (TextView) findViewById(R.id.contact_me);
-		contactMeView.setText("联系我：139-8949-8009");
+		contactMeView.setText("联系我们：0571-88906958");
 	}
 
 	private void initView() {
