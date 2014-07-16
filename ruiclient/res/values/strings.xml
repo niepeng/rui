@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <string name="app_name">Rui</string>
+    <string name="app_name">百瑞</string>
     <string name="title_section1">游戏精选</string>
     <string name="title_section2">精品推荐</string>
     <string name="title_section3">下载排行</string>
@@ -31,5 +31,7 @@
 	<string name="feedback_failed">反馈失败，请稍后再试！</string>
 	
 	<string name="detail">详情</string>
+	
+	<string name="about_us_desc">新百锐移动app应用产品发布平台软件</string>
 
 </resources>

@@ -2,8 +2,10 @@ package com.rui.android_client.activity;
 
 import java.util.ArrayList;
 
+import android.app.ActionBar;
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -24,14 +26,28 @@ public class SubCategoryActivity extends BaseActivity {
 	private ListView mListView;
 	private ListAdapter mListAdapter;
 
+	private String mCategoryName = null;
 	private ArrayList<SubCategory> mCategories = new ArrayList<SubCategory>();
+	
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+		switch (item.getItemId()) {
+		case android.R.id.home:
+			finish();
+			return true;
+		default:
+			return super.onOptionsItemSelected(item);
+		}
+	}
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_sub_category);
+		mCategoryName = getIntent().getStringExtra("category_name");
 		mCategories = (ArrayList<SubCategory>) getIntent().getSerializableExtra(
 				"sub_categories");
+		initActionBar();
 		mListView = (ListView) findViewById(R.id.list_view);
 		mListAdapter = new ListAdapter();
 		mListView.setAdapter(mListAdapter);
@@ -43,10 +59,21 @@ public class SubCategoryActivity extends BaseActivity {
 				SubCategory item = mListAdapter.getItem(position);
 				Intent intent = new Intent(SubCategoryActivity.this,
 						CategoryItemActivity.class);
+				intent.putExtra("category_name", item.getName());
 				intent.putExtra("catId", item.getId());
 				startActivity(intent);
 			}
 		});
+	}
+	
+	private void initActionBar() {
+		ActionBar actionBar = getActionBar();
+		actionBar.setTitle(mCategoryName);
+		actionBar.setDisplayHomeAsUpEnabled(true);
+		actionBar.setHomeButtonEnabled(true);
+		actionBar.setDisplayShowTitleEnabled(true);
+		actionBar.setDisplayUseLogoEnabled(false);
+		actionBar.setDisplayShowHomeEnabled(false);
 	}
 
 	@Override

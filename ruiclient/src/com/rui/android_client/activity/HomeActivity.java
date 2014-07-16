@@ -15,7 +15,7 @@ public class HomeActivity extends FragmentActivity implements
 
 	private static String[] tabSpec = new String[] { "INDEX", "TYPE", "SEARCH",
 			"MANAGER", "MORE" };
-	private static String[] tabIndicator = new String[] { "首页", "类型", "搜索",
+	private static String[] tabIndicator = new String[] { "首页", "类目", "搜索",
 			"管理", "更多" };
 	private static Class[] tabFragments = new Class[] { IndexFragment.class,
 			CategoryFragment.class, SearchFragment.class,

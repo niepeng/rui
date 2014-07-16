@@ -3,6 +3,7 @@ package com.rui.android_client.activity;
 import android.app.ActionBar;
 import android.os.Bundle;
 import android.view.MenuItem;
+import android.widget.TextView;
 
 import com.rui.android_client.R;
 
@@ -28,6 +29,10 @@ public class AboutUsActivity extends BaseActivity {
 
 	private void init() {
 		initView();
+		TextView currentVersionView = (TextView) findViewById(R.id.current_version);
+		currentVersionView.setText("当前版本：" + RuiApp.getVersionName());
+		TextView contactMeView = (TextView) findViewById(R.id.contact_me);
+		contactMeView.setText("联系我们：0571-88906958");
 	}
 
 	private void initView() {
@@ -41,6 +46,7 @@ public class AboutUsActivity extends BaseActivity {
 		actionBar.setHomeButtonEnabled(true);
 		actionBar.setDisplayShowTitleEnabled(true);
 		actionBar.setDisplayUseLogoEnabled(false);
+		actionBar.setDisplayShowHomeEnabled(false);
 	}
 
 }

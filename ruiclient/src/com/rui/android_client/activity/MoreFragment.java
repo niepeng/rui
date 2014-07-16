@@ -94,7 +94,6 @@ public class MoreFragment extends Fragment {
 				JSONObject jsonData = JsonUtil.getJSONObject(json, "data");
 				long versionCode = JsonUtil.getLong(jsonData,
 						"lastAndroidVersion", -1l);
-				versionCode = 2;
 				if (versionCode > RuiApp.getVersionCode()) {
 					alertNewVersionFoundDialog(jsonData);
 				} else {

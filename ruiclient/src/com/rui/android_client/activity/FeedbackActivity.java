@@ -59,6 +59,7 @@ public class FeedbackActivity extends BaseActivity {
 		actionBar.setHomeButtonEnabled(true);
 		actionBar.setDisplayShowTitleEnabled(true);
 		actionBar.setDisplayUseLogoEnabled(false);
+		actionBar.setDisplayShowHomeEnabled(false);
 	}
 
 	private View.OnClickListener onSubmitFeedbackClick = new View.OnClickListener() {

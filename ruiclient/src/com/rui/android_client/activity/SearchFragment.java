@@ -48,6 +48,7 @@ public class SearchFragment extends Fragment {
 		
 		@Override
 		public void onClick(View v) {
+			mListView.clearApps();
 			String searchInput = mSearchKeyView.getText().toString();
 			if (StringUtil.isNotBlank(searchInput)) {
 				String url = Config.getConfig().getProperty(Config.Names.SEARCH_URL);
