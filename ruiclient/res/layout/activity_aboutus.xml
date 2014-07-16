@@ -1,8 +1,8 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:layout_margin="@dimen/padding_view" >
+    android:layout_margin="@dimen/padding_view"
+    android:orientation="vertical" >
 
     <TextView
         android:id="@+id/app_name"
@@ -16,6 +16,13 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/padding_text"
+        android:textSize="18sp" />
+    
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/padding_text"
+        android:text="@string/about_us_company"
         android:textSize="18sp" />
 
     <TextView

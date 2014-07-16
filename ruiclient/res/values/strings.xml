@@ -7,12 +7,11 @@
     <string name="title_section3">下载排行</string>
     <string name="title_section4">猜你喜欢</string>
     <string name="action_settings">Settings</string>
-    
     <string name="upgrade_version">升级</string>
     <string name="about_us">关于我们</string>
     <string name="feedback">反馈</string>
     <string name="help_center">帮助中心</string>
-    
+
     <!-- 按钮 -->
     <string name="search">搜索</string>
     <string name="download">下载</string>
@@ -20,18 +19,14 @@
     <string name="upgrade">升级</string>
     <string name="ok">确定</string>
     <string name="submit">提交</string>
-    
     <string name="no_new_version">当前已是最新版</string>
     <string name="found_new_version">发现新版！</string>
-	<string name="update_client_sd_no_space_msg">对不起，无法下载到你的SD卡，请确保SD卡有用的空间。</string>
-	
-	<string name="app_label_conect_network_fail">连接网络失败。</string>
-	
-	<string name="feedback_success">反馈成功！</string>
-	<string name="feedback_failed">反馈失败，请稍后再试！</string>
-	
-	<string name="detail">详情</string>
-	
-	<string name="about_us_desc">新百锐移动app应用产品发布平台软件</string>
+    <string name="update_client_sd_no_space_msg">对不起，无法下载到你的SD卡，请确保SD卡有用的空间。</string>
+    <string name="app_label_conect_network_fail">连接网络失败。</string>
+    <string name="feedback_success">反馈成功！</string>
+    <string name="feedback_failed">反馈失败，请稍后再试！</string>
+    <string name="detail">详情</string>
+    <string name="about_us_desc">名字全称：新百锐移动app应用产品发布平台软件</string>
+    <string name="about_us_company">百锐app是为安卓系统提供软件和游戏下载平台，为用户提供良好的手机软件服务。自2012年4月29日面世起，该产品致力于为广大安卓爱好者提供最全面、最快捷的软件、游戏下载服务。经过创新研发、精心耕耘，百锐app目前拥有丰富的应用。</string>
 
 </resources>

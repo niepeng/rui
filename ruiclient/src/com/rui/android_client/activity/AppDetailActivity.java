@@ -27,7 +27,6 @@ import android.widget.TextView;
 import com.rui.android_client.R;
 import com.rui.android_client.component.ButtonProgress;
 import com.rui.android_client.component.ButtonProgress.OnButtonClickListener;
-import com.rui.android_client.component.LinePageIndicator;
 import com.rui.android_client.component.TextViewWithLabelLayout;
 import com.rui.android_client.model.AppInfo;
 import com.rui.android_client.model.DownloadInfo;
@@ -65,7 +64,6 @@ public class AppDetailActivity extends BaseActivity {
 	private ArrayList<View> bannerImageViewList = new ArrayList<View>();
 	private BannerPagerAdapter mBannerPageAdapter;
 	private ViewPager mBannerViewPager;
-	private LinePageIndicator mBannerViewIndicator;
 
 	private UpdateProgressReceiver mUpdateProgressReceiver;
 
@@ -115,8 +113,6 @@ public class AppDetailActivity extends BaseActivity {
 		mBannerPageAdapter = new BannerPagerAdapter();
 		mBannerViewPager = (ViewPager) findViewById(R.id.banner_viewpage);
 		mBannerViewPager.setAdapter(mBannerPageAdapter);
-		mBannerViewIndicator = (LinePageIndicator) findViewById(R.id.indicator);
-		mBannerViewIndicator.setViewPager(mBannerViewPager);
 	}
 
 	private void initActionBar() {
@@ -213,6 +209,7 @@ public class AppDetailActivity extends BaseActivity {
 			bannerImageViewList.add(view);
 		}
 		mBannerPageAdapter.notifyDataSetChanged();
+		mBannerViewPager.setOffscreenPageLimit(bannerImageViewList.size());
 	}
 
 	private class GetAppInfoCallbackListener implements ThreadListener {
@@ -278,6 +275,11 @@ public class AppDetailActivity extends BaseActivity {
 		@Override
 		public boolean isViewFromObject(View arg0, Object arg1) {
 			return arg0 == arg1;
+		}
+
+		@Override
+		public float getPageWidth(int position) {
+			return 0.3f;
 		}
 
 	}
