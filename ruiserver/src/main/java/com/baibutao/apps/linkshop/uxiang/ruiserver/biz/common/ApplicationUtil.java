@@ -24,11 +24,11 @@ public class ApplicationUtil {
 	}
 	
 	public static String websiteName() {
-		return "百百锐锐";
+		return "百锐";
 	}
 	
 	public static String phone() {
-		return "139-8949-8009";
+		return "0571-88906958";
 	}
 	
 	public static String roleName(int roleId) {
