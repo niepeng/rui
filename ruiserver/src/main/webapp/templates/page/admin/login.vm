@@ -1,3 +1,19 @@
+<!--[if IE]>
+
+<style>
+
+.w-account-ctn label{
+display:block;
+ position: absolute;
+top: 12px;
+
+}
+
+</style>
+
+<![endif]-->
+
+
 <div class="a-ctn">
 		<div class="w-container">
                 <div class="w-account-ctn a-module-login">
@@ -6,14 +22,14 @@
                         <fieldset>
                             <legend class="h3">登录$!applicationUtil.websiteName() <span class="w-text-info"></span></legend>
                             <div class="w-control-group a-field-username">
-                                <label class="w-text-secondary" for="a-login-username">用户名，建议手机号</label>
+                                <label class="w-text-secondary" for="a-login-username" style="left:-140px;">用户名(建议手机号)</label>
                                 <input autofocus="" class="w-input w-input-block w-input-kaiju js-email-autocomplete" type="email" name="$form.nick.name" value="$!form.nick.value" placeholder="用户名，建议手机号" id="a-login-username" autocomplete="off">
 									<ul class="a-autocomplete" style="width: 360px; display: none;"></ul>#errorMessage($!form.nick.message)
                                 <span class="a-input-clear" style="display: none;">×</span>
                                 <div class="w-text-warning a-error" style="display: none;"></div>
                             </div>
                             <div class="w-control-group a-field-password">
-                                <label class="w-text-secondary" for="a-login-password">密码</label>
+                                <label class="w-text-secondary" for="a-login-password" style="-44px;">密码</label>
                                 <input class="w-input w-input-block w-input-kaiju" type="password" name="$form.password.name" value="$!form.password.value" placeholder="密码" id="a-login-password">
                                 <span class="a-input-clear" style="display: none;">×</span>
                                 <div class="w-text-warning a-error" style="display: none;"></div>#errorMessage($!form.password.message)  #errorMessage($!resultmessage.message)
