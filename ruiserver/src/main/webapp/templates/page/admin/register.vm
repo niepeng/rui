@@ -26,20 +26,20 @@ top: 12px;
                 <legend class="h3">注册$!applicationUtil.websiteName() <span class="w-text-info"></span></legend>
                 <div class="w-control-group a-field-username-group">
                     <div class="a-field-phone">
-                        <label class="w-text-secondary" for="a-register-phone" style="-140px;">用户名(建议手机号)</label>
+                        <label class="w-text-secondary" for="a-register-phone" style="left:-140px;">用户名(建议手机号)</label>
                         <input autofocus="" class="w-input w-input-block w-input-kaiju" type="tel" name="$form.userName.name" value="$!form.userName.value"  placeholder="用户名，建议手机号" id="a-register-phone">
                        #errorMessage($!form.userName.message) <span class="a-input-clear" style="display: none;">×</span>
                         <div class="w-text-warning a-error" style="display: none;"></div>
                     </div>
                 </div>
                 <div class="w-control-group a-field-password">
-                    <label class="w-text-secondary" for="a-register-password" style="-44px;">密码<span></span></label>
+                    <label class="w-text-secondary" for="a-register-password" style="left:-44px;">密码<span></span></label>
                     <input class="w-input w-input-block w-input-kaiju js-readable-password" type="password" name="$form.psw.name" value="$!form.psw.value"  placeholder="密码" data-placeholder="密码" id="a-register-password">
                     #errorMessage($!form.psw.message)<span class="a-input-clear">×</span>
                     <div class="w-text-warning a-error"></div>
                 </div>
                 <div class="w-control-group a-field-name">
-                    <label class="w-text-secondary" for="a-register-name" style="-44px;">姓名<span></span></label>
+                    <label class="w-text-secondary" for="a-register-name" style="left:-44px;">姓名<span></span></label>
                     <input class="w-input w-input-block w-input-kaiju" type="text" name="$form.nick.name" value="$!form.nick.value"  placeholder="姓名" data-placeholder="姓名" id="a-register-name">
                     #errorMessage($!form.nick.message)<span class="a-input-clear">×</span>
                     <div class="w-text-warning a-error"></div>
@@ -53,7 +53,7 @@ top: 12px;
                 </div>
 				-->
                 <div class="w-control-group a-field-contact">
-                    <label class="w-text-secondary" for="a-register-contact" style="-70px;">联系方式<span></span></label>
+                    <label class="w-text-secondary" for="a-register-contact" style="left:-70px;">联系方式<span></span></label>
                     <input class="w-input w-input-block w-input-kaiju" type="text" name="$form.phone.name" value="$!form.phone.value"  placeholder="联系方式" data-placeholder="联系方式" id="a-register-contact">
                     #errorMessage($!form.phone.message)<span class="a-input-clear">×</span>
                     <div class="w-text-warning a-error"></div>

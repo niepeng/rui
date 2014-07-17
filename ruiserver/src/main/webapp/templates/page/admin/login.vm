@@ -29,7 +29,7 @@ top: 12px;
                                 <div class="w-text-warning a-error" style="display: none;"></div>
                             </div>
                             <div class="w-control-group a-field-password">
-                                <label class="w-text-secondary" for="a-login-password" style="-44px;">密码</label>
+                                <label class="w-text-secondary" for="a-login-password" style="left:-44px;">密码</label>
                                 <input class="w-input w-input-block w-input-kaiju" type="password" name="$form.password.name" value="$!form.password.value" placeholder="密码" id="a-login-password">
                                 <span class="a-input-clear" style="display: none;">×</span>
                                 <div class="w-text-warning a-error" style="display: none;"></div>#errorMessage($!form.password.message)  #errorMessage($!resultmessage.message)
