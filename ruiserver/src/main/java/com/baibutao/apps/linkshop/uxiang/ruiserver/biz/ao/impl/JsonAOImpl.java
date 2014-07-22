@@ -45,10 +45,6 @@ public class JsonAOImpl extends BaseAO implements JsonAO {
 	
 	private KeyValueDAO keyValueDAO;
 	
-	private int default_version_code = 1;
-	
-	private String default_version_url = "http://static.uxiang.com/uxiang/uxiang-v2.0.0.apk";
-	
 	public static final int APP_LIST_NUM = 10;
 
 	@Override

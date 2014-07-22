@@ -10,5 +10,6 @@ package com.baibutao.apps.linkshop.uxiang.ruiserver.biz.ao;
 public interface UserAO {
 	
 	
+	
 }
 

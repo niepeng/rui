@@ -1,9 +1,10 @@
 package com.baibutao.apps.linkshop.uxiang.ruiserver.web.action;
 
 import wint.help.biz.result.Result;
-import wint.help.biz.result.ResultSupport;
 import wint.mvc.flow.FlowData;
 import wint.mvc.template.Context;
+
+import com.baibutao.apps.linkshop.uxiang.ruiserver.biz.ao.WebAO;
 
 /**
  * <p>标题: </p>
@@ -14,11 +15,18 @@ import wint.mvc.template.Context;
  */
 public class Index extends BaseAction {
 	
+	private WebAO webAO;
+	
 	public void execute(FlowData flowData, Context context) {
-		Result result = new ResultSupport(true);
+		Result result = webAO.index();
 		addLoginInfo(result, flowData);
 		handleResult(result, flowData, context);
 	}
 
+	
+	public void setWebAO(WebAO webAO) {
+		this.webAO = webAO;
+	}
+	
 }
 

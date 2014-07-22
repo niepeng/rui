@@ -1,5 +1,8 @@
 package com.baibutao.apps.linkshop.uxiang.ruiserver.biz.ao;
 
+import org.json.JSONObject;
+
+import com.baibutao.apps.linkshop.uxiang.ruiserver.biz.common.JsonUtil;
 import com.baibutao.apps.linkshop.uxiang.ruiserver.web.action.BaseAction;
 
 /**
@@ -11,5 +14,16 @@ import com.baibutao.apps.linkshop.uxiang.ruiserver.web.action.BaseAction;
  */
 public class BaseAO extends BaseAction {
 
+	protected int default_version_code = 1;
+	
+	protected String default_version_url = "http://img.uxiang.com/ruiserver/files/bairui.apk";
+	
+	protected String parseDownloadUrl(String jsonValue) {
+		JSONObject dataJson = JsonUtil.getJSONObject(JsonUtil.getJsonObject(jsonValue), "data");
+		if (dataJson != null) {
+			return JsonUtil.getString(dataJson, "lastAndroidUrl", default_version_url);
+		}
+		return default_version_url;
+	}
 }
 
