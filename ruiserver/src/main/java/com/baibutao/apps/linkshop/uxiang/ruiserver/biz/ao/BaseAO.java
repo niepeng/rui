@@ -19,7 +19,7 @@ public class BaseAO extends BaseAction {
 	protected String default_version_url = "http://img.uxiang.com/ruiserver/files/bairui.apk";
 	
 	protected String parseDownloadUrl(String jsonValue) {
-		JSONObject dataJson = JsonUtil.getJSONObject(JsonUtil.getJsonObject(jsonValue), "data");
+		JSONObject dataJson = JsonUtil.getJsonObject(jsonValue);
 		if (dataJson != null) {
 			return JsonUtil.getString(dataJson, "lastAndroidUrl", default_version_url);
 		}
