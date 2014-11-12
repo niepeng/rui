@@ -1,5 +1,4 @@
 package com.baibutao.apps.linkshop.uxiang.ruiserver.biz.common;
-import java.awt.SystemColor;
 import java.io.BufferedReader;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -24,6 +23,8 @@ import org.apache.commons.httpclient.params.HttpMethodParams;
 import org.apache.commons.httpclient.util.URIUtil;
 import org.json.JSONArray;
 import org.json.JSONObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import wint.lang.utils.CollectionUtil;
 import wint.lang.utils.StringUtil;
@@ -32,6 +33,8 @@ import com.baibutao.apps.linkshop.uxiang.ruiserver.biz.bean.CatchDataBean;
 import com.baibutao.apps.linkshop.uxiang.ruiserver.biz.dal.dataobject.AppInfoDO;
 
 public class ContentUtil {
+
+	protected final static Logger log = LoggerFactory.getLogger(ContentUtil.class);
 
 	public static String getContent(String url, int timeout, String charset) {
 		String response = "";
@@ -307,11 +310,14 @@ public class ContentUtil {
 			JSONObject jsonContentObject = new JSONObject("{\"value\":" + content + "}");
 			JSONArray tmp = JsonUtil.getJsonArray(jsonContentObject, "value");
 			JSONArray jsonArray = JsonUtil.getJsonArray(tmp.getJSONObject(0), "apps");
+			log.error("url=" + url);
+			log.error("jsonArrayLength=" + (jsonArray != null ? jsonArray.length() : 0));
 			for (int i = 0; i < jsonArray.length(); i++) {
 				AppInfoDO appInfoDO = new AppInfoDO();
 
 				JSONObject currentObject = jsonArray.getJSONObject(i);
 				String mainTitle = JsonUtil.getString(currentObject, "title", null);
+				log.error("mainTitle=" + mainTitle);
 				String subTitle = JsonUtil.getString(currentObject, "tagline", null);
 				int favNum = JsonUtil.getInt(currentObject, "likesCount", 0);
 				int downloadNum = JsonUtil.getInt(currentObject, "downloadCount", 0);
@@ -334,7 +340,7 @@ public class ContentUtil {
 //				JSONArray downloadUrlArray = apkInfoObject.getJSONArray("downloadUrls");
 //				String downloadUrl = downloadUrlArray.getJSONObject(0).getString("url");
 				String packageName = apkInfoObject.getString("packageName");
-
+				log.error("packageName=" + packageName);
 				if(StringUtil.isBlank(packageName)) {
 					continue;
 				}
