@@ -1214,6 +1214,8 @@ public class AdminAOImpl extends BaseAO implements AdminAO {
 
 							}
 						}
+
+						log.error("catchCatsAndAppsByMaxNumIsEnd");
 					}
 				}).start();
 				result.setSuccess(true);
