@@ -15,12 +15,12 @@ import com.baibutao.apps.linkshop.uxiang.ruiserver.biz.dal.dataobject.AppInfoDO;
 import com.baibutao.apps.linkshop.uxiang.ruiserver.biz.query.AppQuery;
 
 public class Admin extends BaseAction {
-	
+
 	private AdminAO adminAO;
-	
+
 	/**
 	 * admin index page
-	 * 
+	 *
 	 * @param flowData
 	 * @param context
 	 */
@@ -36,7 +36,7 @@ public class Admin extends BaseAction {
 		Result result = adminAO.index(flowData, query);
 		handleResult(result, flowData, context);
 	}
-	
+
 	public void myAppList(FlowData flowData, Context context) {
 		int page = flowData.getParameters().getInt("page");
 		AppQuery query = new AppQuery();
@@ -47,7 +47,7 @@ public class Admin extends BaseAction {
 		result.getModels().put("title", "我的应用");
 		handleResult(result, flowData, context);
 	}
-	
+
 	public void viewAddAppFirst(FlowData flowData, Context context) {
 		if (!checkSessionNeedRedrect(flowData, context)) {
 			return;
@@ -60,8 +60,8 @@ public class Admin extends BaseAction {
 		handleResult(result, flowData, context);
 		flowData.setLayout("/admin/addApp");
 	}
-	
-	@Action(defaultTarget="/admin/viewAddAppFirst") 
+
+	@Action(defaultTarget="/admin/viewAddAppFirst")
 	public void doAddAppFirst(FlowData flowData, Context context) {
 		long fatherAppId = flowData.getParameters().getLong("fatherAppId");
 		Result result = adminAO.addAppFirst(flowData, fatherAppId);
@@ -71,7 +71,7 @@ public class Admin extends BaseAction {
 		}
 		handleError(result, flowData, context);
 	}
-	
+
 	public void viewAppUpdateInfo(FlowData flowData, Context context) {
 		long appId = getLongByParam(flowData, context, "appId");
 		Result result = adminAO.viewAddUpdateInfo(flowData, appId);
@@ -79,8 +79,8 @@ public class Admin extends BaseAction {
 		flowData.setLayout("/admin/addApp");
 		handleResult(result, flowData, context);
 	}
-	
-	@Action(defaultTarget="/admin/viewAppUpdateInfo") 
+
+	@Action(defaultTarget="/admin/viewAppUpdateInfo")
 	public void doAppUpdateInfo(FlowData flowData, Context context) {
 		long appId = getLongByParam(flowData, context, "appId");
 		context.put("appId", appId);
@@ -99,11 +99,11 @@ public class Admin extends BaseAction {
 		}
 		handleResult(result, flowData, context);
 	}
-	
+
 	/**
 	 * 后台登陆
 	 */
-	@Action(defaultTarget="admin/login") 
+	@Action(defaultTarget="admin/login")
 	public void doLogin(FlowData flowData, Context context) {
 		Form form = flowData.getForm("user.login");
 		UserBean userBean = new UserBean();
@@ -125,21 +125,21 @@ public class Admin extends BaseAction {
 
 		handleError(result, flowData, context);
 	}
-	
+
 	public void login(FlowData flowData, Context context) {
 		context.put("title", "登录-" + ApplicationUtil.websiteName());
 	}
-	
+
 	public void register(FlowData flowData, Context context) {
 		flowData.setLayout("/admin/login");
 		context.put("title", "注册-" + ApplicationUtil.websiteName());
 	}
-	
-	
+
+
 	/**
 	 * 注册
 	 */
-	@Action(defaultTarget="admin/register") 
+	@Action(defaultTarget="admin/register")
 	public void doRegister(FlowData flowData, Context context) {
 		Form form = flowData.getForm("admin.register");
 		AdminDO adminDO = new AdminDO();
@@ -154,7 +154,7 @@ public class Admin extends BaseAction {
 		}
 		handleResult(result, flowData, context);
 	}
-	
+
 	public void updatePsw(FlowData flowData, Context context) {
 		if (!isUserLogin(flowData)) {
 			flowData.redirectTo("adminModule", "login");
@@ -162,11 +162,11 @@ public class Admin extends BaseAction {
 		}
 		flowData.setLayout("/admin/login");
 	}
-	
+
 	/**
 	 * 修改密码
 	 */
-	@Action(defaultTarget="admin/updatePsw") 
+	@Action(defaultTarget="admin/updatePsw")
 	public void doUpdatePsw(FlowData flowData, Context context) {
 		Form form = flowData.getForm("admin.updatepsw");
 		AdminDO adminDO = new AdminDO();
@@ -181,26 +181,26 @@ public class Admin extends BaseAction {
 		}
 		handleResult(result, flowData, context);
 	}
-	
+
 	public void catchCatsAndApps(FlowData flowData, Context context) {
 		String flag = flowData.getParameters().getString("flag");
-		log.error("catchCatsAndApps0");
+		log.error("catchCatsAndAppsStart");
 		if ("start".equals(flag)) {
 			log.error("catchCatsAndApps1");
 			Result result = adminAO.catchCatsAndApps(flowData);
 			handleResult(result, flowData, context);
 			return;
 		}
-		log.error("catchCatsAndApps2");
+		log.error("catchCatsAndAppsEnd");
 	}
-	
+
 	public void quit(FlowData flowData, Context context) {
 		adminAO.loginOut(flowData);
 		flowData.redirectTo("adminModule", "login");
 	}
-	
+
 	public void setAdminAO(AdminAO adminAO) {
 		this.adminAO = adminAO;
 	}
-	
+
 }
