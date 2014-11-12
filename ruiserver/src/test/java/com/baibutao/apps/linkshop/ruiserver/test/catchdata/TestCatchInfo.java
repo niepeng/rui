@@ -4,8 +4,13 @@ import java.util.List;
 
 import junit.framework.TestCase;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import com.baibutao.apps.linkshop.uxiang.ruiserver.biz.common.CatchDataUtil;
 import com.baibutao.apps.linkshop.uxiang.ruiserver.biz.common.ContentUtil;
+import com.baibutao.apps.linkshop.uxiang.ruiserver.biz.common.JsonUtil;
 import com.baibutao.apps.linkshop.uxiang.ruiserver.biz.dal.dataobject.AppInfoDO;
 import com.baibutao.apps.linkshop.uxiang.ruiserver.biz.dal.dataobject.CatDO;
 
@@ -18,6 +23,17 @@ import com.baibutao.apps.linkshop.uxiang.ruiserver.biz.dal.dataobject.CatDO;
  */
 public class TestCatchInfo extends TestCase {
 
+
+	public void testCatchApps() throws JSONException {
+		List<AppInfoDO> appInfoList = ContentUtil.catchApps("便捷生活", 2);
+		for(AppInfoDO tmp : appInfoList) {
+			System.out.println(tmp.getPackageName());
+			System.out.println(tmp.getMainTitle());
+			System.out.println(tmp.getCatchDataBean().downloadUrl);
+			System.out.println("\n");
+		}
+	}
+
 	public void testCat() {
 		String url = "http://www.wandoujia.com/tag/app";
 //		String url = "http://www.wandoujia.com/tag/game";
@@ -27,7 +43,7 @@ public class TestCatchInfo extends TestCase {
 			System.out.println("linkUrl="+cat.getCatchUrl());
 		}
 	}
-	
+
 	/**
 	 * title=便捷生活
 	 * linkUrl=http://www.wandoujia.com/tag/便捷生活
@@ -41,7 +57,7 @@ public class TestCatchInfo extends TestCase {
 			System.out.println("img = " + app.getIconUrl());
 		}
 	}
-	
+
 	/**
 	 * packageName = com.taobao.taobao
 	 * detailUrl = http://www.wandoujia.com/apps/com.taobao.taobao
@@ -60,10 +76,11 @@ public class TestCatchInfo extends TestCase {
 		System.out.println(app.getInfo());
 		System.out.println(app.getUpdateInfo());
 	}
-	
+
 	public void testDownloadApp() {
-		String downloadUrl = "http://apps.wandoujia.com/apps/com.taobao.taobao/download";
-		String filepathAndName = "/Volumes/util/jhl_project/taobao.apk";
+		String downloadUrl = "http://apps.wandoujia.com/apps/com.sankuai.meituan/download";
+//		String downloadUrl = "http://apps.wandoujia.com/apps/com.taobao.taobao/download";
+		String filepathAndName = "/Volumes/util/tuan.apk";
 		long start = System.currentTimeMillis();
 		System.out.println("start->" + start);
 		boolean isSuccess = ContentUtil.saveFile(filepathAndName, downloadUrl);
