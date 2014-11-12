@@ -26,6 +26,7 @@ import com.baibutao.apps.linkshop.uxiang.ruiserver.biz.bean.UserBean;
 import com.baibutao.apps.linkshop.uxiang.ruiserver.biz.bo.FileService;
 import com.baibutao.apps.linkshop.uxiang.ruiserver.biz.bo.impl.FileServiceImpl;
 import com.baibutao.apps.linkshop.uxiang.ruiserver.biz.common.CatchDataUtil;
+import com.baibutao.apps.linkshop.uxiang.ruiserver.biz.common.ContentUtil;
 import com.baibutao.apps.linkshop.uxiang.ruiserver.biz.dal.daointerface.AdminDAO;
 import com.baibutao.apps.linkshop.uxiang.ruiserver.biz.dal.daointerface.AppInfoDAO;
 import com.baibutao.apps.linkshop.uxiang.ruiserver.biz.dal.daointerface.BannerDAO;
@@ -51,22 +52,22 @@ import com.baibutao.apps.linkshop.uxiang.ruiserver.web.common.SessionKeys;
  * <p>作者：聂鹏</p>
  */
 public class AdminAOImpl extends BaseAO implements AdminAO {
-	
+
 	private AdminDAO adminDAO;
-	
+
 	private KeyValueDAO keyValueDAO;
-	
+
 	private CatDAO catDAO;
-	
+
 	private AppInfoDAO appInfoDAO;
-	
+
 	private BannerDAO bannerDAO;
-	
+
 	private FileService fileService;
-	
+
 	// app的icon的大小为 512 * 512，其他大小不允许
 	private int ICON_WIDTH = 512;
-	
+
 	private int ICON_HEIGHT = 512;
 
 	@Override
@@ -109,7 +110,7 @@ public class AdminAOImpl extends BaseAO implements AdminAO {
 		}
 		return result;
 	}
-	
+
 	@Override
 	public Result register(FlowData flowData, AdminDO adminDO) {
 		Result result = new ResultSupport(false);
@@ -140,7 +141,7 @@ public class AdminAOImpl extends BaseAO implements AdminAO {
 		}
 		return result;
 	}
-	
+
 	@Override
 	public Result updatePsw(FlowData flowData, AdminDO adminDO) {
 		Result result = new ResultSupport(false);
@@ -176,7 +177,7 @@ public class AdminAOImpl extends BaseAO implements AdminAO {
 		}
 		return result;
 	}
-	
+
 	@Override
 	public Result index(FlowData flowData, AppQuery appQuery) {
 		Result result = new ResultSupport(false);
@@ -193,7 +194,7 @@ public class AdminAOImpl extends BaseAO implements AdminAO {
 					appQuery.setUserId(loginUserId);
 				}
 			}
-			
+
 			if(appQuery.getUserId() == 0 && isAdmin(flowData)) {
 				appQuery.setUserId(getLoginUserId(flowData));
 			}
@@ -210,7 +211,7 @@ public class AdminAOImpl extends BaseAO implements AdminAO {
 		}
 		return result;
 	}
-	
+
 	@Override
 	public Result myAppList(FlowData flowData, AppQuery appQuery) {
 		Result result = new ResultSupport(false);
@@ -239,7 +240,7 @@ public class AdminAOImpl extends BaseAO implements AdminAO {
 		}
 		return result;
 	}
-	
+
 	@Override
 	public Result addAppFirst(FlowData flowData, long fatherAppId) {
 		Result result = new ResultSupport(false);
@@ -248,7 +249,7 @@ public class AdminAOImpl extends BaseAO implements AdminAO {
 			if (!ensureUserLogin(result, flowData)) {
 				return result;
 			}
-			
+
 			// 上传apk，并分析apk
 			UploadFile file = flowData.getUploadFiles().get("uploadFile");
 			if (file == null || file.getSize() < 1) {
@@ -261,7 +262,7 @@ public class AdminAOImpl extends BaseAO implements AdminAO {
 				result.setResultCode(new StringResultCode("请上传apk文件"));
 				return result;
 			}
-			
+
 			AppInfoDO appInfoDO = new AppInfoDO();
 			appInfoDO.setStatus(APPStsutsEnum.READY_SAVE.getValue());
 			appInfoDO.setUploadDate(new Date());
@@ -272,12 +273,12 @@ public class AdminAOImpl extends BaseAO implements AdminAO {
 				result.setResultCode(new StringResultCode("上传apk文件失败"));
 				return result;
 			}
-			
-			// 1. 解析出包名以及版本 
+
+			// 1. 解析出包名以及版本
 			if(!parseAPKPackage(result, appInfoDO, visitUrl)) {
 				return result;
 			}
-			
+
 			// 2. 新增app:原有系统中不存在的app
 			// 	  更新app:原有系统中要有app，并把信息复制过去
 			boolean isUpdateApp = false;
@@ -290,10 +291,10 @@ public class AdminAOImpl extends BaseAO implements AdminAO {
 					// 标记当前参数fatherAppId有问题，设置空
 					fatherAppId = 0;
 				}
-				
+
 			}
-			
-			
+
+
 			List<AppInfoDO> dbAppList = appInfoDAO.queryByPackageName(appInfoDO.getPackageName());
 			if (!CollectionUtil.isEmpty(dbAppList) && !isUpdateApp) {
 				result.setResultCode(new StringResultCode("该app已经存在"));
@@ -303,15 +304,15 @@ public class AdminAOImpl extends BaseAO implements AdminAO {
 			if(isUpdateApp) {
 				copyAppInfo(appInfoDO, fatherAppInfoDO);
 			}
-			
+
 			long id = appInfoDAO.create(appInfoDO);
-			
+
 			// 并在原有的app中记录nextAppId
 			if (isUpdateApp && fatherAppInfoDO != null) {
 				fatherAppInfoDO.setNextAppId(id);
 				appInfoDAO.update(fatherAppInfoDO);
 			}
-			
+
 			result.getModels().put("appId", id);
 			result.setSuccess(true);
 
@@ -322,6 +323,9 @@ public class AdminAOImpl extends BaseAO implements AdminAO {
 	}
 
 	private boolean parseAPKPackage(Result result, AppInfoDO appInfoDO, String visitUrl) throws ZipException, IOException {
+		if(StringUtil.isBlank(visitUrl)) {
+			return false;
+		}
 		String fileName = visitUrl.substring(visitUrl.lastIndexOf("/") + 1);
 		File apkFile = fileService.getFileByName(fileName);
 		if (!apkFile.exists()) {
@@ -330,7 +334,7 @@ public class AdminAOImpl extends BaseAO implements AdminAO {
 			}
 			return false;
 		}
-		
+
 		AndroidApk apk = new AndroidApk(apkFile);
 		long fileSize = apkFile.length();
 		appInfoDO.setPackageName(apk.getPackageName());
@@ -345,12 +349,12 @@ public class AdminAOImpl extends BaseAO implements AdminAO {
 		appInfoDO.setDownUrl(visitUrl);
 		return true;
 	}
-	
+
 	private void copyAppInfo(AppInfoDO appInfoDO, AppInfoDO fatherAppInfoDO) {
 		if(appInfoDO == null || fatherAppInfoDO == null) {
 			return;
 		}
-		
+
 		appInfoDO.setReferMainAppId(fatherAppInfoDO.getId());
 		appInfoDO.setIconUrl(fatherAppInfoDO.getIconUrl());
 		appInfoDO.setMainTitle(fatherAppInfoDO.getMainTitle());
@@ -359,7 +363,7 @@ public class AdminAOImpl extends BaseAO implements AdminAO {
 		appInfoDO.setSecondCatId(fatherAppInfoDO.getSecondCatId());
 		appInfoDO.setInfo(fatherAppInfoDO.getInfo());
 		appInfoDO.setScreenshots(fatherAppInfoDO.getScreenshots());
-		
+
 	}
 
 	private boolean isSameApp(AppInfoDO appInfoDO, AppInfoDO fatherAppInfoDO) {
@@ -388,9 +392,9 @@ public class AdminAOImpl extends BaseAO implements AdminAO {
 				result.setResultCode(AdminResultCodes.APP_ARGS_ERROR);
 				return result;
 			}
-			
+
 			List<CatDO> catList = catDAO.listAll();
-			
+
 			result.getModels().put("appInfoDO", appInfoDO);
 			result.getModels().put("catList", catList);
 			result.setSuccess(true);
@@ -410,13 +414,13 @@ public class AdminAOImpl extends BaseAO implements AdminAO {
 			if (!ensureUserLogin(result, flowData)) {
 				return result;
 			}
-			
+
 			AppInfoDO fromDB = appInfoDAO.queryById(appInfoDO.getId());
 			if (fromDB == null || (!isAdmin(flowData) && getLoginUserId(flowData) != fromDB.getUploadUserId()) || fromDB.isTimeOut()) {
 				result.setResultCode(AdminResultCodes.APP_ARGS_ERROR);
 				return result;
 			}
-			
+
 			// 图标上传处理
 			UploadFile file = flowData.getUploadFiles().get("iconUrl");
 			if (file != null && file.getSize() > 0) {
@@ -442,14 +446,14 @@ public class AdminAOImpl extends BaseAO implements AdminAO {
 				result.setResultCode(new StringResultCode("请先上传图标"));
 				return result;
 			}
-			
+
 			fromDB.setMainTitle(appInfoDO.getMainTitle());
 			fromDB.setSubTitle(appInfoDO.getSubTitle());
 			fromDB.setFirstCatId(appInfoDO.getFirstCatId());
 			fromDB.setSecondCatId(appInfoDO.getSecondCatId());
 			fromDB.setInfo(appInfoDO.getInfo());
 			fromDB.setUpdateInfo(appInfoDO.getUpdateInfo());
-			
+
 			// 应用截图上传处理：如果原来为空，那么一定要上传5张，原来不为空，那么可以替换上传的部分
 			int screenshotsNum = 5;
 			boolean screenShotAllUpload = true;
@@ -459,7 +463,7 @@ public class AdminAOImpl extends BaseAO implements AdminAO {
 			} else {
 				screenShotUrls = new String[screenshotsNum];
 			}
-			
+
 			for (int i = 1; i <= screenshotsNum; i++) {
 				UploadFile uploadFile = flowData.getUploadFiles().get("screenshots" + i);
 				String url = fileService.uploadFile(uploadFile);
@@ -469,17 +473,17 @@ public class AdminAOImpl extends BaseAO implements AdminAO {
 				}
 				screenShotUrls[i-1] = url;
 			}
-			
+
 			if(StringUtil.isBlank(fromDB.getScreenshots()) && !screenShotAllUpload) {
 				result.setResultCode(new StringResultCode("必须上传" + screenshotsNum + "张截图"));
 				return result;
 			}
-			
+
 			fromDB.setScreenshots(mergeString(screenShotUrls, ","));
 			if (!isAdmin(flowData) || (!fromDB.isOnLine())) {
 				fromDB.setStatus(APPStsutsEnum.READY_CHECK.getValue());
 			}
-			
+
 			appInfoDAO.update(fromDB);
 			result.getModels().put("appInfoDO", fromDB);
 			result.setSuccess(true);
@@ -509,19 +513,19 @@ public class AdminAOImpl extends BaseAO implements AdminAO {
 			if (!ensureUserLogin(result, flowData) && !isAdmin(flowData)) {
 				return result;
 			}
-			
+
 			List<AppInfoDO> appInfoList = appInfoDAO.query(query);
 
 			result.getModels().put("appInfoList", appInfoList);
 			result.getModels().put("query", query);
-			
+
 			result.setSuccess(true);
 		} catch (Exception e) {
 			log.error("adminAppList error", e);
 		}
 		return result;
 	}
-	
+
 	@Override
 	public Result appCheckSuccess(FlowData flowData, long appId) {
 		Result result = new ResultSupport(false);
@@ -530,22 +534,22 @@ public class AdminAOImpl extends BaseAO implements AdminAO {
 			if (!ensureUserLogin(result, flowData) && !isAdmin(flowData)) {
 				return result;
 			}
-			
+
 			/*
 			 * 最终上线的appId的值还是老的appId的值，就是当前的referMainAppId对应的app，信息使用新的
-			 * 
+			 *
 			 * 1. 根据传递过来的appId，获取他的referMainApp，把appId对应的与referMainApp对应的信息互换
 			 * 2. appId的修改为过期，referMainApp在线
 			 * 3. appId对应的referMainAppId=referMainApp.id,nextAppId=0
 			 * 4. referMainApp对应的referMainAppId=0，next=0
 			 */
-			
+
 			AppInfoDO appInfoDO = appInfoDAO.queryById(appId);
 			if(appInfoDO == null || appInfoDO.isOnLine() || appInfoDO.isTimeOut()) {
 				result.setResultCode(new StringResultCode("当前app不存在或已经上线了"));
 				return result;
 			}
-			
+
 			// app第一次提交审核通过处理
 			if(appInfoDO.getReferMainAppId() == 0) {
 				appInfoDO.setStatus(APPStsutsEnum.ONLINE.getValue());
@@ -553,15 +557,15 @@ public class AdminAOImpl extends BaseAO implements AdminAO {
 				result.setSuccess(true);
 				return result;
 			}
-			
+
 			AppInfoDO fatherAppDO = appInfoDAO.queryById(appInfoDO.getReferMainAppId());
 			if(fatherAppDO == null || !fatherAppDO.isOnLine()) {
 				result.setResultCode(new StringResultCode("当前参数错误"));
 				return result;
 			}
-			
+
 			AppInfoDO lastOnlineAppInfoDO = appInfoDO.clone();
-			
+
 			// 设置最终上线的信息
 			lastOnlineAppInfoDO.setId(fatherAppDO.getId());
 			lastOnlineAppInfoDO.setStatus(APPStsutsEnum.ONLINE.getValue());
@@ -573,21 +577,21 @@ public class AdminAOImpl extends BaseAO implements AdminAO {
 			lastOnlineAppInfoDO.setRecommendNum(fatherAppDO.getRecommendNum());
 			lastOnlineAppInfoDO.setCommentNum(fatherAppDO.getCommentNum());
 			appInfoDAO.update(lastOnlineAppInfoDO);
-			
+
 			// 设置过期
 			fatherAppDO.setId(appInfoDO.getId());
 			fatherAppDO.setStatus(APPStsutsEnum.SUCCESS_VERSION_OUT.getValue());
 			fatherAppDO.setNextAppId(0);
 			fatherAppDO.setReferMainAppId(lastOnlineAppInfoDO.getId());
 			appInfoDAO.update(fatherAppDO);
-			
+
 			result.setSuccess(true);
 		} catch (Exception e) {
 			log.error("appCheckSuccess error", e);
 		}
 		return result;
 	}
-	
+
 	@Override
 	public Result catList(FlowData flowData) {
 		Result result = new ResultSupport(false);
@@ -605,7 +609,7 @@ public class AdminAOImpl extends BaseAO implements AdminAO {
 		}
 		return result;
 	}
-	
+
 	@Override
 	public Result viewAddCat(FlowData flowData, long catId) {
 		Result result = new ResultSupport(false);
@@ -763,7 +767,7 @@ public class AdminAOImpl extends BaseAO implements AdminAO {
 		}
 		return result;
 	}
-	
+
 	@Override
 	public Result bannerList(FlowData flowData) {
 		Result result = new ResultSupport(false);
@@ -772,7 +776,7 @@ public class AdminAOImpl extends BaseAO implements AdminAO {
 			if (!ensureUserLogin(result, flowData) || !isAdmin(flowData)) {
 				return result;
 			}
-			
+
 			List<BannerDO> bannerList = bannerDAO.listAll();
 			result.getModels().put("bannerList", bannerList);
 
@@ -782,7 +786,7 @@ public class AdminAOImpl extends BaseAO implements AdminAO {
 		}
 		return result;
 	}
-	
+
 	@Override
 	public Result viewAddBanner(FlowData flowData) {
 		Result result = new ResultSupport(false);
@@ -807,7 +811,7 @@ public class AdminAOImpl extends BaseAO implements AdminAO {
 			if (!ensureUserLogin(result, flowData) || !isAdmin(flowData)) {
 				return result;
 			}
-			
+
 			// 图片上传
 			UploadFile file = flowData.getUploadFiles().get("imageUrl");
 			if (file == null || file.getSize() < 1) {
@@ -904,7 +908,7 @@ public class AdminAOImpl extends BaseAO implements AdminAO {
 		}
 		return result;
 	}
-	
+
 	@Override
 	public Result permissionList(FlowData flowData) {
 		Result result = new ResultSupport(false);
@@ -922,7 +926,7 @@ public class AdminAOImpl extends BaseAO implements AdminAO {
 		}
 		return result;
 	}
-	
+
 	@Override
 	public Result viewAddPermission(FlowData flowData) {
 		Result result = new ResultSupport(false);
@@ -947,23 +951,23 @@ public class AdminAOImpl extends BaseAO implements AdminAO {
 			if (!ensureUserLogin(result, flowData) || !isAdmin(flowData)) {
 				return result;
 			}
-			
+
 			KeyValueDO fromDB = keyValueDAO.queryByKey(keyValueDO.getKeyName());
 			if(fromDB != null) {
 				result.setResultCode(new StringResultCode("当前权限翻译已经存在"));
 				return result;
 			}
-			
+
 			keyValueDO.setType(KeyValueTypeEnum.PERMINSSION_MAP.getId());
 			keyValueDAO.create(keyValueDO);
-			
+
 			result.setSuccess(true);
 		} catch (Exception e) {
 			log.error("addPermission error", e);
 		}
 		return result;
 	}
-	
+
 	@Override
 	public Result deletePermission(FlowData flowData, long id) {
 		Result result = new ResultSupport(false);
@@ -992,7 +996,7 @@ public class AdminAOImpl extends BaseAO implements AdminAO {
 		}
 		return result;
 	}
-	
+
 	@Override
 	public Result recommendAppList(FlowData flowData, int type, int page) {
 		Result result = new ResultSupport(false);
@@ -1052,7 +1056,7 @@ public class AdminAOImpl extends BaseAO implements AdminAO {
 		}
 		return appInfoList;
 	}
-	
+
 	@Override
 	public Result managerAppList(FlowData flowData, int type, int page) {
 		Result result = new ResultSupport(false);
@@ -1082,7 +1086,7 @@ public class AdminAOImpl extends BaseAO implements AdminAO {
 		return result;
 
 	}
-	
+
 	@Override
 	public Result updateRecommendApps(FlowData flowData, int type, long[] nonRecommendAppIds, long[] recommendAppIds) {
 		Result result = new ResultSupport(false);
@@ -1096,10 +1100,10 @@ public class AdminAOImpl extends BaseAO implements AdminAO {
 				result.setResultCode(new StringResultCode("当前参数错误"));
 				return result;
 			}
-			
+
 			Map<Long, KeyValueDO> map = getRecommendAppByType(type);
-			
-			
+
+
 			if (nonRecommendAppIds != null && map != null) {
 				for (long non : nonRecommendAppIds) {
 					if (non == 0) {
@@ -1112,7 +1116,7 @@ public class AdminAOImpl extends BaseAO implements AdminAO {
 					}
 				}
 			}
-			
+
 			if(recommendAppIds != null) {
 				for (long recommendAppId : recommendAppIds) {
 					if (recommendAppId == 0) {
@@ -1134,15 +1138,15 @@ public class AdminAOImpl extends BaseAO implements AdminAO {
 					}
 				}
 			}
-			
+
 			result.setSuccess(true);
 		} catch (Exception e) {
 			log.error("updateRecommendApps error", e);
 		}
 		return result;
 	}
-	
-	
+
+
 	@Override
 	public Result catchCatsAndApps(FlowData flowData) {
 		Result result = new ResultSupport(false);
@@ -1152,16 +1156,76 @@ public class AdminAOImpl extends BaseAO implements AdminAO {
 			if (!ensureUserLogin(result, flowData) || !isAdmin(flowData)) {
 				return result;
 			}
-			
+
 			log.error("catchCatsAndApps->2");
-			
+
 			// 应用
 			final String startAppUrl = "http://www.wandoujia.com/tag/app";
 			// 游戏
 			final String startGameUrl = "http://www.wandoujia.com/tag/game";
-			
+
 			final long userId = getLoginUserId(flowData);
-			
+
+
+			int type = flowData.getParameters().getInt("type");
+			final int maxNum = flowData.getParameters().getInt("max");
+
+			/**
+			 * type=2 通过类目抓取，max是抓取数量
+			 * type=1 默认抓取，如果类目存在就不抓取了
+			 */
+			if(type == 2 && maxNum > 0) {
+				new Thread(new Runnable() {
+
+					@Override
+					public void run() {
+						// 遍历获取二级类目，然后执行抓取
+						List<CatDO> catList = catDAO.queryFirstLevel();
+						if(CollectionUtil.isEmpty(catList)) {
+							return;
+						}
+						for (CatDO firstCat : catList) {
+							List<CatDO> secondCatList = catDAO.queryByParentId(firstCat.getId());
+							if (CollectionUtil.isEmpty(secondCatList)) {
+								continue;
+							}
+
+							for (CatDO secondCat : secondCatList) {
+								String name = secondCat.getName();
+//								System.out.println("name=(" + secondCat.getName() + "), maxNum=(" + maxNum + ")");
+								List<AppInfoDO> appList = ContentUtil.catchApps(name, maxNum);
+								if (CollectionUtil.isEmpty(appList)) {
+									continue;
+								}
+
+								for (int i = 0, size = appList.size(); i < size; i++) {
+									List<AppInfoDO> fromDBList = appInfoDAO.queryByPackageName(appList.get(i).getPackageName());
+									if (!CollectionUtil.isEmpty(fromDBList)) {
+										continue;
+									}
+
+									AppInfoDO prepareAppInfoDO = mergeAppInfo(appList.get(i), secondCat, userId);
+									if (prepareAppInfoDO != null) {
+										prepareAppInfoDO.setUploadDate(new Date());
+										prepareAppInfoDO.setPublishDate(new Date());
+										appInfoDAO.create(prepareAppInfoDO);
+									}
+								}
+
+							}
+						}
+					}
+				}).start();
+				result.setSuccess(true);
+				return result;
+			}
+
+			if(type <=0) {
+				result.setSuccess(true);
+				return result;
+			}
+
+
 			/* 1. 抓取类目数据
 			 * 2. 抓取app数据
 			*/
@@ -1173,11 +1237,11 @@ public class AdminAOImpl extends BaseAO implements AdminAO {
 						log.error("catchCatsAndApps-> firstCat num is not correct");
 						return;
 					}
-					
+
 					log.error("catchCatsAndApps->start");
 					CatDO appCat = catList.get(0);
 					CatDO gameCat = catList.get(1);
-					
+
 					List<CatDO> catchAppCatList = CatchDataUtil.catchCats(startAppUrl);
 					optCurrentCats(catchAppCatList, appCat);
 					List<CatDO> catchGameCatList = CatchDataUtil.catchCats(startGameUrl);
@@ -1223,7 +1287,9 @@ public class AdminAOImpl extends BaseAO implements AdminAO {
 						if (!CollectionUtil.isEmpty(fromDBList)) {
 							continue;
 						}
-						AppInfoDO prepareAppInfoDO = mergeAppInfo(appInfoDO, cat);
+						AppInfoDO fromCatchApp = CatchDataUtil.catAppDetail(appInfoDO.getCatchDetailUrl(), null);
+						fromCatchApp.setPackageName(appInfoDO.getPackageName());
+						AppInfoDO prepareAppInfoDO = mergeAppInfo(fromCatchApp, cat, userId);
 						if (prepareAppInfoDO != null) {
 							prepareAppInfoDO.setUploadDate(new Date());
 							prepareAppInfoDO.setPublishDate(new Date());
@@ -1233,50 +1299,10 @@ public class AdminAOImpl extends BaseAO implements AdminAO {
 					}
 				}
 
-				private AppInfoDO mergeAppInfo(AppInfoDO appInfoDO, CatDO cat) {
-					try {
-						AppInfoDO fromCatchApp = CatchDataUtil.catAppDetail(appInfoDO.getCatchDetailUrl(), null);
-						String apkUrl = fileService.uploadFile(fromCatchApp.getCatchDataBean().downloadUrl, FileServiceImpl.APK);
-						fromCatchApp.setDownUrl(apkUrl);
-						String iconUrl = fileService.uploadFile(fromCatchApp.getCatchDataBean().iconUrl, FileServiceImpl.PNG);
-						fromCatchApp.setIconUrl(iconUrl);
-						String packageName = appInfoDO.getPackageName();
-						if (!parseAPKPackage(null, fromCatchApp, apkUrl)) {
-							return null;
-						}
 
-						if (!packageName.equals(fromCatchApp.getPackageName())) {
-							return null;
-						}
-						uploadScreenshots(fromCatchApp);
-						fromCatchApp.setFirstCatId(cat.getParentId());
-						fromCatchApp.setSecondCatId(cat.getId());
-						fromCatchApp.setUploadUserId(userId);
-						fromCatchApp.setStatus(APPStsutsEnum.ONLINE.getValue());
-						return fromCatchApp;
-					} catch (Exception e) {
-						log.error("mergeAppInfoError", e);
-					}
-					return null;
-				}
 
-				private void uploadScreenshots(AppInfoDO fromCatchApp) {
-					String[] screenshots = fromCatchApp.getScreenshots().split(",");
-					StringBuilder sb = new StringBuilder();
-					for (String s : screenshots) {
-						String screenshot = fileService.uploadFile(s, FileServiceImpl.PNG);
-						if (!StringUtil.isBlank(screenshot)) {
-							sb.append(screenshot);
-							sb.append(",");
-						}
-					}
-					String result = sb.toString();
-					if (!StringUtil.isBlank(result)) {
-						fromCatchApp.setScreenshots(result.substring(0, result.length() - 1));
-					}
-				}
 			}).start();
-			
+
 			result.setSuccess(true);
 		} catch (Exception e) {
 			log.error("catchCatsAndApps error", e);
@@ -1288,13 +1314,13 @@ public class AdminAOImpl extends BaseAO implements AdminAO {
 		if (CollectionUtil.isEmpty(appInfoList)) {
 			return;
 		}
-		
+
 		// 获取当前的所有的推荐app
 		Map<Long, KeyValueDO> map = getRecommendAppByType(type);
 		if(map == null) {
 			return;
 		}
-		
+
 		// 遍历当前appList，设置推荐值
 		for (AppInfoDO appInfoDO : appInfoList) {
 			if (map.containsKey(appInfoDO.getId())) {
@@ -1303,6 +1329,49 @@ public class AdminAOImpl extends BaseAO implements AdminAO {
 		}
 
 	}
+
+	private AppInfoDO mergeAppInfo(AppInfoDO fromCatchApp, CatDO cat, long userId) {
+		try {
+			String apkUrl = fileService.uploadFile(fromCatchApp.getCatchDataBean().downloadUrl, FileServiceImpl.APK);
+			fromCatchApp.setDownUrl(apkUrl);
+			String iconUrl = fileService.uploadFile(fromCatchApp.getCatchDataBean().iconUrl, FileServiceImpl.PNG);
+			fromCatchApp.setIconUrl(iconUrl);
+			String packageName = fromCatchApp.getPackageName();
+			if (!parseAPKPackage(null, fromCatchApp, apkUrl)) {
+				return null;
+			}
+
+			if (!packageName.equals(fromCatchApp.getPackageName())) {
+				return null;
+			}
+			uploadScreenshots(fromCatchApp);
+			fromCatchApp.setFirstCatId(cat.getParentId());
+			fromCatchApp.setSecondCatId(cat.getId());
+			fromCatchApp.setUploadUserId(userId);
+			fromCatchApp.setStatus(APPStsutsEnum.ONLINE.getValue());
+			return fromCatchApp;
+		} catch (Exception e) {
+			log.error("mergeAppInfoError", e);
+		}
+		return null;
+	}
+
+	private void uploadScreenshots(AppInfoDO fromCatchApp) {
+		String[] screenshots = fromCatchApp.getScreenshots().split(",");
+		StringBuilder sb = new StringBuilder();
+		for (String s : screenshots) {
+			String screenshot = fileService.uploadFile(s, FileServiceImpl.PNG);
+			if (!StringUtil.isBlank(screenshot)) {
+				sb.append(screenshot);
+				sb.append(",");
+			}
+		}
+		String result = sb.toString();
+		if (!StringUtil.isBlank(result)) {
+			fromCatchApp.setScreenshots(result.substring(0, result.length() - 1));
+		}
+	}
+
 
 	private Map<Long, KeyValueDO> getRecommendAppByType(int type) {
 		KeyValueQuery query = new KeyValueQuery();
@@ -1351,6 +1420,6 @@ public class AdminAOImpl extends BaseAO implements AdminAO {
 	public void setBannerDAO(BannerDAO bannerDAO) {
 		this.bannerDAO = bannerDAO;
 	}
-	
+
 }
 
